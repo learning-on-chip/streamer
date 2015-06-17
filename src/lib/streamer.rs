@@ -31,6 +31,12 @@ pub struct Streamer {
     sources: Vec<Box<source::Source>>,
 }
 
+pub struct Stream<'l> {
+    streamer: &'l Streamer,
+}
+
+pub struct State;
+
 impl Streamer {
     pub fn new(config: &Path) -> Result<Streamer> {
         let root = config.parent().map(|root| PathBuf::from(root)).unwrap_or(PathBuf::new());
@@ -49,5 +55,20 @@ impl Streamer {
         Ok(Streamer {
             sources: sources,
         })
+    }
+
+    #[inline]
+    pub fn iter<'l>(&'l self) -> Stream<'l> {
+        Stream {
+            streamer: self,
+        }
+    }
+}
+
+impl<'l> Iterator for Stream<'l> {
+    type Item = State;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        None
     }
 }

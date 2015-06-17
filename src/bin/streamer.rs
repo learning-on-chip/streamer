@@ -25,10 +25,14 @@ fn start() -> Result<()> {
     if arguments.get::<bool>("help").unwrap_or(false) {
         help();
     }
-    let _streamer = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
+    let streamer = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
         Some(ref config) => try!(Streamer::new(config)),
         _ => raise!("a configuration file is required"),
     };
+
+    let mut stream = streamer.iter();
+    for _ in stream.take(10) {
+    }
 
     Ok(())
 }
