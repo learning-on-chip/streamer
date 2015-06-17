@@ -21,6 +21,9 @@ macro_rules! ok(
 mod config;
 mod source;
 
+use config::Config;
+use source::Source;
+
 pub type Error = Box<std::fmt::Display>;
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -30,23 +33,13 @@ pub struct Streamer {
 
 impl Streamer {
     pub fn new(config: &Path) -> Result<Streamer> {
-        let root = config.parent().map(|path| PathBuf::from(path));
-        let config = try!(config::open(config));
+        let root = config.parent().map(|root| PathBuf::from(root)).unwrap_or(PathBuf::new());
+        let config = try!(Config::new(config));
 
-        let mut sources: Vec<Box<source::Source>> = Vec::new();
-        for &config::Source { ref kind, ref path, .. } in config.sources.iter() {
-            let mut path = PathBuf::from(path);
-            if path.is_relative() {
-                if let Some(ref root) = root {
-                    path = root.join(path);
-                }
-            }
-            if std::fs::metadata(&path).is_err() {
-                raise!("the source file {:?} does not exist", &path);
-            }
-            match &**kind {
-                "sqlite3" => sources.push(Box::new(ok!(sqlite::open(&path)))),
-                _ => raise!("the source kind {:?} is unknown", kind),
+        let mut sources = vec![];
+        if let Some(ref configs) = config.sources {
+            for config in configs {
+                sources.push(try!(source::new(config, &root)));
             }
         }
         if sources.is_empty() {

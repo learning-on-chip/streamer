@@ -2,5 +2,5 @@ period = 1e-3
 
 [[sources]]
 name = "Black–Scholes"
-kind = "sqlite3"
+kind = "sqlite"
 path = "blackscholes.sqlite3"
