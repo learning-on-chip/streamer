@@ -33,7 +33,7 @@ impl Streamer {
         let root = config.parent().map(|path| PathBuf::from(path));
         let config = try!(config::open(config));
 
-        let mut sources = Vec::new();
+        let mut sources: Vec<Box<source::Source>> = Vec::new();
         for &config::Source { ref kind, ref path, .. } in config.sources.iter() {
             let mut path = PathBuf::from(path);
             if path.is_relative() {
@@ -45,7 +45,7 @@ impl Streamer {
                 raise!("the source file {:?} does not exist", &path);
             }
             match &**kind {
-                "sqlite3" => sources.push(Box::new(ok!(sqlite::open(&path))) as Box<source::Source>),
+                "sqlite3" => sources.push(Box::new(ok!(sqlite::open(&path)))),
                 _ => raise!("the source kind {:?} is unknown", kind),
             }
         }
