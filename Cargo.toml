@@ -3,6 +3,14 @@ name = "streamer"
 version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 
+[lib]
+name = "streamer"
+path = "src/lib/streamer.rs"
+
+[[bin]]
+name = "streamer"
+path = "src/bin/streamer.rs"
+
 [dependencies]
 arguments = "*"
 rustc-serialize = "*"
