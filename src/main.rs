@@ -5,12 +5,9 @@ extern crate toml;
 use std::path::Path;
 
 const USAGE: &'static str = "
-Usage: streamer [options]
+Usage: streamer [options] <database>...
 
 Options:
-    --database <path>        SQLite3 database (required).
-    --table <name>           Table containing area estimates (required).
-
     --help                   Display this message.
 ";
 
@@ -40,21 +37,28 @@ fn start() -> Result<()> {
         help();
     }
 
-    let _database = match arguments.get::<String>("database") {
-        Some(ref database) => ok!(sqlite::open(&Path::new(database))),
-        _ => raise!("a database filename is required"),
-    };
+    let mut databases = vec![];
+    for ref path in arguments.orphans.iter() {
+        let path = Path::new(path);
+        if std::fs::metadata(path).is_err() {
+            raise!("the database {:?} does not exist", path);
+        }
+        databases.push(ok!(sqlite::open(path)));
+    }
+    if databases.is_empty() {
+        raise!("at least one database is required");
+    }
 
     Ok(())
+}
+
+fn help() -> ! {
+    println!("{}", USAGE.trim());
+    std::process::exit(0);
 }
 
 fn fail(error: Error) -> ! {
     use std::io::{stderr, Write};
     stderr().write_all(format!("Error: {}.\n", &*error).as_bytes()).unwrap();
     std::process::exit(1);
-}
-
-fn help() -> ! {
-    println!("{}", USAGE.trim());
-    std::process::exit(0);
 }
