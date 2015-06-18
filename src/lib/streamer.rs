@@ -45,7 +45,7 @@ impl Streamer {
         let mut sources = vec![];
         match config.power.and_then(|config| config.sources) {
             Some(ref configs) => for config in configs {
-                sources.push(try!(source::new(config, &root)));
+                sources.push(try!(Source::new(config, &root)));
             },
             _ => {},
         }

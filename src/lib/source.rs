@@ -10,29 +10,31 @@ pub struct Source {
     pub leakage: Vec<f64>,
 }
 
-pub fn new(config: &config::Source, root: &Path) -> Result<Source> {
-    let backend = {
-        let mut path = match config.path {
-            Some(ref path) => PathBuf::from(path),
-            _ => raise!("a path to the database is required"),
+impl Source {
+    pub fn new(config: &config::Source, root: &Path) -> Result<Source> {
+        let backend = {
+            let mut path = match config.path {
+                Some(ref path) => PathBuf::from(path),
+                _ => raise!("a path to the database is required"),
+            };
+            if path.is_relative() {
+                path = root.join(path);
+            }
+            if ::std::fs::metadata(&path).is_err() {
+                raise!("the file {:?} does not exist", &path);
+            }
+            ok!(Database::open(&path))
         };
-        if path.is_relative() {
-            path = root.join(path);
-        }
-        if ::std::fs::metadata(&path).is_err() {
-            raise!("the file {:?} does not exist", &path);
-        }
-        ok!(Database::open(&path))
-    };
 
-    let (names, leakage) = try!(read_names_and_leakage_power(&backend));
-    let dynamic = try!(read_dynamic_power(&backend, &names));
+        let (names, leakage) = try!(read_names_and_leakage_power(&backend));
+        let dynamic = try!(read_dynamic_power(&backend, &names));
 
-    Ok(Source {
-        names: names,
-        dynamic: dynamic,
-        leakage: leakage,
-    })
+        Ok(Source {
+            names: names,
+            dynamic: dynamic,
+            leakage: leakage,
+        })
+    }
 }
 
 fn read_names_and_leakage_power(backend: &Database) -> Result<(Vec<String>, Vec<f64>)> {
@@ -73,4 +75,21 @@ fn read_dynamic_power(backend: &Database, names: &[String]) -> Result<Vec<f64>> 
         }
     }
     Ok(data)
+}
+
+#[cfg(test)]
+mod tests {
+    use config;
+    use std::path::Path;
+
+    #[test]
+    fn new() {
+        let config = config::Source {
+            name: None,
+            path: Some("tests/fixtures/blackscholes.sqlite3".to_string()),
+            details: None,
+        };
+        let source = super::Source::new(&config, &Path::new("")).ok().unwrap();
+        assert_eq!(source.dynamic.len(), (2 + 1) * 76);
+    }
 }
