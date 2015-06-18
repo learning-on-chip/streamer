@@ -4,15 +4,16 @@ use std::path::Path;
 
 mod sqlite;
 
-pub use self::sqlite::SQLite;
-
-pub trait Source {
+pub struct Source {
+    pub names: Vec<String>,
+    pub dynamic: Vec<f64>,
+    pub leakage: Vec<f64>,
 }
 
-pub fn new(config: &config::Source, root: &Path) -> Result<Box<Source>> {
+pub fn new(config: &config::Source, root: &Path) -> Result<Source> {
     Ok(match config.kind {
         Some(ref kind) => match &**kind {
-            "sqlite" => Box::new(try!(SQLite::new(config, root))),
+            "sqlite" => try!(sqlite::new(config, root)),
             _ => raise!("the source kind {:?} is unknown", kind),
         },
         _ => raise!("the source kind is required"),

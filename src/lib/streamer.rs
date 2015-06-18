@@ -28,7 +28,7 @@ pub type Error = Box<std::fmt::Display>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct Streamer {
-    sources: Vec<Box<source::Source>>,
+    sources: Vec<source::Source>,
 }
 
 pub struct Stream<'l> {
