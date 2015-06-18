@@ -1,6 +1,4 @@
-period = 1e-3
-
-[[sources]]
+[[power.sources]]
 name = "Black–Scholes"
 kind = "sqlite"
 path = "blackscholes.sqlite3"

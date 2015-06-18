@@ -2,7 +2,7 @@ use sqlite::Database;
 use std::path::{Path, PathBuf};
 
 use Result;
-use config;
+use config::{self, Detailable};
 
 pub struct SQLite<'l> {
     backend: Database<'l>,
@@ -10,7 +10,7 @@ pub struct SQLite<'l> {
 
 impl<'l> SQLite<'l> {
     pub fn new(config: &config::Source, root: &Path) -> Result<SQLite<'l>> {
-        let mut path = match config.path {
+        let mut path = match config.lookup("path") {
             Some(ref path) => PathBuf::from(path),
             _ => raise!("the path to the database is required"),
         };

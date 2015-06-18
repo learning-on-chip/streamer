@@ -43,13 +43,14 @@ impl Streamer {
         let config = try!(Config::new(config));
 
         let mut sources = vec![];
-        if let Some(ref configs) = config.sources {
-            for config in configs {
+        match config.power.and_then(|config| config.sources) {
+            Some(ref configs) => for config in configs {
                 sources.push(try!(source::new(config, &root)));
-            }
+            },
+            _ => {},
         }
         if sources.is_empty() {
-            raise!("at least one source is required");
+            raise!("at least one power source is required");
         }
 
         Ok(Streamer {
