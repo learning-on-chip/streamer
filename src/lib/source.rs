@@ -2,12 +2,17 @@ use sqlite::{Database, State};
 use std::path::{Path, PathBuf};
 
 use Result;
-use config::{self, Detailable};
-use super::Source;
+use config;
+
+pub struct Source {
+    pub names: Vec<String>,
+    pub dynamic: Vec<f64>,
+    pub leakage: Vec<f64>,
+}
 
 pub fn new(config: &config::Source, root: &Path) -> Result<Source> {
     let backend = {
-        let mut path = match config.lookup("path") {
+        let mut path = match config.path {
             Some(ref path) => PathBuf::from(path),
             _ => raise!("a path to the database is required"),
         };

@@ -1,4 +1,3 @@
 [[power.sources]]
 name = "Black–Scholes"
-kind = "sqlite"
 path = "blackscholes.sqlite3"

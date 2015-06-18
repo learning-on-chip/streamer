@@ -50,7 +50,7 @@ pub struct Temperature {
 #[derive(RustcDecodable)]
 pub struct Source {
     pub name: Option<String>,
-    pub kind: Option<String>,
+    pub path: Option<String>,
     pub details: Option<Details>,
 }
 
