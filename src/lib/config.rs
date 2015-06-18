@@ -8,11 +8,11 @@ use Result;
 pub struct Details(pub toml::Value);
 
 pub trait Detailable {
-    fn set_details<'l>(&mut self, Option<&'l toml::Value>);
-    fn get_details<'l>(&'l self) -> Option<&'l toml::Value>;
+    fn detail<'l>(&mut self, Option<&'l toml::Value>);
+    fn liated<'l>(&'l self) -> Option<&'l toml::Value>;
 
     fn lookup(&self, name: &str) -> Option<String> {
-        self.get_details().and_then(|toml| {
+        self.liated().and_then(|toml| {
             match toml.lookup(name) {
                 Some(&toml::Value::String(ref string)) => Some(string.clone()),
                 _ => None,
@@ -65,7 +65,7 @@ impl Config {
             Some(root) => {
                 let mut decoder = toml::Decoder::new(toml::Value::Table(root));
                 let mut config: Config = ok!(Decodable::decode(&mut decoder));
-                config.set_details(decoder.toml.as_ref());
+                config.detail(decoder.toml.as_ref());
                 config
             },
             _ => raise!("failed to parse the configuration file"),
@@ -85,11 +85,11 @@ impl Decodable for Details {
 macro_rules! detailable(
     ($kind:ty, [$($scalar:ident),*], [$($vector:ident),*]) => (
         impl Detailable for $kind {
-            fn set_details<'l>(&mut self, toml: Option<&'l toml::Value>) {
+            fn detail<'l>(&mut self, toml: Option<&'l toml::Value>) {
                 self.details = toml.and_then(|toml| {
                     $(
                         if let Some(ref mut child) = self.$scalar {
-                            child.set_details(toml.lookup(stringify!($scalar)));
+                            child.detail(toml.lookup(stringify!($scalar)));
                         }
                     )*
                     $(
@@ -97,7 +97,7 @@ macro_rules! detailable(
                             match toml.lookup(stringify!($vector)) {
                                 Some(&toml::Value::Array(ref array)) => {
                                     for (child, toml) in children.iter_mut().zip(array) {
-                                        child.set_details(Some(toml));
+                                        child.detail(Some(toml));
                                     }
                                 },
                                 _ => {},
@@ -109,7 +109,7 @@ macro_rules! detailable(
             }
 
             #[inline]
-            fn get_details<'l>(&'l self) -> Option<&'l toml::Value> {
+            fn liated<'l>(&'l self) -> Option<&'l toml::Value> {
                 self.details.as_ref().map(|details| &details.0)
             }
         }
