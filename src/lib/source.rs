@@ -45,10 +45,10 @@ fn read_names_and_leakage_power(backend: &Database) -> Result<(Vec<String>, Vec<
     ));
     while State::Row == ok!(statement.step()) {
         names.push({
-            let name = ok!(statement.column::<String>(0));
+            let name = ok!(statement.read::<String>(0));
             String::from(&name[..name.find('_').unwrap()])
         });
-        data.push(ok!(statement.column::<f64>(1)));
+        data.push(ok!(statement.read::<f64>(1)));
     }
     Ok((names, data))
 }
@@ -71,7 +71,7 @@ fn read_dynamic_power(backend: &Database, names: &[String]) -> Result<Vec<f64>> 
     )));
     while State::Row == ok!(statement.step()) {
         for i in 0..count {
-            data.push(ok!(statement.column::<f64>(i)));
+            data.push(ok!(statement.read::<f64>(i)));
         }
     }
     Ok(data)
