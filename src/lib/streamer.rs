@@ -38,8 +38,9 @@ pub struct Stream<'l> {
 pub struct State;
 
 impl Streamer {
-    pub fn new(config: &Path) -> Result<Streamer> {
-        let root = config.parent().map(|root| PathBuf::from(root)).unwrap_or(PathBuf::new());
+    pub fn new<T: AsRef<Path>>(config: T) -> Result<Streamer> {
+        let root = config.as_ref().parent().map(|root| PathBuf::from(root))
+                                           .unwrap_or(PathBuf::new());
         let config = try!(Config::new(config));
 
         let mut sources = vec![];

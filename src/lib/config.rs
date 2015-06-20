@@ -55,7 +55,7 @@ pub struct Source {
 }
 
 impl Config {
-    pub fn new(path: &Path) -> Result<Config> {
+    pub fn new<T: AsRef<Path>>(path: T) -> Result<Config> {
         use std::io::Read;
 
         let mut contents = String::new();

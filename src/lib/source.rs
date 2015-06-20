@@ -11,14 +11,14 @@ pub struct Source {
 }
 
 impl Source {
-    pub fn new(config: &config::Source, root: &Path) -> Result<Source> {
+    pub fn new<T: AsRef<Path>>(config: &config::Source, root: T) -> Result<Source> {
         let backend = {
             let mut path = match config.path {
                 Some(ref path) => PathBuf::from(path),
                 _ => raise!("a path to the database is required"),
             };
             if path.is_relative() {
-                path = root.join(path);
+                path = root.as_ref().join(path);
             }
             if ::std::fs::metadata(&path).is_err() {
                 raise!("the file {:?} does not exist", &path);
@@ -80,7 +80,6 @@ fn read_dynamic_power(backend: &Database, names: &[String]) -> Result<Vec<f64>> 
 #[cfg(test)]
 mod tests {
     use config;
-    use std::path::Path;
 
     #[test]
     fn new() {
@@ -89,7 +88,7 @@ mod tests {
             path: Some("tests/fixtures/blackscholes.sqlite3".to_string()),
             details: None,
         };
-        let source = super::Source::new(&config, &Path::new("")).ok().unwrap();
+        let source = super::Source::new(&config, "").ok().unwrap();
         assert_eq!(source.dynamic.len(), (2 + 1) * 76);
     }
 }
