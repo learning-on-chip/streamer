@@ -13,6 +13,8 @@ path = "src/bin/streamer.rs"
 
 [dependencies]
 arguments = "*"
+fractal = "*"
+probability = "*"
 rustc-serialize = "*"
 sqlite = "*"
 toml = "*"

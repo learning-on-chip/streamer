@@ -1,5 +1,5 @@
 use sqlite::{Database, State};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use Result;
 use config;
@@ -12,19 +12,8 @@ pub struct Source {
 
 impl Source {
     pub fn new<T: AsRef<Path>>(config: &config::Source, root: T) -> Result<Source> {
-        let backend = {
-            let mut path = match config.path {
-                Some(ref path) => PathBuf::from(path),
-                _ => raise!("a path to the database is required"),
-            };
-            if path.is_relative() {
-                path = root.as_ref().join(path);
-            }
-            if ::std::fs::metadata(&path).is_err() {
-                raise!("the file {:?} does not exist", &path);
-            }
-            ok!(Database::open(&path))
-        };
+        let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
+                                                "a power-source database")));
 
         let (names, leakage) = try!(read_names_and_leakage_power(&backend));
         let dynamic = try!(read_dynamic_power(&backend, &names));

@@ -23,27 +23,21 @@ pub trait Detailable {
 
 #[derive(RustcDecodable)]
 pub struct Config {
-    pub time: Option<Time>,
+    pub traffic: Option<Traffic>,
     pub power: Option<Power>,
-    pub temperature: Option<Temperature>,
     pub details: Option<Details>,
 }
 
 #[derive(RustcDecodable)]
-pub struct Time {
-    pub period: Option<f64>,
+pub struct Traffic {
+    pub path: Option<String>,
+    pub query: Option<String>,
     pub details: Option<Details>,
 }
 
 #[derive(RustcDecodable)]
 pub struct Power {
     pub sources: Option<Vec<Source>>,
-    pub details: Option<Details>,
-}
-
-#[derive(RustcDecodable)]
-pub struct Temperature {
-    pub stack: Option<String>,
     pub details: Option<Details>,
 }
 
@@ -122,11 +116,9 @@ macro_rules! implement(
     );
 );
 
-implement!(Config, [time, power, temperature]);
+implement!(Config, [traffic, power]);
 
-implement!(Time);
+implement!(Traffic);
 
 implement!(Power, [], [sources]);
 implement!(Source);
-
-implement!(Temperature);

@@ -30,8 +30,8 @@ fn start() -> Result<()> {
         _ => raise!("a configuration file is required"),
     };
 
-    let mut stream = streamer.iter();
-    for _ in stream.take(10) {
+    for state in streamer.iter() {
+        println!("{}", state);
     }
 
     Ok(())
