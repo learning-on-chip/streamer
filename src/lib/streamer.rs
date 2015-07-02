@@ -8,6 +8,7 @@ extern crate toml;
 #[macro_use]
 extern crate log;
 
+use random::Source;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -46,7 +47,7 @@ mod traffic;
 mod workload;
 
 use config::Config;
-use traffic::Traffic;
+use traffic::{Traffic, Queue};
 use workload::Workload;
 
 pub type Error = Box<std::fmt::Display>;
@@ -57,8 +58,8 @@ pub struct Streamer {
     workload: Workload,
 }
 
-pub struct Stream<'l> {
-    streamer: &'l Streamer,
+pub struct Stream<'l, S: Source + 'l> {
+    queue: Queue<'l, S>,
 }
 
 #[derive(Clone, Copy)]
@@ -69,8 +70,6 @@ impl Streamer {
         let root = config.as_ref().parent().map(|root| PathBuf::from(root))
                                            .unwrap_or(PathBuf::new());
         let config = try!(Config::new(config));
-
-        random::default().seed([0x12345678, 0x87654321]);
 
         let traffic = match config.traffic {
             Some(ref traffic) => try!(Traffic::new(traffic, &root)),
@@ -89,18 +88,17 @@ impl Streamer {
     }
 
     #[inline]
-    pub fn iter<'l>(&'l self) -> Stream<'l> {
-        Stream {
-            streamer: self,
-        }
+    pub fn iter<'l, S: Source>(&'l self, source: &'l mut S) -> Stream<'l, S> {
+        Stream { queue: self.traffic.iter(source) }
     }
 }
 
-impl<'l> Iterator for Stream<'l> {
+impl<'l, S: Source> Iterator for Stream<'l, S> {
     type Item = State;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        None
+        self.queue.next().map(|time| State(time))
     }
 }
 

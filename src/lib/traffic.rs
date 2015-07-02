@@ -1,12 +1,22 @@
 use fractal::Beta;
+use random::Source;
 use sqlite::{Database, State};
 use std::path::Path;
+use std::rc::Rc;
 
 use Result;
 use config;
 
 pub struct Traffic {
-    model: Beta,
+    model: Rc<Beta>,
+}
+
+pub struct Queue<'l, S: Source + 'l> {
+    model: Rc<Beta>,
+    source: &'l mut S,
+    time: f64,
+    steps: Vec<f64>,
+    position: usize,
 }
 
 impl Traffic {
@@ -25,8 +35,49 @@ impl Traffic {
             ncoarse => ncoarse as usize,
         };
 
-        info!(target: "traffic", "Fitting a multiscale wavelet model...");
-        Ok(Traffic { model: ok!(Beta::fit(&data, ncoarse)) })
+        info!(target: "traffic", "Fitting a taffic model using {} data points...", ncoarse);
+        Ok(Traffic { model: Rc::new(ok!(Beta::fit(&data, ncoarse))) })
+    }
+
+    #[inline]
+    pub fn iter<'l, S: Source + 'l>(&'l self, source: &'l mut S) -> Queue<'l, S> {
+        Queue {
+            model: self.model.clone(),
+            source: source,
+            time: 0.0,
+            steps: vec![],
+            position: 0,
+        }
+    }
+}
+
+impl<'l, S: Source> Queue<'l, S> {
+    #[inline]
+    fn is_empty(&self) -> bool {
+        self.position >= self.steps.len()
+    }
+
+    #[inline]
+    fn renew(&mut self) -> Result<()> {
+        self.steps = ok!(self.model.sample(self.source));
+        self.position = 0;
+        Ok(())
+    }
+}
+
+impl<'l, S: Source> Iterator for Queue<'l, S> {
+    type Item = f64;
+
+    fn next(&mut self) -> Option<f64> {
+        if self.is_empty() {
+            if let Err(error) = self.renew() {
+                error!(target: "traffic", "Failed to sample the traffic model ({}).", error);
+                return None;
+            }
+        }
+        self.time += self.steps[self.position];
+        self.position += 1;
+        Some(self.time)
     }
 }
 

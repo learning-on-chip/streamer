@@ -2,6 +2,7 @@
 
 extern crate arguments;
 extern crate log;
+extern crate random;
 
 #[macro_use]
 extern crate streamer;
@@ -36,7 +37,9 @@ fn start() -> Result<()> {
         _ => raise!("a configuration file is required"),
     };
 
-    for state in streamer.iter() {
+    let mut source = random::default().seed([0x12345678, 0x87654321]);
+
+    for state in streamer.iter(&mut source) {
         println!("{}", state);
     }
 
