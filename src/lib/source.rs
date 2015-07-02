@@ -29,9 +29,9 @@ impl Source {
 fn read_names_and_leakage_power(backend: &Database) -> Result<(Vec<String>, Vec<f64>)> {
     let mut names = vec![];
     let mut data = vec![];
-    let mut statement = ok!(backend.prepare(
-        r#"SELECT `name`, `value` from `static` where `name` LIKE "%_leakage_power";"#
-    ));
+    let mut statement = ok!(backend.prepare("
+        SELECT `name`, `value` FROM `static` WHERE `name` LIKE '%_leakage_power';
+    "));
     while State::Row == ok!(statement.step()) {
         names.push({
             let name = ok!(statement.read::<String>(0));
@@ -55,9 +55,9 @@ fn read_dynamic_power(backend: &Database, names: &[String]) -> Result<Vec<f64>> 
         }
         buffer
     };
-    let mut statement = ok!(backend.prepare(&format!(
-        "SELECT {} FROM `dynamic` ORDER BY `time` ASC;", &fields,
-    )));
+    let mut statement = ok!(backend.prepare(&format!("
+        SELECT {} FROM `dynamic` ORDER BY `time` ASC;
+    ", &fields)));
     while State::Row == ok!(statement.step()) {
         for i in 0..count {
             data.push(ok!(statement.read::<f64>(i)));

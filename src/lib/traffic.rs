@@ -55,11 +55,11 @@ mod tests {
     #[test]
     fn read_interarrivals() {
         let backend = Database::open("tests/fixtures/google.sqlite3").unwrap();
-        let data = super::read_interarrivals(&backend,
-            "SELECT 1e-6 * `time` FROM `job_events` \
-             WHERE `time` IS NOT 0 AND `event type` is 0 \
-             ORDER BY `time` ASC;"
-        ).ok().unwrap();
+        let data = super::read_interarrivals(&backend, "
+            SELECT 1e-6 * `time` FROM `job_events`
+            WHERE `time` IS NOT 0 AND `event type` IS 0
+            ORDER BY `time` ASC;
+        ").ok().unwrap();
         assert_eq!(data.len(), 19640);
     }
 }
