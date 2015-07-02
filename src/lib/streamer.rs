@@ -1,10 +1,13 @@
 extern crate fractal;
 extern crate probability;
+extern crate random;
 extern crate rustc_serialize;
 extern crate sqlite;
 extern crate toml;
 
-use probability::generator;
+#[macro_use]
+extern crate log;
+
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -67,6 +70,8 @@ impl Streamer {
                                            .unwrap_or(PathBuf::new());
         let config = try!(Config::new(config));
 
+        random::default().seed([0x12345678, 0x87654321]);
+
         let traffic = match config.traffic {
             Some(ref traffic) => try!(Traffic::new(traffic, &root)),
             _ => raise!("a traffic configuration is required"),
@@ -85,8 +90,6 @@ impl Streamer {
 
     #[inline]
     pub fn iter<'l>(&'l self) -> Stream<'l> {
-        let mut generator = generator::default();
-        generator.seed([0x12345678, 0x87654321]);
         Stream {
             streamer: self,
         }

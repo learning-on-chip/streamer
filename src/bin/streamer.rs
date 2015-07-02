@@ -1,10 +1,15 @@
 #![cfg_attr(test, allow(dead_code))]
 
 extern crate arguments;
-#[macro_use] extern crate streamer;
+extern crate log;
+
+#[macro_use]
+extern crate streamer;
 
 use std::path::PathBuf;
 use streamer::{Error, Result, Streamer};
+
+mod logger;
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -16,6 +21,7 @@ Options:
 ";
 
 fn main() {
+    logger::setup();
     start().unwrap_or_else(|error| fail(error));
 }
 

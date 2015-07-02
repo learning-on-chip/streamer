@@ -14,6 +14,7 @@ impl Traffic {
         let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
                                                 "a traffic database")));
 
+        info!(target: "traffic", "Reading interarrival times...");
         let data = match config.query {
             Some(ref query) => try!(read_interarrivals(&backend, query)),
             _ => raise!("an SQL query is required for the traffic database"),
@@ -24,6 +25,7 @@ impl Traffic {
             ncoarse => ncoarse as usize,
         };
 
+        info!(target: "traffic", "Fitting a multiscale wavelet model...");
         Ok(Traffic { model: ok!(Beta::fit(&data, ncoarse)) })
     }
 }
