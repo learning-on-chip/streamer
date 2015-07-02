@@ -24,18 +24,19 @@ impl Traffic {
         let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
                                                 "a traffic database")));
 
-        info!(target: "traffic", "Reading interarrival times...");
+        info!(target: "traffic", "Reading the database...");
         let data = match config.query {
             Some(ref query) => try!(read_interarrivals(&backend, query)),
             _ => raise!("an SQL query is required for the traffic database"),
         };
+        info!(target: "traffic", "Read {} interarrivals.", data.len());
 
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enought data"),
             ncoarse => ncoarse as usize,
         };
 
-        info!(target: "traffic", "Fitting a taffic model using {} data points...", ncoarse);
+        info!(target: "traffic", "Fitting a model...");
         Ok(Traffic { model: Rc::new(ok!(Beta::fit(&data, ncoarse))) })
     }
 
@@ -59,7 +60,9 @@ impl<'l, S: Source> Queue<'l, S> {
 
     #[inline]
     fn renew(&mut self) -> Result<()> {
+        info!(target: "traffic", "Sampling the model...");
         self.steps = ok!(self.model.sample(self.source));
+        info!(target: "traffic", "Sampled {} interarrivals.", self.steps.len());
         self.position = 0;
         Ok(())
     }
@@ -71,7 +74,7 @@ impl<'l, S: Source> Iterator for Queue<'l, S> {
     fn next(&mut self) -> Option<f64> {
         if self.is_empty() {
             if let Err(error) = self.renew() {
-                error!(target: "traffic", "Failed to sample the traffic model ({}).", error);
+                error!(target: "traffic", "Failed to sample the model ({}).", error);
                 return None;
             }
         }

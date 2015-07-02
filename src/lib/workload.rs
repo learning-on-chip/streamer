@@ -34,7 +34,7 @@ impl Source {
         let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
                                                 "a workload-source database")));
 
-        info!(target: "workload", "Reading a workload source...");
+        info!(target: "workload", "Reading a database...");
         let (names, leakage) = try!(read_names_and_leakage_power(&backend));
         let dynamic = try!(read_dynamic_power(&backend, &names));
 

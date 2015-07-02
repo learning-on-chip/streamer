@@ -9,7 +9,7 @@ impl Log for Logger {
 
     fn log(&self, record: &LogRecord) {
         if self.enabled(record.metadata()) {
-            println!("[{}] {}", record.level(), record.args());
+            println!("[{:10}] {}", record.target(), record.args());
         }
     }
 }
