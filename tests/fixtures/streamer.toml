@@ -6,6 +6,6 @@ WHERE `time` IS NOT 0 AND `event type` IS 0
 ORDER BY `time` ASC;
 """
 
-[[power.sources]]
+[[workload.sources]]
 name = "Black–Scholes"
 path = "blackscholes.sqlite3"

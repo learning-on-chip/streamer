@@ -39,19 +39,19 @@ macro_rules! path(
 );
 
 mod config;
-mod source;
 mod traffic;
+mod workload;
 
 use config::Config;
-use source::Source;
 use traffic::Traffic;
+use workload::Workload;
 
 pub type Error = Box<std::fmt::Display>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct Streamer {
     traffic: Traffic,
-    sources: Vec<source::Source>,
+    workload: Workload,
 }
 
 pub struct Stream<'l> {
@@ -72,19 +72,14 @@ impl Streamer {
             _ => raise!("a traffic configuration is required"),
         };
 
-        let mut sources = vec![];
-        if let Some(ref configs) = config.power.and_then(|config| config.sources) {
-            for config in configs {
-                sources.push(try!(Source::new(config, &root)));
-            }
-        }
-        if sources.is_empty() {
-            raise!("at least one power source is required");
-        }
+        let workload = match config.workload {
+            Some(ref workload) => try!(Workload::new(workload, &root)),
+            _ => raise!("a workload configuration is required"),
+        };
 
         Ok(Streamer {
             traffic: traffic,
-            sources: sources,
+            workload: workload,
         })
     }
 
