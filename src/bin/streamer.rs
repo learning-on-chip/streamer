@@ -37,9 +37,9 @@ fn start() -> Result<()> {
         _ => raise!("a configuration file is required"),
     };
 
-    let mut source = random::default().seed([0x12345678, 0x87654321]);
+    let mut source = random::default().seed([0x42, 0x69]);
 
-    for state in streamer.iter(&mut source) {
+    for state in streamer.iter(&mut source).take(100) {
         println!("{}", state);
     }
 
