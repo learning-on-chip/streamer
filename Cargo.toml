@@ -20,3 +20,6 @@ random = "*"
 rustc-serialize = "*"
 sqlite = "*"
 toml = "*"
+
+[dev-dependencies]
+assert = "*"

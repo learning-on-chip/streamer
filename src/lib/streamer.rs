@@ -1,3 +1,6 @@
+#[cfg(test)]
+extern crate assert;
+
 extern crate fractal;
 extern crate probability;
 extern crate random;
