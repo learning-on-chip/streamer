@@ -5,13 +5,17 @@ use Result;
 use config;
 
 pub struct Workload {
-    sources: Vec<Source>,
+    pub sources: Vec<Source>,
 }
 
 pub struct Source {
-    pub names: Vec<String>,
-    pub dynamic: Vec<f64>,
-    pub leakage: Vec<f64>,
+    pub components: Vec<Component>,
+}
+
+pub struct Component {
+    pub name: String,
+    pub dynamic_power: Vec<f64>,
+    pub leakage_power: f64,
 }
 
 impl Workload {
@@ -35,53 +39,33 @@ impl Source {
                                                 "a workload-source database")));
 
         info!(target: "workload", "Reading a database...");
-        let (names, leakage) = try!(read_names_and_leakage_power(&backend));
-        let dynamic = try!(read_dynamic_power(&backend, &names));
-
-        Ok(Source {
-            names: names,
-            dynamic: dynamic,
-            leakage: leakage,
-        })
+        Ok(Source { components: try!(read_components(&backend)) })
     }
 }
 
-fn read_names_and_leakage_power(backend: &Database) -> Result<(Vec<String>, Vec<f64>)> {
-    let mut names = vec![];
-    let mut data = vec![];
+fn read_components(backend: &Database) -> Result<Vec<Component>> {
+    let mut components = vec![];
     let mut statement = ok!(backend.prepare("
-        SELECT `name`, `value` FROM `static` WHERE `name` LIKE '%_leakage_power';
+        SELECT `component_id`, `name`, `leakage_power` FROM `static`;
     "));
     while State::Row == ok!(statement.step()) {
-        names.push({
-            let name = ok!(statement.read::<String>(0));
-            String::from(&name[..name.find('_').unwrap()])
+        let component_id = ok!(statement.read::<i64>(0));
+        components.push(Component {
+            name: ok!(statement.read::<String>(1)),
+            dynamic_power: try!(read_dynamic_power(backend, component_id)),
+            leakage_power: ok!(statement.read::<f64>(2)),
         });
-        data.push(ok!(statement.read::<f64>(1)));
     }
-    Ok((names, data))
+    Ok(components)
 }
 
-fn read_dynamic_power(backend: &Database, names: &[String]) -> Result<Vec<f64>> {
-    let count = names.len();
-    let mut data = Vec::with_capacity(count);
-    let fields = {
-        let mut buffer = String::new();
-        for name in names.iter() {
-            if !buffer.is_empty() {
-                buffer.push_str(", ");
-            }
-            buffer.push_str(&format!("`{}_dynamic_power`", name));
-        }
-        buffer
-    };
+fn read_dynamic_power(backend: &Database, component_id: i64) -> Result<Vec<f64>> {
+    let mut data = vec![];
     let mut statement = ok!(backend.prepare(&format!("
-        SELECT {} FROM `dynamic` ORDER BY `time` ASC;
-    ", &fields)));
+        SELECT `dynamic_power` FROM `dynamic` WHERE `component_id` = {} ORDER BY `time` ASC;
+    ", component_id)));
     while State::Row == ok!(statement.step()) {
-        for i in 0..count {
-            data.push(ok!(statement.read::<f64>(i)));
-        }
+        data.push(ok!(statement.read::<f64>(0)));
     }
     Ok(data)
 }
@@ -98,6 +82,9 @@ mod tests {
             details: None,
         };
         let source = super::Source::new(&config, "").ok().unwrap();
-        assert_eq!(source.dynamic.len(), (2 + 1) * 76);
+        assert_eq!(source.components.len(), 2 + 1);
+        for component in source.components.iter() {
+            assert_eq!(component.dynamic_power.len(), 76);
+        }
     }
 }

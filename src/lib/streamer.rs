@@ -54,8 +54,8 @@ pub type Error = Box<std::fmt::Display>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct Streamer {
-    traffic: Traffic,
-    workload: Workload,
+    pub traffic: Traffic,
+    pub workload: Workload,
 }
 
 pub struct Stream<'l, S: Source + 'l> {

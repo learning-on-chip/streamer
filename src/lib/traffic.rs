@@ -105,7 +105,6 @@ fn read_interarrivals(backend: &Database, query: &str) -> Result<Vec<f64>> {
 
 #[cfg(test)]
 mod tests {
-    use config;
     use sqlite::Database;
 
     #[test]
