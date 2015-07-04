@@ -12,20 +12,18 @@ extern crate toml;
 extern crate log;
 
 use random::Source;
-use std::fmt;
+use std::{error, fmt};
 use std::path::{Path, PathBuf};
 
-#[macro_export]
 macro_rules! raise(
-    ($error:expr) => (return Err(Box::new($error)));
-    ($($arg:tt)*) => (raise!(format!($($arg)*)));
+    ($message:expr) => (return Err(Box::new(::ErrorString($message.to_string()))));
+    ($($arg:tt)*) => (return Err(Box::new(::ErrorString(format!($($arg)*)))));
 );
 
-#[macro_export]
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
-        Err(error) => raise!(error),
+        Err(error) => return Err(Box::new(error)),
     });
 );
 
@@ -53,7 +51,8 @@ use config::Config;
 use traffic::{Traffic, Queue};
 use workload::Workload;
 
-pub type Error = Box<std::fmt::Display>;
+pub struct ErrorString(pub String);
+pub type Error = Box<std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct Streamer {
@@ -108,5 +107,26 @@ impl<'l, S: Source> Iterator for Stream<'l, S> {
 impl fmt::Display for State {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         write!(formatter, "{:25.15e}", self.0)
+    }
+}
+
+impl fmt::Debug for ErrorString {
+    #[inline]
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(formatter)
+    }
+}
+
+impl fmt::Display for ErrorString {
+    #[inline]
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        self.0.fmt(formatter)
+    }
+}
+
+impl error::Error for ErrorString {
+    #[inline]
+    fn description(&self) -> &str {
+        &self.0
     }
 }

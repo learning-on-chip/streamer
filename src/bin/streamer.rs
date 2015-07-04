@@ -3,12 +3,11 @@
 extern crate arguments;
 extern crate log;
 extern crate random;
-
-#[macro_use]
 extern crate streamer;
 
+use std::error::Error;
 use std::path::PathBuf;
-use streamer::{Error, Result, Streamer};
+use streamer::{ErrorString, Result, Streamer};
 
 mod logger;
 
@@ -21,9 +20,20 @@ Options:
     --help                   Display this message.
 ";
 
+macro_rules! ok(
+    ($result:expr) => (match $result {
+        Ok(result) => result,
+        Err(error) => return Err(Box::new(error)),
+    });
+);
+
+macro_rules! raise(
+    ($message:expr) => (return Err(Box::new(ErrorString($message.to_string()))));
+);
+
 fn main() {
     logger::setup();
-    start().unwrap_or_else(|error| fail(error));
+    start().unwrap_or_else(|error| fail(&*error));
 }
 
 fn start() -> Result<()> {
@@ -51,8 +61,8 @@ fn help() -> ! {
     std::process::exit(0);
 }
 
-fn fail(error: Error) -> ! {
+fn fail(error: &Error) -> ! {
     use std::io::{stderr, Write};
-    stderr().write_all(format!("Error: {}.\n", &*error).as_bytes()).unwrap();
+    stderr().write_all(format!("Error: {}.\n", error).as_bytes()).unwrap();
     std::process::exit(1);
 }

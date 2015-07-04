@@ -1,6 +1,6 @@
 use fractal::Beta;
 use random::Source;
-use sqlite::{Database, State};
+use sqlite::{Connection, State};
 use std::path::Path;
 use std::rc::Rc;
 
@@ -21,8 +21,8 @@ pub struct Queue<'l, S: Source + 'l> {
 
 impl Traffic {
     pub fn new<T: AsRef<Path>>(config: &config::Traffic, root: T) -> Result<Traffic> {
-        let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
-                                                "a traffic database")));
+        let backend = ok!(Connection::open(&path!(config.path, root.as_ref(),
+                                                  "a traffic database")));
 
         info!(target: "traffic", "Reading the database...");
         let data = match config.query {
@@ -84,7 +84,7 @@ impl<'l, S: Source> Iterator for Queue<'l, S> {
     }
 }
 
-fn read_interarrivals(backend: &Database, query: &str) -> Result<Vec<f64>> {
+fn read_interarrivals(backend: &Connection, query: &str) -> Result<Vec<f64>> {
     let mut statement = ok!(backend.prepare(query));
 
     let mut data = Vec::new();
@@ -105,11 +105,11 @@ fn read_interarrivals(backend: &Database, query: &str) -> Result<Vec<f64>> {
 
 #[cfg(test)]
 mod tests {
-    use sqlite::Database;
+    use sqlite::Connection;
 
     #[test]
     fn read_interarrivals() {
-        let backend = Database::open("tests/fixtures/google.sqlite3").unwrap();
+        let backend = Connection::open("tests/fixtures/google.sqlite3").unwrap();
         let data = super::read_interarrivals(&backend, "
             SELECT 1e-6 * `time` FROM `job_events`
             WHERE `time` IS NOT 0 AND `event type` IS 0

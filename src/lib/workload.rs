@@ -1,4 +1,4 @@
-use sqlite::{Database, State};
+use sqlite::{Connection, State};
 use std::path::Path;
 
 use Result;
@@ -35,15 +35,15 @@ impl Workload {
 
 impl Source {
     pub fn new<T: AsRef<Path>>(config: &config::Source, root: T) -> Result<Source> {
-        let backend = ok!(Database::open(&path!(config.path, root.as_ref(),
-                                                "a workload-source database")));
+        let backend = ok!(Connection::open(&path!(config.path, root.as_ref(),
+                                                  "a workload-source database")));
 
         info!(target: "workload", "Reading a database...");
         Ok(Source { components: try!(read_components(&backend)) })
     }
 }
 
-fn read_components(backend: &Database) -> Result<Vec<Component>> {
+fn read_components(backend: &Connection) -> Result<Vec<Component>> {
     use std::collections::HashMap;
 
     let mut names = HashMap::new();
@@ -104,11 +104,11 @@ fn read_components(backend: &Database) -> Result<Vec<Component>> {
 #[cfg(test)]
 mod tests {
     use assert;
-    use sqlite::Database;
+    use sqlite::Connection;
 
     #[test]
     fn read_components() {
-        let backend = Database::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
         let components = super::read_components(&backend).ok().unwrap();
         assert_eq!(components.len(), 2 + 1);
         for component in components.iter() {
