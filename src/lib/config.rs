@@ -1,20 +1,20 @@
 use rustc_serialize::{Decodable, Decoder};
 use std::fs::File;
 use std::path::Path;
-use toml;
+use toml::{Table, Value};
 
 use Result;
 
-pub struct Details(pub toml::Value);
+pub struct Details(pub Value);
 
 pub trait Detailable {
-    fn set_details<'l>(&mut self, Option<&'l toml::Value>);
-    fn get_details<'l>(&'l self) -> Option<&'l toml::Value>;
+    fn set_details<'l>(&mut self, Option<&'l Value>);
+    fn get_details<'l>(&'l self) -> Option<&'l Value>;
 
     fn detail(&self, name: &str) -> Option<String> {
-        self.get_details().and_then(|toml| {
-            match toml.lookup(name) {
-                Some(&toml::Value::String(ref string)) => Some(string.clone()),
+        self.get_details().and_then(|value| {
+            match value.lookup(name) {
+                Some(&Value::String(ref string)) => Some(string.clone()),
                 _ => None,
             }
         })
@@ -52,17 +52,46 @@ impl Config {
     pub fn new<T: AsRef<Path>>(path: T) -> Result<Config> {
         use std::io::Read;
 
-        let mut contents = String::new();
-        ok!(ok!(File::open(path)).read_to_string(&mut contents));
+        let path = path.as_ref();
+        let mut content = String::new();
+        ok!(ok!(File::open(path)).read_to_string(&mut content));
 
-        let config = match toml::Parser::new(&contents).parse() {
-            Some(root) => {
-                let mut decoder = toml::Decoder::new(toml::Value::Table(root));
+        Config::parse(&content, |table| {
+            if let Some(root) = path.parent() {
+                if let Some(root) = root.to_str() {
+                    table.insert("root".to_string(), Value::String(root.to_string()));
+                }
+            }
+        })
+    }
+
+    fn parse<F>(content: &str, broadcast: F) -> Result<Config> where F: FnOnce(&mut Table) {
+        use std::mem::replace;
+        use toml::{Decoder, Parser};
+
+        let mut parser = Parser::new(content);
+        let config = match parser.parse() {
+            Some(config) => {
+                let mut decoder = Decoder::new(Value::Table(config));
                 let mut config: Config = ok!(Decodable::decode(&mut decoder));
-                config.set_details(decoder.toml.as_ref());
+                let mut table = match replace(&mut decoder.toml, None) {
+                    Some(Value::Table(table)) => table,
+                    _ => Table::new(),
+                };
+                broadcast(&mut table);
+                config.set_details(Some(&Value::Table(table)));
                 config
             },
-            _ => raise!("failed to parse the configuration file"),
+            _ => {
+                let mut errors = String::new();
+                for error in parser.errors {
+                    if !errors.is_empty() {
+                        errors.push_str(", ");
+                    }
+                    errors.push_str(&format!("{}", error));
+                }
+                raise!("failed to parse the configuration file ({})", errors);
+            },
         };
 
         Ok(config)
@@ -79,31 +108,56 @@ impl Decodable for Details {
 macro_rules! implement(
     ($kind:ty, [$($scalar:ident),*], [$($vector:ident),*]) => (
         impl Detailable for $kind {
-            fn set_details<'l>(&mut self, toml: Option<&'l toml::Value>) {
-                self.details = toml.and_then(|toml| {
-                    $(
-                        if let Some(ref mut child) = self.$scalar {
-                            child.set_details(toml.lookup(stringify!($scalar)));
-                        }
-                    )*
-                    $(
-                        if let Some(ref mut children) = self.$vector {
-                            match toml.lookup(stringify!($vector)) {
-                                Some(&toml::Value::Array(ref array)) => {
-                                    for (child, toml) in children.iter_mut().zip(array) {
-                                        child.set_details(Some(toml));
-                                    }
-                                },
-                                _ => {},
+            #[allow(unused_imports, unused_mut, unused_variables)]
+            fn set_details<'l>(&mut self, value: Option<&'l Value>) {
+                use std::mem::replace;
+
+                let value = match value {
+                    Some(value) => value,
+                    _ => {
+                        self.details = None;
+                        return;
+                    },
+                };
+
+                let broadcast = match value {
+                    &Value::Table(ref table) => {
+                        let mut table = table.clone();
+                        $(table.remove(stringify!($scalar));)*
+                        $(table.remove(stringify!($vector));)*
+                        Some(Value::Table(table))
+                    },
+                    _ => None,
+                };
+                let broadcast = broadcast.as_ref();
+
+                $(
+                    if let Some(ref mut child) = self.$scalar {
+                        let value = merge(broadcast, value.lookup(stringify!($scalar)));
+                        child.set_details(value.as_ref());
+                    }
+                )*
+                $(
+                    if let Some(ref mut children) = self.$vector {
+                        if let Some(&Value::Array(ref array)) = value.lookup(stringify!($vector)) {
+                            for (child, value) in children.iter_mut().zip(array) {
+                                let value = merge(broadcast, Some(value));
+                                child.set_details(value.as_ref());
+                            }
+                        } else {
+                            for child in children.iter_mut() {
+                                child.set_details(broadcast);
                             }
                         }
-                    )*
-                    Some(Details(toml.clone()))
-                });
+                    }
+                )*
+
+                let value = merge(self.details.as_ref().map(|details| &details.0), Some(value));
+                self.details = value.map(|value| Details(value));
             }
 
             #[inline]
-            fn get_details<'l>(&'l self) -> Option<&'l toml::Value> {
+            fn get_details<'l>(&'l self) -> Option<&'l Value> {
                 self.details.as_ref().map(|details| &details.0)
             }
         }
@@ -122,3 +176,60 @@ implement!(Traffic);
 
 implement!(Workload, [], [sources]);
 implement!(Source);
+
+fn merge<'l>(into: Option<&'l Value>, from: Option<&'l Value>) -> Option<Value> {
+    use toml::Value::Table;
+
+    match (into, from) {
+        (Some(&Value::Table(ref into)), Some(&Value::Table(ref from))) => {
+            let mut table = into.clone();
+            for (key, value) in from {
+                table.insert(key.clone(), value.clone());
+            }
+            Some(Value::Table(table))
+        },
+        (Some(value), None) => Some(value.clone()),
+        (None, Some(value)) => Some(value.clone()),
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Config, Detailable};
+    use toml::Value;
+
+    #[test]
+    fn parse() {
+        let content = r#"
+            [traffic]
+            path = "traffic/path"
+
+            [[workload.sources]]
+            path = "workload1/path"
+
+            [[workload.sources]]
+            path = "workload2/path"
+        "#;
+        let config = Config::parse(content, |table| {
+            table.insert("foo".to_string(), Value::String("bar".to_string()));
+        }).unwrap();
+
+        assert_eq!(&**config.traffic.as_ref().unwrap()
+                            .path.as_ref().unwrap(), "traffic/path");
+
+        assert_eq!(&config.traffic.as_ref().unwrap()
+                          .detail("foo").unwrap(), "bar");
+
+        assert_eq!(&config.workload.as_ref().unwrap()
+                          .detail("foo").unwrap(), "bar");
+
+        assert_eq!(&**config.workload.as_ref().unwrap()
+                            .sources.as_ref().unwrap()[0]
+                            .path.as_ref().unwrap(), "workload1/path");
+
+        assert_eq!(&config.workload.as_ref().unwrap()
+                          .sources.as_ref().unwrap()[0]
+                          .detail("foo").unwrap(), "bar");
+    }
+}
