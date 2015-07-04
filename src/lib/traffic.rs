@@ -1,7 +1,6 @@
 use fractal::Beta;
 use random::Source;
 use sqlite::{Connection, State};
-use std::path::Path;
 use std::rc::Rc;
 
 use Result;
@@ -20,9 +19,8 @@ pub struct Queue<'l, S: Source + 'l> {
 }
 
 impl Traffic {
-    pub fn new<T: AsRef<Path>>(config: &config::Traffic, root: T) -> Result<Traffic> {
-        let backend = ok!(Connection::open(&path!(config.path, root.as_ref(),
-                                                  "a traffic database")));
+    pub fn new(config: &config::Traffic) -> Result<Traffic> {
+        let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "traffic", "Reading the database...");
         let data = match config.query {

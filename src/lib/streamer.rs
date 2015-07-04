@@ -13,7 +13,7 @@ extern crate log;
 
 use random::Source;
 use std::{error, fmt};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 macro_rules! raise(
     ($message:expr) => (return Err(Box::new(::ErrorString($message.to_string()))));
@@ -28,13 +28,16 @@ macro_rules! ok(
 );
 
 macro_rules! path(
-    ($path:expr, $root:expr, $destination:expr) => ({
-        let mut path = match $path {
+    ($config:ident, $destination:expr) => ({
+        use ::config::Detailable;
+        let mut path = match $config.path {
             Some(ref path) => ::std::path::PathBuf::from(path),
             _ => raise!("the path to {} is missing", $destination),
         };
         if path.is_relative() {
-            path = $root.join(path);
+            if let Some(ref root) = $config.detail("root") {
+                path = ::std::path::PathBuf::from(root).join(path);
+            }
         }
         if ::std::fs::metadata(&path).is_err() {
             raise!("the file {:?} does not exist", &path);
@@ -69,17 +72,15 @@ pub struct State(f64);
 
 impl Streamer {
     pub fn new<T: AsRef<Path>>(config: T) -> Result<Streamer> {
-        let root = config.as_ref().parent().map(|root| PathBuf::from(root))
-                                           .unwrap_or(PathBuf::new());
         let config = try!(Config::new(config));
 
         let traffic = match config.traffic {
-            Some(ref traffic) => try!(Traffic::new(traffic, &root)),
+            Some(ref traffic) => try!(Traffic::new(traffic)),
             _ => raise!("a traffic configuration is required"),
         };
 
         let workload = match config.workload {
-            Some(ref workload) => try!(Workload::new(workload, &root)),
+            Some(ref workload) => try!(Workload::new(workload)),
             _ => raise!("a workload configuration is required"),
         };
 
