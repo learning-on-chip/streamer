@@ -1,4 +1,5 @@
 use sqlite::{Connection, State};
+use std::collections::HashMap;
 
 use Result;
 use config::Config;
@@ -35,67 +36,70 @@ impl Workload {
 impl Source {
     pub fn new(config: &Config) -> Result<Source> {
         let backend = ok!(Connection::open(&path!(config, "a workload-source database")));
+
         info!(target: "workload", "Reading a database...");
-        Ok(Source { components: try!(read_components(&backend)) })
+
+        let mut names = match config.get::<String>("query_names") {
+            Some(query) => try!(read_names(&backend, query)),
+            _ => raise!("an SQL query for reading components’ names is required"),
+        };
+        let mut dynamic_power = match config.get::<String>("query_dynamic_power") {
+            Some(query) => try!(read_dynamic_power(&backend, query)),
+            _ => raise!("an SQL query for reading the dynamic power is required"),
+        };
+        let mut leakage_power = match config.get::<String>("query_leakage_power") {
+            Some(query) => try!(read_leakage_power(&backend, query)),
+            _ => raise!("an SQL query for reading the leakage power is required"),
+        };
+
+        let mut ids = names.keys().map(|&name| name).collect::<Vec<_>>();
+        ids.sort();
+
+        let mut components = vec![];
+        for i in ids {
+            components.push(Component {
+                name: names.remove(&i).unwrap(),
+                dynamic_power: match dynamic_power.remove(&i) {
+                    Some(value) => value,
+                    _ => raise!("cannot find the dynamic power of a component"),
+                },
+                leakage_power: match leakage_power.remove(&i) {
+                    Some(value) => value,
+                    _ => raise!("cannot find the leakage power of a component"),
+                },
+            });
+        }
+
+        Ok(Source { components: components })
     }
 }
 
-fn read_components(backend: &Connection) -> Result<Vec<Component>> {
-    use std::collections::HashMap;
-
-    let mut names = HashMap::new();
-    let mut dynamic_power = HashMap::new();
-    let mut leakage_power = HashMap::new();
-
-    {
-        let mut statement = ok!(backend.prepare("
-            SELECT `component_id`, `name` FROM `static`;
-        "));
-        while State::Row == ok!(statement.step()) {
-            let id = ok!(statement.read::<i64>(0));
-            names.insert(id, ok!(statement.read::<String>(1)));
-            dynamic_power.insert(id, vec![]);
-            leakage_power.insert(id, 0.0);
-        }
+fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>> {
+    let mut data = HashMap::new();
+    let mut statement = ok!(backend.prepare(query));
+    while State::Row == ok!(statement.step()) {
+        data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<String>(1)));
     }
+    Ok(data)
+}
 
-    {
-        let mut statement = ok!(backend.prepare("
-            SELECT `component_id`, `dynamic_power` FROM `dynamic` ORDER BY `time` ASC;
-        "));
-        while State::Row == ok!(statement.step()) {
-            match dynamic_power.get_mut(&ok!(statement.read::<i64>(0))) {
-                Some(value) => value.push(ok!(statement.read::<f64>(1))),
-                _ => raise!("found a dynamic-power value with an unknown ID"),
-            }
-        }
+fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, Vec<f64>>> {
+    let mut data = HashMap::new();
+    let mut statement = ok!(backend.prepare(query));
+    while State::Row == ok!(statement.step()) {
+        data.entry(ok!(statement.read::<i64>(0))).or_insert_with(|| vec![])
+                                                 .push(ok!(statement.read::<f64>(1)));
     }
+    Ok(data)
+}
 
-    {
-        let mut statement = ok!(backend.prepare("
-            SELECT `component_id`, `leakage_power` FROM `static`;
-        "));
-        while State::Row == ok!(statement.step()) {
-            match leakage_power.get_mut(&ok!(statement.read::<i64>(0))) {
-                Some(value) => *value = ok!(statement.read::<f64>(1)),
-                _ => raise!("found a leakage-power value with an unknown ID"),
-            }
-        }
+fn read_leakage_power(backend: &Connection, query: &str) -> Result<HashMap<i64, f64>> {
+    let mut data = HashMap::new();
+    let mut statement = ok!(backend.prepare(query));
+    while State::Row == ok!(statement.step()) {
+        data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<f64>(1)));
     }
-
-    let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
-    ids.sort();
-
-    let mut components = vec![];
-    for i in ids {
-        components.push(Component {
-            name: names.remove(&i).unwrap(),
-            dynamic_power: dynamic_power.remove(&i).unwrap(),
-            leakage_power: leakage_power.remove(&i).unwrap(),
-        });
-    }
-
-    Ok(components)
+    Ok(data)
 }
 
 #[cfg(test)]
@@ -104,15 +108,43 @@ mod tests {
     use sqlite::Connection;
 
     #[test]
-    fn read_components() {
+    fn read_names() {
         let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
-        let components = super::read_components(&backend).ok().unwrap();
-        assert_eq!(components.len(), 2 + 1);
-        for component in components.iter() {
-            assert_eq!(component.dynamic_power.len(), 76);
+        let data = super::read_names(&backend, "
+            SELECT `component_id`, `name` FROM `static`;
+        ").unwrap();
+
+        assert_eq!(data.len(), 2 + 1);
+        assert_eq!(data.get(&0).unwrap(), "core0");
+        assert_eq!(data.get(&1).unwrap(), "core1");
+        assert_eq!(data.get(&2).unwrap(), "l30");
+    }
+
+    #[test]
+    fn read_dynamic_power() {
+        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let data = super::read_dynamic_power(&backend, "
+            SELECT `component_id`, `dynamic_power` FROM `dynamic`
+            ORDER BY `time` ASC;
+        ").unwrap();
+
+        assert_eq!(data.len(), 2 + 1);
+        for (_, data) in &data {
+            assert_eq!(data.len(), 76);
         }
-        assert::close(&[components[0].dynamic_power[2]], &[0.608065803127267], 1e-14);
-        assert::close(&[components[1].dynamic_power[4]], &[9.19824419508802], 1e-14);
-        assert::close(&[components[2].dynamic_power[0]], &[0.00613680976814029], 1e-14);
+        assert::close(&[data.get(&0).unwrap()[2]], &[0.608065803127267], 1e-14);
+        assert::close(&[data.get(&1).unwrap()[4]], &[9.19824419508802], 1e-14);
+        assert::close(&[data.get(&2).unwrap()[0]], &[0.00613680976814029], 1e-14);
+    }
+
+    #[test]
+    fn read_leakage_power() {
+        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let data = super::read_leakage_power(&backend, "
+            SELECT `component_id`, `leakage_power` FROM `static`;
+        ").unwrap();
+
+        assert_eq!(data.len(), 2 + 1);
+        assert_eq!(data.get(&0).unwrap(), data.get(&1).unwrap());
     }
 }

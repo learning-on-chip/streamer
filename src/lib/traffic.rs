@@ -25,7 +25,7 @@ impl Traffic {
         info!(target: "traffic", "Reading the database...");
         let data = match config.get::<String>("query") {
             Some(ref query) => try!(read_interarrivals(&backend, query)),
-            _ => raise!("an SQL query is required for the traffic database"),
+            _ => raise!("an SQL query for reading the traffic data is required"),
         };
         info!(target: "traffic", "Read {} interarrivals.", data.len());
 

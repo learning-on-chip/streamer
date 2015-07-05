@@ -6,6 +6,18 @@ WHERE `time` IS NOT 0 AND `event type` IS 0
 ORDER BY `time` ASC;
 """
 
+[workload]
+query_names = """
+SELECT `component_id`, `name` FROM `static`;
+"""
+query_dynamic_power = """
+SELECT `component_id`, `dynamic_power` FROM `dynamic`
+ORDER BY `time` ASC;
+"""
+query_leakage_power = """
+SELECT `component_id`, `leakage_power` FROM `static`;
+"""
+
 [[workload.sources]]
 name = "Black–Scholes"
 path = "blackscholes.sqlite3"
