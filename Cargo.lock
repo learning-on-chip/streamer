@@ -6,11 +6,11 @@ dependencies = [
  "assert 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "toml 0.1.21 (git+https://github.com/IvanUkhov/toml-rs.git?branch=array-leftovers)",
+ "toml 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -18,7 +18,7 @@ name = "arguments"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "options 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -57,7 +57,7 @@ dependencies = [
 
 [[package]]
 name = "options"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -112,7 +112,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "toml"
 version = "0.1.21"
-source = "git+https://github.com/IvanUkhov/toml-rs.git?branch=array-leftovers#b4f1e4371929db3ba4d6a0fdad464177e28bf981"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

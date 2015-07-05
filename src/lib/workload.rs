@@ -1,7 +1,7 @@
 use sqlite::{Connection, State};
 
 use Result;
-use config;
+use config::Config;
 
 pub struct Workload {
     pub sources: Vec<Source>,
@@ -18,9 +18,9 @@ pub struct Component {
 }
 
 impl Workload {
-    pub fn new(config: &config::Workload) -> Result<Workload> {
+    pub fn new(config: &Config) -> Result<Workload> {
         let mut sources = vec![];
-        if let Some(ref configs) = config.sources {
+        if let Some(configs) = config.get::<Vec<Config>>("sources") {
             for config in configs {
                 sources.push(try!(Source::new(config)));
             }
@@ -33,7 +33,7 @@ impl Workload {
 }
 
 impl Source {
-    pub fn new(config: &config::Source) -> Result<Source> {
+    pub fn new(config: &Config) -> Result<Source> {
         let backend = ok!(Connection::open(&path!(config, "a workload-source database")));
         info!(target: "workload", "Reading a database...");
         Ok(Source { components: try!(read_components(&backend)) })

@@ -2,9 +2,9 @@
 extern crate assert;
 
 extern crate fractal;
+extern crate options;
 extern crate probability;
 extern crate random;
-extern crate rustc_serialize;
 extern crate sqlite;
 extern crate toml;
 
@@ -29,14 +29,13 @@ macro_rules! ok(
 
 macro_rules! path(
     ($config:ident, $destination:expr) => ({
-        use ::config::Detailable;
-        let mut path = match $config.path {
+        let mut path = match $config.get::<String>("path") {
             Some(ref path) => ::std::path::PathBuf::from(path),
             _ => raise!("the path to {} is missing", $destination),
         };
         if path.is_relative() {
-            if let Some(ref root) = $config.detail("root") {
-                path = ::std::path::PathBuf::from(root).join(path);
+            if let Some(ref root) = $config.get::<::std::path::PathBuf>("root") {
+                path = root.join(path);
             }
         }
         if ::std::fs::metadata(&path).is_err() {
@@ -74,12 +73,12 @@ impl Streamer {
     pub fn new<T: AsRef<Path>>(config: T) -> Result<Streamer> {
         let config = try!(Config::new(config));
 
-        let traffic = match config.traffic {
+        let traffic = match config.get::<Config>("traffic") {
             Some(ref traffic) => try!(Traffic::new(traffic)),
             _ => raise!("a traffic configuration is required"),
         };
 
-        let workload = match config.workload {
+        let workload = match config.get::<Config>("workload") {
             Some(ref workload) => try!(Workload::new(workload)),
             _ => raise!("a workload configuration is required"),
         };

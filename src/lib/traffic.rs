@@ -4,7 +4,7 @@ use sqlite::{Connection, State};
 use std::rc::Rc;
 
 use Result;
-use config;
+use config::Config;
 
 pub struct Traffic {
     model: Rc<Beta>,
@@ -19,11 +19,11 @@ pub struct Queue<'l, S: Source + 'l> {
 }
 
 impl Traffic {
-    pub fn new(config: &config::Traffic) -> Result<Traffic> {
+    pub fn new(config: &Config) -> Result<Traffic> {
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "traffic", "Reading the database...");
-        let data = match config.query {
+        let data = match config.get::<String>("query") {
             Some(ref query) => try!(read_interarrivals(&backend, query)),
             _ => raise!("an SQL query is required for the traffic database"),
         };
