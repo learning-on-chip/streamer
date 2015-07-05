@@ -2,7 +2,7 @@
 name = "streamer"
 version = "0.0.1"
 dependencies = [
- "arguments 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "arguments 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "assert 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -15,7 +15,7 @@ dependencies = [
 
 [[package]]
 name = "arguments"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
