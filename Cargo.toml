@@ -19,7 +19,7 @@ probability = "*"
 random = "*"
 rustc-serialize = "*"
 sqlite = "*"
-toml = "*"
+toml = { git = "https://github.com/IvanUkhov/toml-rs.git", branch = "array-leftovers" }
 
 [dev-dependencies]
 assert = "*"

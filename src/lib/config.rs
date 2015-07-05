@@ -188,6 +188,7 @@ fn merge<'l>(into: Option<&'l Value>, from: Option<&'l Value>) -> Option<Value> 
             }
             Some(Value::Table(table))
         },
+        (Some(value), Some(&Value::Integer(0))) => Some(value.clone()),
         (Some(value), None) => Some(value.clone()),
         (None, Some(value)) => Some(value.clone()),
         _ => None,
@@ -210,26 +211,21 @@ mod tests {
 
             [[workload.sources]]
             path = "workload2/path"
+            root = "bar"
         "#;
         let config = Config::parse(content, |table| {
-            table.insert("foo".to_string(), Value::String("bar".to_string()));
+            table.insert("root".to_string(), Value::String("foo".to_string()));
         }).unwrap();
 
-        assert_eq!(&**config.traffic.as_ref().unwrap()
-                            .path.as_ref().unwrap(), "traffic/path");
+        assert_eq!(&**config.traffic.as_ref().unwrap().path.as_ref().unwrap(), "traffic/path");
+        assert_eq!(&config.traffic.as_ref().unwrap().detail("root").unwrap(), "foo");
+        assert_eq!(&config.workload.as_ref().unwrap().detail("root").unwrap(), "foo");
 
-        assert_eq!(&config.traffic.as_ref().unwrap()
-                          .detail("foo").unwrap(), "bar");
+        let sources = config.workload.as_ref().unwrap().sources.as_ref().unwrap();
 
-        assert_eq!(&config.workload.as_ref().unwrap()
-                          .detail("foo").unwrap(), "bar");
-
-        assert_eq!(&**config.workload.as_ref().unwrap()
-                            .sources.as_ref().unwrap()[0]
-                            .path.as_ref().unwrap(), "workload1/path");
-
-        assert_eq!(&config.workload.as_ref().unwrap()
-                          .sources.as_ref().unwrap()[0]
-                          .detail("foo").unwrap(), "bar");
+        assert_eq!(&**sources[0].path.as_ref().unwrap(), "workload1/path");
+        assert_eq!(&**sources[1].path.as_ref().unwrap(), "workload2/path");
+        assert_eq!(&sources[0].detail("root").unwrap(), "foo");
+        assert_eq!(&sources[1].detail("root").unwrap(), "bar");
     }
 }

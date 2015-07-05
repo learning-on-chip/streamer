@@ -10,7 +10,7 @@ dependencies = [
  "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "toml 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
+ "toml 0.1.21 (git+https://github.com/IvanUkhov/toml-rs.git?branch=array-leftovers)",
 ]
 
 [[package]]
@@ -112,7 +112,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "toml"
 version = "0.1.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/IvanUkhov/toml-rs.git?branch=array-leftovers#b4f1e4371929db3ba4d6a0fdad464177e28bf981"
 dependencies = [
  "rustc-serialize 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

@@ -35,7 +35,6 @@ impl Workload {
 impl Source {
     pub fn new(config: &config::Source) -> Result<Source> {
         let backend = ok!(Connection::open(&path!(config, "a workload-source database")));
-
         info!(target: "workload", "Reading a database...");
         Ok(Source { components: try!(read_components(&backend)) })
     }
