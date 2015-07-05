@@ -73,12 +73,12 @@ impl Streamer {
     pub fn new<T: AsRef<Path>>(config: T) -> Result<Streamer> {
         let config = try!(Config::new(config));
 
-        let traffic = match config.get::<Config>("traffic") {
+        let traffic = match config.branch("traffic") {
             Some(ref traffic) => try!(Traffic::new(traffic)),
             _ => raise!("a traffic configuration is required"),
         };
 
-        let workload = match config.get::<Config>("workload") {
+        let workload = match config.branch("workload") {
             Some(ref workload) => try!(Workload::new(workload)),
             _ => raise!("a workload configuration is required"),
         };
