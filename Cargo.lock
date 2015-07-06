@@ -4,7 +4,7 @@ version = "0.0.1"
 dependencies = [
  "arguments 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "assert 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "fractal 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "fractal 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -33,13 +33,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "fractal"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "dwt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "statistics 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "statistics 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -106,7 +106,7 @@ dependencies = [
 
 [[package]]
 name = "statistics"
-version = "0.2.0"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]

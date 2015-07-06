@@ -35,7 +35,7 @@ impl Traffic {
         };
 
         info!(target: "traffic", "Fitting a model...");
-        Ok(Traffic { model: Rc::new(ok!(Beta::fit(&data, ncoarse))) })
+        Ok(Traffic { model: Rc::new(ok!(Beta::new(&data, ncoarse))) })
     }
 
     #[inline]
