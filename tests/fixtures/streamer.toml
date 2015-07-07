@@ -18,6 +18,6 @@ query_leakage_power = """
 SELECT `component_id`, `leakage_power` FROM `static`;
 """
 
-[[workload.sources]]
+[[workload.patterns]]
 name = "Black–Scholes"
 path = "blackscholes.sqlite3"

@@ -1,6 +1,9 @@
 #[cfg(test)]
 extern crate assert;
 
+#[macro_use]
+extern crate log;
+
 extern crate fractal;
 extern crate options;
 extern crate probability;
@@ -8,12 +11,7 @@ extern crate random;
 extern crate sqlite;
 extern crate toml;
 
-#[macro_use]
-extern crate log;
-
-use random::Source;
 use std::{error, fmt};
-use std::path::Path;
 
 macro_rules! raise(
     ($message:expr) => (return Err(Box::new(::ErrorString($message.to_string()))));
@@ -46,69 +44,18 @@ macro_rules! path(
 );
 
 mod config;
+mod system;
 mod traffic;
 mod workload;
 
-use config::Config;
-use traffic::{Traffic, Queue};
-use workload::Workload;
+pub use system::{State, System};
 
-pub struct ErrorString(pub String);
 pub type Error = Box<std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub struct Streamer {
-    pub traffic: Traffic,
-    pub workload: Workload,
-}
+pub struct ErrorString(pub String);
 
-pub struct Stream<'l, S: Source + 'l> {
-    queue: Queue<'l, S>,
-}
-
-#[derive(Clone, Copy)]
-pub struct State(f64);
-
-impl Streamer {
-    pub fn new<T: AsRef<Path>>(config: T) -> Result<Streamer> {
-        let config = try!(Config::new(config));
-
-        let traffic = match config.branch("traffic") {
-            Some(ref traffic) => try!(Traffic::new(traffic)),
-            _ => raise!("a traffic configuration is required"),
-        };
-
-        let workload = match config.branch("workload") {
-            Some(ref workload) => try!(Workload::new(workload)),
-            _ => raise!("a workload configuration is required"),
-        };
-
-        Ok(Streamer {
-            traffic: traffic,
-            workload: workload,
-        })
-    }
-
-    #[inline]
-    pub fn iter<'l, S: Source>(&'l self, source: &'l mut S) -> Stream<'l, S> {
-        Stream { queue: self.traffic.iter(source) }
-    }
-}
-
-impl<'l, S: Source> Iterator for Stream<'l, S> {
-    type Item = State;
-
-    #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
-        self.queue.next().map(|time| State(time))
-    }
-}
-
-impl fmt::Display for State {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:25.15e}", self.0)
-    }
-}
+pub type Random = random::Default;
 
 impl fmt::Debug for ErrorString {
     #[inline]

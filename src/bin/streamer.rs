@@ -7,7 +7,7 @@ extern crate streamer;
 
 use std::error::Error;
 use std::path::PathBuf;
-use streamer::{ErrorString, Result, Streamer};
+use streamer::{ErrorString, Result, System};
 
 mod logger;
 
@@ -42,13 +42,13 @@ fn start() -> Result<()> {
     if arguments.get::<bool>("help").unwrap_or(false) {
         help();
     }
-    let streamer = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
-        Some(ref config) => try!(Streamer::new(config)),
+
+    let system = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
+        Some(ref config) => try!(System::new(config, &random::default())),
         _ => raise!("a configuration file is required"),
     };
 
-    let mut source = random::default().seed([42, 69]);
-    for state in streamer.iter(&mut source).take(100) {
+    for state in system.take(100) {
         println!("{}", state);
     }
 

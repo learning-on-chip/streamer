@@ -1,25 +1,19 @@
 use fractal::Beta;
-use random::Source;
 use sqlite::{Connection, State};
+use std::collections::VecDeque;
 use std::rc::Rc;
 
-use Result;
+use {Random, Result};
 use config::Config;
 
 pub struct Traffic {
     model: Rc<Beta>,
-}
-
-pub struct Queue<'l, S: Source + 'l> {
-    model: Rc<Beta>,
-    source: &'l mut S,
-    time: f64,
-    steps: Vec<f64>,
-    position: usize,
+    random: Random,
+    steps: VecDeque<f64>,
 }
 
 impl Traffic {
-    pub fn new(config: &Config) -> Result<Traffic> {
+    pub fn new(config: &Config, random: &Random) -> Result<Traffic> {
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "traffic", "Reading the database...");
@@ -30,55 +24,37 @@ impl Traffic {
         info!(target: "traffic", "Read {} interarrivals.", data.len());
 
         let ncoarse = match (data.len() as f64).log2().floor() {
-            ncoarse if ncoarse < 1.0 => raise!("there are not enought data"),
+            ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),
             ncoarse => ncoarse as usize,
         };
 
         info!(target: "traffic", "Fitting a model...");
-        Ok(Traffic { model: Rc::new(ok!(Beta::new(&data, ncoarse))) })
+        Ok(Traffic {
+            model: Rc::new(ok!(Beta::new(&data, ncoarse))),
+            random: random.clone(),
+            steps: VecDeque::new(),
+        })
     }
 
-    #[inline]
-    pub fn iter<'l, S: Source + 'l>(&'l self, source: &'l mut S) -> Queue<'l, S> {
-        Queue {
-            model: self.model.clone(),
-            source: source,
-            time: 0.0,
-            steps: vec![],
-            position: 0,
-        }
-    }
-}
-
-impl<'l, S: Source> Queue<'l, S> {
-    #[inline]
-    fn is_empty(&self) -> bool {
-        self.position >= self.steps.len()
-    }
-
-    #[inline]
-    fn renew(&mut self) -> Result<()> {
-        info!(target: "traffic", "Sampling the model...");
-        self.steps = ok!(self.model.sample(self.source));
-        info!(target: "traffic", "Sampled {} interarrivals.", self.steps.len());
-        self.position = 0;
+    fn refill(&mut self) -> Result<()> {
+        info!(target: "traffic", "Refilling the queue...");
+        self.steps.extend(&ok!(self.model.sample(&mut self.random)));
+        info!(target: "traffic", "The queue contains {} arrivals.", self.steps.len());
         Ok(())
     }
 }
 
-impl<'l, S: Source> Iterator for Queue<'l, S> {
+impl Iterator for Traffic {
     type Item = f64;
 
     fn next(&mut self) -> Option<f64> {
-        if self.is_empty() {
-            if let Err(error) = self.renew() {
-                error!(target: "traffic", "Failed to sample the model ({}).", error);
+        if self.steps.is_empty() {
+            if let Err(error) = self.refill() {
+                error!(target: "traffic", "Failed to refill the queue ({}).", error);
                 return None;
             }
         }
-        self.time += self.steps[self.position];
-        self.position += 1;
-        Some(self.time)
+        self.steps.pop_front()
     }
 }
 

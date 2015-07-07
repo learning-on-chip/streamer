@@ -1,14 +1,14 @@
 use sqlite::{Connection, State};
 use std::collections::HashMap;
 
-use Result;
+use {Random, Result};
 use config::Config;
 
 pub struct Workload {
-    pub sources: Vec<Source>,
+    pub patterns: Vec<Pattern>,
 }
 
-pub struct Source {
+pub struct Pattern {
     pub components: Vec<Component>,
 }
 
@@ -19,23 +19,23 @@ pub struct Component {
 }
 
 impl Workload {
-    pub fn new(config: &Config) -> Result<Workload> {
-        let mut sources = vec![];
-        if let Some(configs) = config.get::<Vec<Config>>("sources") {
+    pub fn new(config: &Config, _: &Random) -> Result<Workload> {
+        let mut patterns = vec![];
+        if let Some(configs) = config.get::<Vec<Config>>("patterns") {
             for config in configs {
-                sources.push(try!(Source::new(config)));
+                patterns.push(try!(Pattern::new(config)));
             }
         }
-        if sources.is_empty() {
-            raise!("at least one workload source is required");
+        if patterns.is_empty() {
+            raise!("at least one workload pattern is required");
         }
-        Ok(Workload { sources: sources })
+        Ok(Workload { patterns: patterns })
     }
 }
 
-impl Source {
-    pub fn new(config: &Config) -> Result<Source> {
-        let backend = ok!(Connection::open(&path!(config, "a workload-source database")));
+impl Pattern {
+    pub fn new(config: &Config) -> Result<Pattern> {
+        let backend = ok!(Connection::open(&path!(config, "a workload pattern database")));
 
         info!(target: "workload", "Reading a database...");
 
@@ -70,7 +70,7 @@ impl Source {
             });
         }
 
-        Ok(Source { components: components })
+        Ok(Pattern { components: components })
     }
 }
 

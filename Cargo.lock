@@ -7,8 +7,8 @@ dependencies = [
  "fractal 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "probability 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "probability 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "random 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "toml 0.1.21 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -37,8 +37,8 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "dwt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "probability 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "probability 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "random 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "statistics 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -62,16 +62,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "probability"
-version = "0.10.0"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "random 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "random 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "special 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "random"
-version = "0.8.0"
+version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
