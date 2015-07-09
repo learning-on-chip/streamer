@@ -3,17 +3,17 @@ use sqlite::{Connection, State};
 use std::collections::VecDeque;
 use std::rc::Rc;
 
-use {Random, Result};
 use config::Config;
+use {Result, Source};
 
 pub struct Traffic {
     model: Rc<Beta>,
-    random: Random,
+    source: Source,
     steps: VecDeque<f64>,
 }
 
 impl Traffic {
-    pub fn new(config: &Config, random: &Random) -> Result<Traffic> {
+    pub fn new(config: &Config, source: &Source) -> Result<Traffic> {
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "traffic", "Reading the database...");
@@ -31,23 +31,12 @@ impl Traffic {
         info!(target: "traffic", "Fitting a model...");
         Ok(Traffic {
             model: Rc::new(ok!(Beta::new(&data, ncoarse))),
-            random: random.clone(),
+            source: source.clone(),
             steps: VecDeque::new(),
         })
     }
 
-    fn refill(&mut self) -> Result<()> {
-        info!(target: "traffic", "Refilling the queue...");
-        self.steps.extend(&ok!(self.model.sample(&mut self.random)));
-        info!(target: "traffic", "The queue contains {} arrivals.", self.steps.len());
-        Ok(())
-    }
-}
-
-impl Iterator for Traffic {
-    type Item = f64;
-
-    fn next(&mut self) -> Option<f64> {
+    pub fn next(&mut self) -> Option<f64> {
         if self.steps.is_empty() {
             if let Err(error) = self.refill() {
                 error!(target: "traffic", "Failed to refill the queue ({}).", error);
@@ -55,6 +44,13 @@ impl Iterator for Traffic {
             }
         }
         self.steps.pop_front()
+    }
+
+    fn refill(&mut self) -> Result<()> {
+        info!(target: "traffic", "Refilling the queue...");
+        self.steps.extend(&ok!(self.model.sample(&mut self.source)));
+        info!(target: "traffic", "The queue contains {} arrivals.", self.steps.len());
+        Ok(())
     }
 }
 

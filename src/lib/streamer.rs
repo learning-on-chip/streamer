@@ -55,7 +55,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 pub struct ErrorString(pub String);
 
-pub type Random = random::Default;
+pub type Source = random::Default;
 
 impl fmt::Debug for ErrorString {
     #[inline]

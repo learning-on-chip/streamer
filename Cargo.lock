@@ -2,11 +2,11 @@
 name = "streamer"
 version = "0.0.1"
 dependencies = [
- "arguments 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "arguments 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "assert 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "options 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -15,10 +15,10 @@ dependencies = [
 
 [[package]]
 name = "arguments"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "options 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "options 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -57,7 +57,7 @@ dependencies = [
 
 [[package]]
 name = "options"
-version = "0.3.0"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]

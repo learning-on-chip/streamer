@@ -44,7 +44,7 @@ fn start() -> Result<()> {
     }
 
     let system = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
-        Some(ref config) => try!(System::new(config, &random::default())),
+        Some(ref config) => try!(System::new(config, &random::default().seed([69, 42]))),
         _ => raise!("a configuration file is required"),
     };
 

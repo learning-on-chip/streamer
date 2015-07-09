@@ -1,14 +1,18 @@
+use probability::distribution::{Categorical, Sample};
 use sqlite::{Connection, State};
 use std::collections::HashMap;
 
-use {Random, Result};
 use config::Config;
+use {Result, Source};
 
 pub struct Workload {
-    pub patterns: Vec<Pattern>,
+    patterns: Vec<Pattern>,
+    source: Source,
+    distribution: Categorical,
 }
 
 pub struct Pattern {
+    pub name: String,
     pub components: Vec<Component>,
 }
 
@@ -19,26 +23,40 @@ pub struct Component {
 }
 
 impl Workload {
-    pub fn new(config: &Config, _: &Random) -> Result<Workload> {
+    pub fn new(config: &Config, source: &Source) -> Result<Workload> {
         let mut patterns = vec![];
-        if let Some(configs) = config.get::<Vec<Config>>("patterns") {
+        if let Some(ref configs) = config.collection("patterns") {
             for config in configs {
                 patterns.push(try!(Pattern::new(config)));
             }
         }
-        if patterns.is_empty() {
+        let count = patterns.len();
+        if count == 0 {
             raise!("at least one workload pattern is required");
         }
-        Ok(Workload { patterns: patterns })
+        Ok(Workload {
+            patterns: patterns,
+            source: source.clone(),
+            distribution: Categorical::new(&vec![1.0 / count as f64; count]),
+        })
+    }
+
+    pub fn next<'l>(&'l mut self) -> Option<&'l Pattern> {
+        Some(&self.patterns[self.distribution.sample(&mut self.source)])
     }
 }
 
 impl Pattern {
     pub fn new(config: &Config) -> Result<Pattern> {
-        let backend = ok!(Connection::open(&path!(config, "a workload pattern database")));
+        let path = path!(config, "a workload pattern database");
+        let backend = ok!(Connection::open(&path));
 
         info!(target: "workload", "Reading a database...");
 
+        let name = match config.get::<String>("name") {
+            Some(name) => name.to_string(),
+            _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
+        };
         let mut names = match config.get::<String>("query_names") {
             Some(query) => try!(read_names(&backend, query)),
             _ => raise!("an SQL query for reading components’ names is required"),
@@ -70,7 +88,7 @@ impl Pattern {
             });
         }
 
-        Ok(Pattern { components: components })
+        Ok(Pattern { name: name, components: components })
     }
 }
 

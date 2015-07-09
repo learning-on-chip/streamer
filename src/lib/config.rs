@@ -51,16 +51,30 @@ impl Config {
     }
 
     pub fn branch(&self, path: &str) -> Option<Config> {
-        if let None = self.get::<Node>(path) {
-            return None;
-        }
-        Some(Config {
-            node: self.node.clone(),
-            path: if self.path.is_empty() {
-                path.to_string()
-            } else {
-                format!("{}.{}", &self.path, path)
-            },
+        self.get::<Node>(path).map(|_| {
+            Config {
+                node: self.node.clone(),
+                path: if self.path.is_empty() {
+                    path.to_string()
+                } else {
+                    format!("{}.{}", &self.path, path)
+                },
+            }
+        })
+    }
+
+    pub fn collection(&self, path: &str) -> Option<Vec<Config>> {
+        self.get::<Vec<Node>>(path).map(|array| {
+            array.iter().enumerate().map(|(i, _)| {
+                Config {
+                    node: self.node.clone(),
+                    path: if self.path.is_empty() {
+                        format!("{}.{}", path, i)
+                    } else {
+                        format!("{}.{}.{}", &self.path, path, i)
+                    },
+                }
+            }).collect()
         })
     }
 }
@@ -171,7 +185,7 @@ mod tests {
     use super::{Config, Node};
 
     #[test]
-    fn branch_get() {
+    fn branch() {
         let content = r#"
             qux = 69
 
@@ -199,5 +213,26 @@ mod tests {
             let config = config.branch("bar.baz.0").unwrap();
             assert_eq!(config.get::<i64>("qux").unwrap(), &42);
         }
+    }
+
+    #[test]
+    fn collection() {
+        let content = r#"
+            [[foo.bar]]
+            baz = 42
+
+            [[foo.bar]]
+            baz = 69
+        "#;
+        let config = Config {
+            node: Rc::new(Node::parse(content).unwrap()),
+            path: String::new(),
+        };
+
+        let baz = config.collection("foo.bar").unwrap().iter().map(|config| {
+            *config.get::<i64>("baz").unwrap()
+        }).collect::<Vec<_>>();
+
+        assert_eq!(&baz, &[42, 69]);
     }
 }
