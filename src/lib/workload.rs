@@ -51,8 +51,7 @@ impl Pattern {
         let path = path!(config, "a workload pattern database");
         let backend = ok!(Connection::open(&path));
 
-        info!(target: "workload", "Reading a database...");
-
+        info!(target: "workload", "Reading {:?}...", &path);
         let name = match config.get::<String>("name") {
             Some(name) => name.to_string(),
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
@@ -127,7 +126,7 @@ mod tests {
 
     #[test]
     fn read_names() {
-        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
         let data = super::read_names(&backend, "
             SELECT `component_id`, `name` FROM `static`;
         ").unwrap();
@@ -140,7 +139,7 @@ mod tests {
 
     #[test]
     fn read_dynamic_power() {
-        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
         let data = super::read_dynamic_power(&backend, "
             SELECT `component_id`, `dynamic_power` FROM `dynamic`
             ORDER BY `time` ASC;
@@ -151,13 +150,13 @@ mod tests {
             assert_eq!(data.len(), 76);
         }
         assert::close(&[data.get(&0).unwrap()[2]], &[0.608065803127267], 1e-14);
-        assert::close(&[data.get(&1).unwrap()[4]], &[9.19824419508802], 1e-14);
-        assert::close(&[data.get(&2).unwrap()[0]], &[0.00613680976814029], 1e-14);
+        assert::close(&[data.get(&1).unwrap()[4]], &[9.19809606345627], 1e-14);
+        assert::close(&[data.get(&2).unwrap()[0]], &[0.00613345574868796], 1e-14);
     }
 
     #[test]
     fn read_leakage_power() {
-        let backend = Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap();
+        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
         let data = super::read_leakage_power(&backend, "
             SELECT `component_id`, `leakage_power` FROM `static`;
         ").unwrap();

@@ -19,5 +19,40 @@ SELECT `component_id`, `leakage_power` FROM `static`;
 """
 
 [[workload.patterns]]
-name = "Black–Scholes"
-path = "blackscholes.sqlite3"
+path = "parsec/blackscholes.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/bodytrack.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/canneal.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/dedup.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/facesim.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/ferret.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/fluidanimate.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/freqmine.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/raytrace.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/streamcluster.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/swaptions.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/vips.sqlite3"
+
+[[workload.patterns]]
+path = "parsec/x264.sqlite3"

@@ -14,21 +14,20 @@ pub struct Traffic {
 
 impl Traffic {
     pub fn new(config: &Config, source: &Source) -> Result<Traffic> {
+        let path = path!(config, "a workload pattern database");
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
-        info!(target: "traffic", "Reading the database...");
+        info!(target: "traffic", "Reading {:?}...", &path);
         let data = match config.get::<String>("query") {
             Some(ref query) => try!(read_interarrivals(&backend, query)),
             _ => raise!("an SQL query for reading the traffic data is required"),
         };
-        info!(target: "traffic", "Read {} interarrivals.", data.len());
-
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),
             ncoarse => ncoarse as usize,
         };
 
-        info!(target: "traffic", "Fitting a model...");
+        info!(target: "traffic", "Read {} arrivals. Fitting the model...", data.len());
         Ok(Traffic {
             model: Rc::new(ok!(Beta::new(&data, ncoarse))),
             source: source.clone(),
@@ -49,7 +48,7 @@ impl Traffic {
     fn refill(&mut self) -> Result<()> {
         info!(target: "traffic", "Refilling the queue...");
         self.steps.extend(&ok!(self.model.sample(&mut self.source)));
-        info!(target: "traffic", "The queue contains {} arrivals.", self.steps.len());
+        info!(target: "traffic", "The queue contains {} interarrivals.", self.steps.len());
         Ok(())
     }
 }
