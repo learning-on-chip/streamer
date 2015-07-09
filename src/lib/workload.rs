@@ -69,18 +69,18 @@ impl Pattern {
             _ => raise!("an SQL query for reading the leakage power is required"),
         };
 
-        let mut ids = names.keys().map(|&name| name).collect::<Vec<_>>();
+        let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
 
         let mut components = vec![];
-        for i in ids {
+        for id in ids {
             components.push(Component {
-                name: names.remove(&i).unwrap(),
-                dynamic_power: match dynamic_power.remove(&i) {
+                name: names.remove(&id).unwrap(),
+                dynamic_power: match dynamic_power.remove(&id) {
                     Some(value) => value,
                     _ => raise!("cannot find the dynamic power of a component"),
                 },
-                leakage_power: match leakage_power.remove(&i) {
+                leakage_power: match leakage_power.remove(&id) {
                     Some(value) => value,
                     _ => raise!("cannot find the leakage power of a component"),
                 },
