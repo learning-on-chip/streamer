@@ -29,7 +29,7 @@ dimensions:
    cell length 0.002e6, width 0.002e6;
 
 stack:
-   die DIE1 DIE floorplan "die.flp";
+   die DIE1 DIE floorplan "tests/fixtures/gainestown.flp";
 
 solver:
    transient step 0.001, slot 0.001;
