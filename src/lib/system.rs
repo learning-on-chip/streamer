@@ -1,11 +1,12 @@
 use std::collections::VecDeque;
 use std::fmt;
 use std::path::Path;
+use std::rc::Rc;
 
-use {Result, Source};
 use config::Config;
 use traffic::Traffic;
-use workload::Workload;
+use workload::{Pattern, Workload};
+use {Result, Source};
 
 pub struct System {
     time: f64,
@@ -17,7 +18,7 @@ pub struct System {
 #[derive(Clone)]
 pub struct State {
     pub time: f64,
-    pub name: String,
+    pub pattern: Rc<Pattern>,
 }
 
 impl System {
@@ -57,7 +58,7 @@ impl Iterator for System {
         self.time += step;
         self.states.push_back(State {
             time: self.time,
-            name: pattern.name.to_string(),
+            pattern: pattern,
         });
         self.states.pop_front()
     }
@@ -65,6 +66,6 @@ impl Iterator for System {
 
 impl fmt::Display for State {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:10.2} s - {}", self.time, &self.name)
+        write!(formatter, "{:10.2} s - {}", self.time, &self.pattern.name)
     }
 }
