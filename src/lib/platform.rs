@@ -1,6 +1,6 @@
 use Result;
 use config::Config;
-use threed_ice::{Stack, StackElement};
+use threed_ice::{StackElement, System};
 
 pub struct Platform {
     pub elements: Vec<Element>,
@@ -15,7 +15,7 @@ impl Platform {
         let path = path!(config, "a stack description");
 
         info!(target: "platform", "Reading {:?}...", &path);
-        let stack = ok!(Stack::new(&path));
+        let stack = ok!(ok!(System::new(&path)).stack());
 
         let mut elements = vec![];
         for element in stack.elements {
