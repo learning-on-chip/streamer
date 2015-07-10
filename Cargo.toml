@@ -19,6 +19,7 @@ options = "*"
 probability = "*"
 random = "*"
 sqlite = "*"
+threed-ice = "*"
 toml = "*"
 
 [dev-dependencies]

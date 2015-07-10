@@ -4,12 +4,14 @@ use std::path::Path;
 use std::rc::Rc;
 
 use config::Config;
+use platform::Platform;
 use traffic::Traffic;
 use workload::{Pattern, Workload};
 use {Result, Source};
 
 pub struct System {
     time: f64,
+    platform: Platform,
     traffic: Traffic,
     workload: Workload,
     states: VecDeque<State>,
@@ -25,6 +27,10 @@ impl System {
     pub fn new<T: AsRef<Path>>(config: T, source: &Source) -> Result<System> {
         let config = try!(Config::new(config));
 
+        let platform = match config.branch("platform") {
+            Some(ref platform) => try!(Platform::new(platform)),
+            _ => raise!("a platform configuration is required"),
+        };
         let traffic = match config.branch("traffic") {
             Some(ref traffic) => try!(Traffic::new(traffic, source)),
             _ => raise!("a traffic configuration is required"),
@@ -36,6 +42,7 @@ impl System {
 
         Ok(System {
             time: 0.0,
+            platform: platform,
             traffic: traffic,
             workload: workload,
             states: VecDeque::new(),

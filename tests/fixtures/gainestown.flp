@@ -1,0 +1,23 @@
+Core0:
+  position 0, 0;
+  dimension 2000, 2000;
+
+  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+
+Core1:
+  position 2000, 0;
+  dimension 2000, 2000;
+
+  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+
+Core2:
+  position 0, 2000;
+  dimension 2000, 2000;
+
+  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+
+Core3:
+  position 2000, 2000;
+  dimension 2000, 2000;
+
+  power values 10.0, 12.5, 15.0, 12.5, 10.0;

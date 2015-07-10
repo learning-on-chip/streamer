@@ -1,3 +1,6 @@
+[platform]
+path = "gainestown.stk"
+
 [traffic]
 path = "google.sqlite3"
 query = """

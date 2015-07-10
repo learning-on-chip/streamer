@@ -9,6 +9,7 @@ extern crate options;
 extern crate probability;
 extern crate random;
 extern crate sqlite;
+extern crate threed_ice;
 extern crate toml;
 
 use std::{error, fmt};
@@ -44,6 +45,7 @@ macro_rules! path(
 );
 
 mod config;
+mod platform;
 mod system;
 mod traffic;
 mod workload;
