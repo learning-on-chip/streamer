@@ -15,10 +15,10 @@ impl Platform {
         let path = path!(config, "a stack description");
 
         info!(target: "platform", "Reading {:?}...", &path);
-        let stack = ok!(ok!(System::new(&path)).stack());
+        let system = ok!(System::new(&path));
 
         let mut elements = vec![];
-        for element in stack.elements {
+        for element in ok!(system.stack_description().elements()) {
             match element {
                 StackElement::Die(ref die) => {
                     for element in die.floorplan.elements.iter() {
