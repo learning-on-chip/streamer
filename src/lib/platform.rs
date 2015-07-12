@@ -18,16 +18,13 @@ impl Platform {
         let system = ok!(System::new(&path));
 
         let mut elements = vec![];
-        for element in ok!(system.stack_description().elements()) {
-            match element {
-                StackElement::Die(ref die) => {
-                    for element in die.floorplan.elements.iter() {
-                        elements.push(Element {
-                            name: element.name.clone(),
-                        });
-                    }
-                },
-                _ => {},
+        for element in system.stack_description().elements() {
+            if let StackElement::Die(ref die) = element {
+                for element in die.floorplan.elements.iter() {
+                    elements.push(Element {
+                        name: element.name.clone(),
+                    });
+                }
             }
         }
 
