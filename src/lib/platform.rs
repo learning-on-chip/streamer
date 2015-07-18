@@ -2,12 +2,15 @@ use Result;
 use config::Config;
 use threed_ice::{StackElement, System};
 
+#[derive(Clone, Debug)]
 pub struct Platform {
     pub elements: Vec<Element>,
 }
 
-pub struct Element {
-    pub name: String,
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Element {
+    Core,
+    L3,
 }
 
 impl Platform {
@@ -18,12 +21,17 @@ impl Platform {
         let system = ok!(System::new(&path));
 
         let mut elements = vec![];
-        for element in system.stack_description().elements() {
-            if let StackElement::Die(ref die) = element {
+        for element in system.stack.elements.iter().rev() {
+            if let &StackElement::Die(ref die) = element {
                 for element in die.floorplan.elements.iter() {
-                    elements.push(Element {
-                        name: element.name.clone(),
-                    });
+                    let id = element.id.to_lowercase();
+                    if id.starts_with("core") {
+                        elements.push(Element::Core);
+                    } else if id.starts_with("l3") {
+                        elements.push(Element::L3);
+                    } else {
+                        raise!("found an unknown id {:?}", &element.id);
+                    }
                 }
             }
         }
@@ -35,6 +43,7 @@ impl Platform {
 #[cfg(test)]
 mod tests {
     use config::Config;
+    use super::Element::Core;
     use super::Platform;
 
     #[test]
@@ -42,7 +51,6 @@ mod tests {
         let config = Config::new("tests/fixtures/streamer.toml").unwrap()
                             .branch("platform").unwrap();
         let platform = Platform::new(&config).unwrap();
-        assert_eq!(platform.elements.iter().map(|element| &element.name).collect::<Vec<_>>(),
-                   &["Core0", "Core1", "Core2", "Core3"]);
+        assert_eq!(&platform.elements, &[Core, Core, Core, Core]);
     }
 }
