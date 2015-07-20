@@ -52,17 +52,9 @@ impl Platform {
 }
 
 fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
-    let ambience = match config.get::<f64>("ambience") {
-        Some(&value) => value,
-        _ => raise!("an ambient temperature is required"),
-    };
-    let time_step = match config.get::<f64>("time_step") {
-        Some(&value) => value,
-        _ => raise!("a time step is required"),
-    };
     Ok(temperature::Config {
-        ambience: ambience,
-        time_step: time_step,
+        ambience: *expect!(config.get::<f64>("ambience"), "an ambient temperature"),
+        time_step: *expect!(config.get::<f64>("time_step"), "a time step"),
     })
 }
 

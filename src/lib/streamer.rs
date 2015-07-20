@@ -27,6 +27,13 @@ macro_rules! ok(
     });
 );
 
+macro_rules! expect(
+    ($option:expr, $name:expr) => (match $option {
+        Some(value) => value,
+        _ => raise!(concat!($name, " is required")),
+    });
+);
+
 macro_rules! path(
     ($config:ident, $destination:expr) => ({
         let mut path = match $config.get::<String>("path") {
