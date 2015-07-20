@@ -84,6 +84,6 @@ mod tests {
             WHERE `time` IS NOT 0 AND `event type` IS 0
             ORDER BY `time` ASC;
         ").ok().unwrap();
-        assert_eq!(data.len(), 19640);
+        assert_eq!(data.len(), 667926);
     }
 }
