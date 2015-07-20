@@ -19,6 +19,7 @@ options = "*"
 probability = "*"
 random = "*"
 sqlite = "*"
+temperature = { version = "*", features = ["threed-ice"], default-features = false }
 threed-ice = "*"
 toml = "*"
 

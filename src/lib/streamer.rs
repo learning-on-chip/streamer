@@ -9,6 +9,7 @@ extern crate options;
 extern crate probability;
 extern crate random;
 extern crate sqlite;
+extern crate temperature;
 extern crate threed_ice;
 extern crate toml;
 

@@ -1,9 +1,11 @@
 use Result;
 use config::Config;
+use temperature::{self, Analysis};
+use temperature::circuit::ThreeDICE;
 use threed_ice::{StackElement, System};
 
-#[derive(Clone, Debug)]
 pub struct Platform {
+    pub analysis: Analysis,
     pub elements: Vec<Element>,
 }
 
@@ -19,6 +21,15 @@ impl Platform {
 
         info!(target: "platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
+
+        info!(target: "platform", "Constructing a thermal circuit...");
+        let analysis = match config.branch("temperature") {
+            Some(ref temperature) => {
+                let temperature = try!(new_temperature_config(temperature));
+                ok!(Analysis::new(&ok!(ThreeDICE::from(&system)), &temperature))
+            },
+            _ => raise!("a temperature configuration is required"),
+        };
 
         let mut elements = vec![];
         for element in system.stack.elements.iter().rev() {
@@ -36,8 +47,23 @@ impl Platform {
             }
         }
 
-        Ok(Platform { elements: elements })
+        Ok(Platform { analysis: analysis, elements: elements })
     }
+}
+
+fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
+    let ambience = match config.get::<f64>("ambience") {
+        Some(&value) => value,
+        _ => raise!("an ambient temperature is required"),
+    };
+    let time_step = match config.get::<f64>("time_step") {
+        Some(&value) => value,
+        _ => raise!("a time step is required"),
+    };
+    Ok(temperature::Config {
+        ambience: ambience,
+        time_step: time_step,
+    })
 }
 
 #[cfg(test)]
