@@ -5,8 +5,8 @@ use temperature::circuit::ThreeDICE;
 use threed_ice::{StackElement, System};
 
 pub struct Platform {
-    pub simulator: Simulator,
     pub elements: Vec<Element>,
+    pub temperature: Simulator,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -21,14 +21,6 @@ impl Platform {
 
         info!(target: "platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
-
-        info!(target: "platform", "Constructing a thermal circuit...");
-        let simulator = {
-            let temperature = some!(config.branch("temperature"),
-                                    "a temperature configuration is required");
-            let temperature = try!(new_temperature_config(&temperature));
-            ok!(Simulator::new(&ok!(ThreeDICE::from(&system)), &temperature))
-        };
 
         let mut elements = vec![];
         for element in system.stack.elements.iter().rev() {
@@ -46,7 +38,15 @@ impl Platform {
             }
         }
 
-        Ok(Platform { simulator: simulator, elements: elements })
+        info!(target: "platform", "Constructing a thermal circuit...");
+        let temperature = {
+            let config = some!(config.branch("temperature"),
+                               "a temperature configuration is required");
+            ok!(Simulator::new(&ok!(ThreeDICE::from(&system)),
+                               &try!(new_temperature_config(&config))))
+        };
+
+        Ok(Platform { elements: elements, temperature: temperature })
     }
 }
 

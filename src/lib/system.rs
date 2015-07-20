@@ -27,17 +27,17 @@ impl System {
     pub fn new<T: AsRef<Path>>(config: T, source: &Source) -> Result<System> {
         let config = try!(Config::new(config));
 
-        let platform = match config.branch("platform") {
-            Some(ref platform) => try!(Platform::new(platform)),
-            _ => raise!("a platform configuration is required"),
+        let platform = {
+            let config = some!(config.branch("platform"), "a platform configuration is required");
+            try!(Platform::new(&config))
         };
-        let traffic = match config.branch("traffic") {
-            Some(ref traffic) => try!(Traffic::new(traffic, source)),
-            _ => raise!("a traffic configuration is required"),
+        let traffic = {
+            let config = some!(config.branch("traffic"), "a traffic configuration is required");
+            try!(Traffic::new(&config, source))
         };
-        let workload = match config.branch("workload") {
-            Some(ref workload) => try!(Workload::new(workload, source)),
-            _ => raise!("a workload configuration is required"),
+        let workload = {
+            let config = some!(config.branch("workload"), "a workload configuration is required");
+            try!(Workload::new(&config, source))
         };
 
         Ok(System {
