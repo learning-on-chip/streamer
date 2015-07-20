@@ -1,11 +1,11 @@
 use Result;
 use config::Config;
-use temperature::{self, Analysis};
+use temperature::{self, Simulator};
 use temperature::circuit::ThreeDICE;
 use threed_ice::{StackElement, System};
 
 pub struct Platform {
-    pub analysis: Analysis,
+    pub simulator: Simulator,
     pub elements: Vec<Element>,
 }
 
@@ -23,11 +23,11 @@ impl Platform {
         let system = ok!(System::new(&path));
 
         info!(target: "platform", "Constructing a thermal circuit...");
-        let analysis = {
+        let simulator = {
             let temperature = some!(config.branch("temperature"),
                                     "a temperature configuration is required");
             let temperature = try!(new_temperature_config(&temperature));
-            ok!(Analysis::new(&ok!(ThreeDICE::from(&system)), &temperature))
+            ok!(Simulator::new(&ok!(ThreeDICE::from(&system)), &temperature))
         };
 
         let mut elements = vec![];
@@ -46,7 +46,7 @@ impl Platform {
             }
         }
 
-        Ok(Platform { analysis: analysis, elements: elements })
+        Ok(Platform { simulator: simulator, elements: elements })
     }
 }
 
