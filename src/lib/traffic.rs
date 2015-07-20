@@ -18,9 +18,10 @@ impl Traffic {
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "traffic", "Reading {:?}...", &path);
-        let data = match config.get::<String>("query") {
-            Some(ref query) => try!(read_interarrivals(&backend, query)),
-            _ => raise!("an SQL query for reading the traffic data is required"),
+        let data = {
+            let query = some!(config.get::<String>("query"),
+                              "an SQL query for reading the traffic data");
+            try!(read_interarrivals(&backend, query))
         };
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),

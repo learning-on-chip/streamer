@@ -23,12 +23,11 @@ impl Platform {
         let system = ok!(System::new(&path));
 
         info!(target: "platform", "Constructing a thermal circuit...");
-        let analysis = match config.branch("temperature") {
-            Some(ref temperature) => {
-                let temperature = try!(new_temperature_config(temperature));
-                ok!(Analysis::new(&ok!(ThreeDICE::from(&system)), &temperature))
-            },
-            _ => raise!("a temperature configuration is required"),
+        let analysis = {
+            let temperature = some!(config.branch("temperature"),
+                                    "a temperature configuration is required");
+            let temperature = try!(new_temperature_config(&temperature));
+            ok!(Analysis::new(&ok!(ThreeDICE::from(&system)), &temperature))
         };
 
         let mut elements = vec![];
@@ -53,8 +52,8 @@ impl Platform {
 
 fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
     Ok(temperature::Config {
-        ambience: *expect!(config.get::<f64>("ambience"), "an ambient temperature"),
-        time_step: *expect!(config.get::<f64>("time_step"), "a time step"),
+        ambience: *some!(config.get::<f64>("ambience"), "an ambient temperature is required"),
+        time_step: *some!(config.get::<f64>("time_step"), "a time step is required"),
     })
 }
 

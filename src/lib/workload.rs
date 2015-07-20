@@ -57,17 +57,20 @@ impl Pattern {
             Some(name) => name.to_string(),
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
         };
-        let mut names = match config.get::<String>("query_names") {
-            Some(query) => try!(read_names(&backend, query)),
-            _ => raise!("an SQL query for reading components’ names is required"),
+        let mut names = {
+            let query = some!(config.get::<String>("query_names"),
+                              "an SQL query for reading components’ names is required");
+            try!(read_names(&backend, query))
         };
-        let mut dynamic_power = match config.get::<String>("query_dynamic_power") {
-            Some(query) => try!(read_dynamic_power(&backend, query)),
-            _ => raise!("an SQL query for reading the dynamic power is required"),
+        let mut dynamic_power = {
+            let query = some!(config.get::<String>("query_dynamic_power"),
+                              "an SQL query for reading the dynamic power is required");
+            try!(read_dynamic_power(&backend, query))
         };
-        let mut leakage_power = match config.get::<String>("query_leakage_power") {
-            Some(query) => try!(read_leakage_power(&backend, query)),
-            _ => raise!("an SQL query for reading the leakage power is required"),
+        let mut leakage_power = {
+            let query = some!(config.get::<String>("query_leakage_power"),
+                              "an SQL query for reading the leakage power is required");
+            try!(read_leakage_power(&backend, query))
         };
 
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
@@ -77,14 +80,10 @@ impl Pattern {
         for id in ids {
             components.push(Component {
                 name: names.remove(&id).unwrap(),
-                dynamic_power: match dynamic_power.remove(&id) {
-                    Some(value) => value,
-                    _ => raise!("cannot find the dynamic power of a component"),
-                },
-                leakage_power: match leakage_power.remove(&id) {
-                    Some(value) => value,
-                    _ => raise!("cannot find the leakage power of a component"),
-                },
+                dynamic_power: some!(dynamic_power.remove(&id),
+                                     "cannot find the dynamic power of a component"),
+                leakage_power: some!(leakage_power.remove(&id),
+                                     "cannot find the leakage power of a component"),
             });
         }
 

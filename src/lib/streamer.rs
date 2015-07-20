@@ -27,19 +27,17 @@ macro_rules! ok(
     });
 );
 
-macro_rules! expect(
-    ($option:expr, $name:expr) => (match $option {
+macro_rules! some(
+    ($option:expr, $($arg:tt)*) => (match $option {
         Some(value) => value,
-        _ => raise!(concat!($name, " is required")),
+        _ => raise!($($arg)*),
     });
 );
 
 macro_rules! path(
     ($config:ident, $destination:expr) => ({
-        let mut path = match $config.get::<String>("path") {
-            Some(ref path) => ::std::path::PathBuf::from(path),
-            _ => raise!("the path to {} is missing", $destination),
-        };
+        let path = some!($config.get::<String>("path"), "the path to {} is missing", $destination);
+        let mut path = ::std::path::PathBuf::from(path);
         if path.is_relative() {
             if let Some(ref root) = $config.get::<::std::path::PathBuf>("root") {
                 path = root.join(path);
