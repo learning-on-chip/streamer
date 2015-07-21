@@ -12,11 +12,13 @@ pub struct Workload {
     distribution: Categorical,
 }
 
+#[derive(Clone, Debug)]
 pub struct Pattern {
     pub name: String,
     pub components: Vec<Component>,
 }
 
+#[derive(Clone, Debug)]
 pub struct Component {
     pub name: String,
     pub dynamic_power: Vec<f64>,

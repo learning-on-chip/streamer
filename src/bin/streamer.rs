@@ -1,5 +1,3 @@
-#![cfg_attr(test, allow(dead_code))]
-
 extern crate arguments;
 extern crate log;
 extern crate random;
@@ -48,8 +46,8 @@ fn start() -> Result<()> {
         _ => raise!("a configuration file is required"),
     };
 
-    for state in system.take(100) {
-        println!("{}", state);
+    for event in system.take(100) {
+        println!("{}", event);
     }
 
     Ok(())

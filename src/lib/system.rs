@@ -1,26 +1,22 @@
-use std::collections::VecDeque;
-use std::fmt;
+use std::collections::BinaryHeap;
 use std::path::Path;
-use std::rc::Rc;
 
 use config::Config;
+use event::{Event, EventKind, Job};
 use platform::Platform;
 use traffic::Traffic;
-use workload::{Pattern, Workload};
+use workload::Workload;
 use {Result, Source};
 
 pub struct System {
     time: f64,
+    jobs: usize,
+
     platform: Platform,
     traffic: Traffic,
     workload: Workload,
-    states: VecDeque<State>,
-}
 
-#[derive(Clone)]
-pub struct State {
-    pub time: f64,
-    pub pattern: Rc<Pattern>,
+    queue: BinaryHeap<Event>,
 }
 
 impl System {
@@ -42,18 +38,21 @@ impl System {
 
         Ok(System {
             time: 0.0,
+            jobs: 0,
+
             platform: platform,
             traffic: traffic,
             workload: workload,
-            states: VecDeque::new(),
+
+            queue: BinaryHeap::new(),
         })
     }
 }
 
 impl Iterator for System {
-    type Item = State;
+    type Item = Event;
 
-    fn next(&mut self) -> Option<State> {
+    fn next(&mut self) -> Option<Event> {
         let step = match self.traffic.next() {
             Some(step) => step,
             _ => return None,
@@ -63,16 +62,14 @@ impl Iterator for System {
             _ => return None,
         };
         self.time += step;
-        self.states.push_back(State {
+        self.queue.push(Event {
             time: self.time,
-            pattern: pattern,
+            kind: EventKind::JobStart(Job {
+                id: self.jobs,
+                pattern: pattern,
+            }),
         });
-        self.states.pop_front()
-    }
-}
-
-impl fmt::Display for State {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:10.2} s - {}", self.time, &self.pattern.name)
+        self.jobs += 1;
+        self.queue.pop()
     }
 }

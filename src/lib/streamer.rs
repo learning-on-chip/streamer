@@ -51,12 +51,14 @@ macro_rules! path(
 );
 
 mod config;
+mod event;
 mod platform;
 mod system;
 mod traffic;
 mod workload;
 
-pub use system::{State, System};
+pub use system::System;
+pub use event::{Event, EventKind, Job};
 
 pub type Error = Box<std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;

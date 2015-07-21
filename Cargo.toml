@@ -10,6 +10,7 @@ path = "src/lib/streamer.rs"
 [[bin]]
 name = "streamer"
 path = "src/bin/streamer.rs"
+test = false
 
 [dependencies]
 arguments = "*"
