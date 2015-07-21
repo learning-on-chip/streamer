@@ -18,6 +18,10 @@ Options:
     --help                   Display this message.
 ";
 
+macro_rules! raise(
+    ($message:expr) => (return Err(Box::new(ErrorString($message.to_string()))));
+);
+
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
@@ -25,8 +29,11 @@ macro_rules! ok(
     });
 );
 
-macro_rules! raise(
-    ($message:expr) => (return Err(Box::new(ErrorString($message.to_string()))));
+macro_rules! some(
+    ($option:expr, $($arg:tt)*) => (match $option {
+        Some(value) => value,
+        _ => raise!($($arg)*),
+    });
 );
 
 fn main() {
@@ -41,9 +48,9 @@ fn start() -> Result<()> {
         help();
     }
 
-    let system = match arguments.get::<String>("config").map(|config| PathBuf::from(config)) {
-        Some(ref config) => try!(System::new(config, &random::default().seed([69, 42]))),
-        _ => raise!("a configuration file is required"),
+    let system = {
+        let config = some!(arguments.get::<String>("config"), "a configuration file is required");
+        try!(System::new(PathBuf::from(config), &random::default().seed([69, 42])))
     };
 
     for event in system.take(100) {
