@@ -1,14 +1,13 @@
 use fractal::Beta;
 use sqlite::{Connection, State};
 use std::collections::VecDeque;
-use std::rc::Rc;
 
 use config::Config;
 use {Result, Source};
 
 pub struct Traffic {
     time: f64,
-    model: Rc<Beta>,
+    model: Beta,
     source: Source,
     arrivals: VecDeque<f64>,
 }
@@ -32,7 +31,7 @@ impl Traffic {
         info!(target: "traffic", "Read {} arrivals. Fitting the model...", data.len());
         Ok(Traffic {
             time: 0.0,
-            model: Rc::new(ok!(Beta::new(&data, ncoarse))),
+            model: ok!(Beta::new(&data, ncoarse)),
             source: source.clone(),
             arrivals: VecDeque::new(),
         })
