@@ -7,6 +7,7 @@ use config::Config;
 use {Result, Source};
 
 pub struct Traffic {
+    time: f64,
     model: Rc<Beta>,
     source: Source,
     steps: VecDeque<f64>,
@@ -30,6 +31,7 @@ impl Traffic {
 
         info!(target: "traffic", "Read {} arrivals. Fitting the model...", data.len());
         Ok(Traffic {
+            time: 0.0,
             model: Rc::new(ok!(Beta::new(&data, ncoarse))),
             source: source.clone(),
             steps: VecDeque::new(),
@@ -43,7 +45,10 @@ impl Traffic {
                 return None;
             }
         }
-        self.steps.pop_front()
+        self.steps.pop_front().map(|step| {
+            self.time += step;
+            self.time
+        })
     }
 
     fn refill(&mut self) -> Result<()> {
