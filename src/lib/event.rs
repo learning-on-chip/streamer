@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::rc::Rc;
 
+use id::ID;
 use workload::Pattern;
 
 #[derive(Clone, Debug)]
@@ -19,7 +20,7 @@ pub enum EventKind {
 
 #[derive(Clone, Debug)]
 pub struct Job {
-    pub id: usize,
+    pub id: ID,
     pub pattern: Rc<Pattern>,
 }
 

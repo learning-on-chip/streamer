@@ -3,9 +3,9 @@ use std::path::Path;
 
 use config::Config;
 use event::{Event, EventKind, Job};
+use id::ID;
 use platform::Platform;
 use traffic::Traffic;
-use unique;
 use workload::Workload;
 use {Result, Source};
 
@@ -63,7 +63,7 @@ impl Iterator for System {
         self.queue.push(Event {
             time: time,
             kind: EventKind::JobArrival(Job {
-                id: unique::generate("job"),
+                id: ID::new("job"),
                 pattern: pattern,
             }),
         });
