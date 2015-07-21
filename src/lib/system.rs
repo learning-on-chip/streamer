@@ -10,12 +10,9 @@ use workload::Workload;
 use {Result, Source};
 
 pub struct System {
-    jobs: usize,
-
     platform: Platform,
     traffic: Traffic,
     workload: Workload,
-
     queue: BinaryHeap<Event>,
 }
 
@@ -37,12 +34,9 @@ impl System {
         };
 
         Ok(System {
-            jobs: 0,
-
             platform: platform,
             traffic: traffic,
             workload: workload,
-
             queue: BinaryHeap::new(),
         })
     }
@@ -67,7 +61,6 @@ impl Iterator for System {
                 pattern: pattern,
             }),
         });
-        self.jobs += 1;
 
         self.queue.pop()
     }
