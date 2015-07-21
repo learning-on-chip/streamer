@@ -55,6 +55,7 @@ mod event;
 mod platform;
 mod system;
 mod traffic;
+mod unique;
 mod workload;
 
 pub use system::System;

@@ -10,7 +10,7 @@ pub struct Traffic {
     time: f64,
     model: Rc<Beta>,
     source: Source,
-    steps: VecDeque<f64>,
+    arrivals: VecDeque<f64>,
 }
 
 impl Traffic {
@@ -34,27 +34,27 @@ impl Traffic {
             time: 0.0,
             model: Rc::new(ok!(Beta::new(&data, ncoarse))),
             source: source.clone(),
-            steps: VecDeque::new(),
+            arrivals: VecDeque::new(),
         })
     }
 
     pub fn next(&mut self) -> Option<f64> {
-        if self.steps.is_empty() {
-            if let Err(error) = self.refill() {
-                error!(target: "traffic", "Failed to refill the queue ({}).", error);
-                return None;
-            }
+        if let Err(error) = self.refill() {
+            error!(target: "traffic", "Failed to refill the queue ({}).", error);
+            return None;
         }
-        self.steps.pop_front().map(|step| {
-            self.time += step;
-            self.time
-        })
+        self.arrivals.pop_front()
     }
 
     fn refill(&mut self) -> Result<()> {
-        info!(target: "traffic", "Refilling the queue...");
-        self.steps.extend(&ok!(self.model.sample(&mut self.source)));
-        info!(target: "traffic", "The queue contains {} interarrivals.", self.steps.len());
+        if self.arrivals.is_empty() {
+            info!(target: "traffic", "Refilling the queue...");
+            for step in ok!(self.model.sample(&mut self.source)) {
+                self.time += step;
+                self.arrivals.push_back(self.time);
+            }
+            info!(target: "traffic", "The queue contains {} arrivals.", self.arrivals.len());
+        }
         Ok(())
     }
 }

@@ -5,11 +5,11 @@ use config::Config;
 use event::{Event, EventKind, Job};
 use platform::Platform;
 use traffic::Traffic;
+use unique;
 use workload::Workload;
 use {Result, Source};
 
 pub struct System {
-    time: f64,
     jobs: usize,
 
     platform: Platform,
@@ -37,7 +37,6 @@ impl System {
         };
 
         Ok(System {
-            time: 0.0,
             jobs: 0,
 
             platform: platform,
@@ -63,12 +62,11 @@ impl Iterator for System {
         };
         self.queue.push(Event {
             time: time,
-            kind: EventKind::JobStart(Job {
-                id: self.jobs,
+            kind: EventKind::JobArrival(Job {
+                id: unique::generate("job"),
                 pattern: pattern,
             }),
         });
-        self.time = time;
         self.jobs += 1;
 
         self.queue.pop()

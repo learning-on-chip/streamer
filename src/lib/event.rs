@@ -12,7 +12,9 @@ pub struct Event {
 
 #[derive(Clone, Debug)]
 pub enum EventKind {
+    JobArrival(Job),
     JobStart(Job),
+    JobFinish(Job),
 }
 
 #[derive(Clone, Debug)]
@@ -52,16 +54,23 @@ impl PartialOrd for Event {
 
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:10.2} s - {}", self.time, &self.kind)
+        write!(formatter, "{:9.2} s: {}", self.time, &self.kind)
     }
 }
 
 impl fmt::Display for EventKind {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        macro_rules! job(
+            ($job:expr, $description:expr) => (
+                write!(formatter, "job ({:5} {:15}) {}", $job.id, $job.pattern.name,
+                       $description)
+            );
+        );
+
         match self {
-            &EventKind::JobStart(ref job) => {
-                write!(formatter, "{}: {}", job.id, job.pattern.name)
-            },
+            &EventKind::JobArrival(ref job) => job!(job, "arrival"),
+            &EventKind::JobStart(ref job) => job!(job, "start"),
+            &EventKind::JobFinish(ref job) => job!(job, "finish"),
         }
     }
 }
