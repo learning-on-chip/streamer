@@ -25,8 +25,8 @@ die DIE:
    source 0.00015e+6 SILICON;
 
 dimensions:
-   chip length 0.004e6, width 0.004e6;
-   cell length 0.002e6, width 0.002e6;
+   chip length 0.015904e6, width 0.011844e6;
+   cell length 0.003976e6, width 0.005922e6;
 
 stack:
    die DIE1 DIE floorplan "tests/fixtures/gainestown.flp";

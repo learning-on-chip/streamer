@@ -1,23 +1,29 @@
 Core0:
   position 0, 0;
-  dimension 2000, 2000;
+  dimension 3976, 7951;
 
-  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+  power values 0;
 
 Core1:
-  position 2000, 0;
-  dimension 2000, 2000;
+  position 3976, 0;
+  dimension 3976, 7951;
 
-  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+  power values 0;
 
 Core2:
-  position 0, 2000;
-  dimension 2000, 2000;
+  position 7952, 0;
+  dimension 3976, 7951;
 
-  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+  power values 0;
 
 Core3:
-  position 2000, 2000;
-  dimension 2000, 2000;
+  position 11928, 0;
+  dimension 3976, 7951;
 
-  power values 10.0, 12.5, 15.0, 12.5, 10.0;
+  power values 0;
+
+L30:
+  position 0, 7951;
+  dimension 15904, 3893;
+
+  power values 0;

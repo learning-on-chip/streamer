@@ -203,12 +203,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "matrix 0.17.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "superlu 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "threed-ice-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "threed-ice-sys 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "threed-ice-sys"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
