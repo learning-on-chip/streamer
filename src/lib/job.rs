@@ -1,18 +1,17 @@
 use std::fmt;
-use std::rc::Rc;
 
-use id::ID;
+use ID;
 use workload::Pattern;
 
 #[derive(Clone, Debug)]
 pub struct Job {
     pub id: ID,
-    pub pattern: Rc<Pattern>,
+    pub pattern: Pattern,
 }
 
 impl Job {
     #[inline]
-    pub fn new(pattern: Rc<Pattern>) -> Job {
+    pub fn new(pattern: Pattern) -> Job {
         Job { id: ID::new("job"), pattern: pattern }
     }
 }

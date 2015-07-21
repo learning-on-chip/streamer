@@ -50,6 +50,35 @@ macro_rules! path(
     });
 );
 
+macro_rules! rc(
+    (
+        $(#[$attr:meta])*
+        pub struct $outer:ident($inner:ident) {
+            $(pub $name:ident: $kind:ty,)*
+        }
+    ) => (
+        $(#[$attr])*
+        pub struct $outer(::std::rc::Rc<$inner>);
+
+        $(#[$attr])*
+        pub struct $inner {
+            $(pub $name: $kind,)*
+        }
+
+        impl ::std::ops::Deref for $outer {
+            type Target = $inner;
+
+            #[inline]
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+    );
+    ($outer:ident($inner:ident { $($name:ident: $value:expr),* })) => (
+        $outer(::std::rc::Rc::new($inner { $($name: $value),* }))
+    );
+);
+
 mod config;
 mod event;
 mod id;

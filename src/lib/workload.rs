@@ -1,22 +1,23 @@
 use probability::distribution::{Categorical, Sample};
 use sqlite::{Connection, State};
 use std::collections::HashMap;
-use std::rc::Rc;
 
 use config::Config;
 use platform::ElementKind;
 use {Result, Source};
 
 pub struct Workload {
-    patterns: Vec<Rc<Pattern>>,
+    patterns: Vec<Pattern>,
     source: Source,
     distribution: Categorical,
 }
 
-#[derive(Clone, Debug)]
-pub struct Pattern {
-    pub name: String,
-    pub elements: Vec<Element>,
+rc!{
+    #[derive(Clone, Debug)]
+    pub struct Pattern(Content) {
+        pub name: String,
+        pub elements: Vec<Element>,
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -31,7 +32,7 @@ impl Workload {
         let mut patterns = vec![];
         if let Some(ref configs) = config.collection("patterns") {
             for config in configs {
-                patterns.push(Rc::new(try!(Pattern::new(config))));
+                patterns.push(try!(Pattern::new(config)));
             }
         }
         let count = patterns.len();
@@ -45,7 +46,7 @@ impl Workload {
         })
     }
 
-    pub fn next(&mut self) -> Option<Rc<Pattern>> {
+    pub fn next(&mut self) -> Option<Pattern> {
         Some(self.patterns[self.distribution.sample(&mut self.source)].clone())
     }
 }
@@ -90,7 +91,7 @@ impl Pattern {
             });
         }
 
-        Ok(Pattern { name: name, elements: elements })
+        Ok(rc!(Pattern(Content { name: name, elements: elements })))
     }
 }
 

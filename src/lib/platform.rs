@@ -4,7 +4,7 @@ use threed_ice::{StackElement, System};
 use std::str::FromStr;
 
 use config::Config;
-use {Error, ID, Job, Result};
+use {Error, ID, Result};
 
 pub struct Platform {
     pub elements: Vec<Element>,
