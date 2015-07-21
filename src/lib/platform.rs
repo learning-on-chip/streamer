@@ -1,7 +1,8 @@
 use Result;
 use config::Config;
-use temperature::{self, Simulator};
+use id::ID;
 use temperature::circuit::ThreeDICE;
+use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
 pub struct Platform {
@@ -10,7 +11,13 @@ pub struct Platform {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Element {
+pub struct Element {
+    pub id: ID,
+    pub kind: ElementKind,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ElementKind {
     Core,
     L3,
 }
@@ -24,16 +31,24 @@ impl Platform {
 
         let mut elements = vec![];
         for element in system.stack.elements.iter().rev() {
-            if let &StackElement::Die(ref die) = element {
-                for element in die.floorplan.elements.iter() {
-                    let id = element.id.to_lowercase();
-                    if id.starts_with("core") {
-                        elements.push(Element::Core);
-                    } else if id.starts_with("l3") {
-                        elements.push(Element::L3);
-                    } else {
-                        raise!("found an unknown id {:?}", &element.id);
-                    }
+            let die = match element {
+                &StackElement::Die(ref die) => die,
+                _ => continue,
+            };
+            for element in die.floorplan.elements.iter() {
+                let id = element.id.to_lowercase();
+                if id.starts_with("core") {
+                    elements.push(Element {
+                        id: ID::new("core"),
+                        kind: ElementKind::Core,
+                    });
+                } else if id.starts_with("l3") {
+                    elements.push(Element {
+                        id: ID::new("l3"),
+                        kind: ElementKind::L3,
+                    });
+                } else {
+                    raise!("found an unknown id {:?}", &element.id);
                 }
             }
         }
@@ -60,7 +75,7 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use config::Config;
-    use super::Element::{Core, L3};
+    use super::ElementKind::{Core, L3};
     use super::Platform;
 
     #[test]
@@ -68,6 +83,7 @@ mod tests {
         let config = Config::new("tests/fixtures/streamer.toml").unwrap()
                             .branch("platform").unwrap();
         let platform = Platform::new(&config).unwrap();
-        assert_eq!(&platform.elements, &[Core, Core, Core, Core, L3]);
+        assert_eq!(&platform.elements.iter().map(|element| element.kind).collect::<Vec<_>>(),
+                   &[Core, Core, Core, Core, L3]);
     }
 }
