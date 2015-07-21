@@ -53,13 +53,15 @@ macro_rules! path(
 mod config;
 mod event;
 mod id;
+mod job;
 mod platform;
 mod system;
 mod traffic;
 mod workload;
 
-pub use event::{Event, EventKind, Job};
+pub use event::{Event, EventKind};
 pub use id::ID;
+pub use job::Job;
 pub use system::System;
 
 pub type Error = Box<std::error::Error>;

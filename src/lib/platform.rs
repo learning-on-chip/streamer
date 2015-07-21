@@ -1,9 +1,9 @@
-use Result;
-use config::Config;
-use id::ID;
 use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
+
+use config::Config;
+use {ID, Result};
 
 pub struct Platform {
     pub elements: Vec<Element>,
@@ -38,15 +38,9 @@ impl Platform {
             for element in die.floorplan.elements.iter() {
                 let id = element.id.to_lowercase();
                 if id.starts_with("core") {
-                    elements.push(Element {
-                        id: ID::new("core"),
-                        kind: ElementKind::Core,
-                    });
+                    elements.push(Element { id: ID::new("core"), kind: ElementKind::Core });
                 } else if id.starts_with("l3") {
-                    elements.push(Element {
-                        id: ID::new("l3"),
-                        kind: ElementKind::L3,
-                    });
+                    elements.push(Element { id: ID::new("l3"), kind: ElementKind::L3 });
                 } else {
                     raise!("found an unknown id {:?}", &element.id);
                 }

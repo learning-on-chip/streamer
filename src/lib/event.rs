@@ -1,9 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
-use std::rc::Rc;
 
-use id::ID;
-use workload::Pattern;
+use Job;
 
 #[derive(Clone, Debug)]
 pub struct Event {
@@ -16,12 +14,6 @@ pub enum EventKind {
     JobArrival(Job),
     JobStart(Job),
     JobFinish(Job),
-}
-
-#[derive(Clone, Debug)]
-pub struct Job {
-    pub id: ID,
-    pub pattern: Rc<Pattern>,
 }
 
 impl Eq for Event {
@@ -61,17 +53,10 @@ impl fmt::Display for Event {
 
 impl fmt::Display for EventKind {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        macro_rules! job(
-            ($job:expr, $description:expr) => (
-                write!(formatter, "job ({:5} {:15}) {}", $job.id, $job.pattern.name,
-                       $description)
-            );
-        );
-
         match self {
-            &EventKind::JobArrival(ref job) => job!(job, "arrival"),
-            &EventKind::JobStart(ref job) => job!(job, "start"),
-            &EventKind::JobFinish(ref job) => job!(job, "finish"),
+            &EventKind::JobArrival(ref job) => write!(formatter, "{} arrival", job),
+            &EventKind::JobStart(ref job) => write!(formatter, "{} start", job),
+            &EventKind::JobFinish(ref job) => write!(formatter, "{} finish", job),
         }
     }
 }

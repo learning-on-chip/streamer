@@ -2,12 +2,10 @@ use std::collections::BinaryHeap;
 use std::path::Path;
 
 use config::Config;
-use event::{Event, EventKind, Job};
-use id::ID;
 use platform::Platform;
 use traffic::Traffic;
 use workload::Workload;
-use {Result, Source};
+use {Event, EventKind, Job, Result, Source};
 
 pub struct System {
     platform: Platform,
@@ -50,17 +48,11 @@ impl Iterator for System {
             Some(time) => time,
             _ => return None,
         };
-        let pattern = match self.workload.next() {
-            Some(pattern) => pattern,
+        let job = match self.workload.next() {
+            Some(pattern) => Job::new(pattern),
             _ => return None,
         };
-        self.queue.push(Event {
-            time: time,
-            kind: EventKind::JobArrival(Job {
-                id: ID::new("job"),
-                pattern: pattern,
-            }),
-        });
+        self.queue.push(Event { time: time, kind: EventKind::JobArrival(job) });
 
         self.queue.pop()
     }
