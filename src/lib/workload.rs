@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use config::Config;
+use platform::ElementKind;
 use {Result, Source};
 
 pub struct Workload {
@@ -15,12 +16,12 @@ pub struct Workload {
 #[derive(Clone, Debug)]
 pub struct Pattern {
     pub name: String,
-    pub components: Vec<Component>,
+    pub elements: Vec<Element>,
 }
 
 #[derive(Clone, Debug)]
-pub struct Component {
-    pub name: String,
+pub struct Element {
+    pub kind: ElementKind,
     pub dynamic_power: Vec<f64>,
     pub leakage_power: f64,
 }
@@ -61,7 +62,7 @@ impl Pattern {
         };
         let mut names = {
             let query = some!(config.get::<String>("query_names"),
-                              "an SQL query for reading components’ names is required");
+                              "an SQL query for reading elements’ names is required");
             try!(read_names(&backend, query))
         };
         let mut dynamic_power = {
@@ -78,10 +79,10 @@ impl Pattern {
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
 
-        let mut components = vec![];
+        let mut elements = vec![];
         for id in ids {
-            components.push(Component {
-                name: names.remove(&id).unwrap(),
+            elements.push(Element {
+                kind: try!(names.remove(&id).unwrap().parse()),
                 dynamic_power: some!(dynamic_power.remove(&id),
                                      "cannot find the dynamic power of a component"),
                 leakage_power: some!(leakage_power.remove(&id),
@@ -89,7 +90,7 @@ impl Pattern {
             });
         }
 
-        Ok(Pattern { name: name, components: components })
+        Ok(Pattern { name: name, elements: elements })
     }
 }
 

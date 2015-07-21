@@ -1,9 +1,10 @@
 use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
+use std::str::FromStr;
 
 use config::Config;
-use {ID, Result};
+use {Error, ID, Job, Result};
 
 pub struct Platform {
     pub elements: Vec<Element>,
@@ -36,14 +37,10 @@ impl Platform {
                 _ => continue,
             };
             for element in die.floorplan.elements.iter() {
-                let id = element.id.to_lowercase();
-                if id.starts_with("core") {
-                    elements.push(Element { id: ID::new("core"), kind: ElementKind::Core });
-                } else if id.starts_with("l3") {
-                    elements.push(Element { id: ID::new("l3"), kind: ElementKind::L3 });
-                } else {
-                    raise!("found an unknown id {:?}", &element.id);
-                }
+                elements.push(Element {
+                    id: ID::new("element"),
+                    kind: try!(element.id.parse()),
+                });
             }
         }
 
@@ -56,6 +53,20 @@ impl Platform {
         };
 
         Ok(Platform { elements: elements, temperature: temperature })
+    }
+}
+
+impl FromStr for ElementKind {
+    type Err = Error;
+
+    fn from_str(id: &str) -> Result<Self> {
+        let lower = id.to_lowercase();
+        if lower.starts_with("core") {
+            return Ok(ElementKind::Core);
+        } else if lower.starts_with("l3") {
+            return Ok(ElementKind::L3);
+        }
+        raise!("found an unknown id {:?}", id);
     }
 }
 
