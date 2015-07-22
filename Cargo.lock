@@ -30,17 +30,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "blas"
-version = "0.6.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "blas-sys 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blas-sys 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "complex 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "blas-sys"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -70,16 +70,17 @@ dependencies = [
 
 [[package]]
 name = "lapack"
-version = "0.3.4"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "lapack-sys 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "complex 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lapack-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "lapack-sys"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -101,12 +102,12 @@ dependencies = [
 
 [[package]]
 name = "matrix"
-version = "0.17.9"
+version = "0.17.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "blas 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blas 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "complex 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "lapack 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lapack 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -174,7 +175,7 @@ version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "matrix 0.17.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrix 0.17.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "superlu-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -183,7 +184,7 @@ name = "superlu-sys"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "blas-sys 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blas-sys 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -192,7 +193,7 @@ name = "temperature"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "matrix 0.17.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrix 0.17.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -201,7 +202,7 @@ name = "threed-ice"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "matrix 0.17.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "matrix 0.17.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "superlu 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice-sys 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
