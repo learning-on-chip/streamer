@@ -12,7 +12,7 @@ pub struct Workload {
     distribution: Categorical,
 }
 
-rc!{
+rc! {
     #[derive(Clone, Debug)]
     pub struct Pattern(Content) {
         pub name: String,

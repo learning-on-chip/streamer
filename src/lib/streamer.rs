@@ -50,19 +50,36 @@ macro_rules! path(
     });
 );
 
+macro_rules! itemize(($blob:item) => ($blob));
+macro_rules! rewrite(
+    ($header:tt [$($member:tt)*] {}) => (
+        rewrite!(output $header [$($member)*]);
+    );
+    ($header:tt [$($member:tt)*] { pub $name:ident: $kind:ty, $($t:tt)* }) => (
+        rewrite!($header [$($member)* pub $name: $kind,] { $($t)* });
+    );
+    ($header:tt [$($member:tt)*] { $name:ident: $kind:ty, $($t:tt)* }) => (
+        rewrite!($header [$($member)* $name: $kind,] { $($t)* });
+    );
+    (output [$($chunk:tt)*] [$($member:tt)*]) => (
+        itemize!(
+            $($chunk)* {
+                $($member)*
+            }
+        );
+    );
+);
+
 macro_rules! rc(
     (
         $(#[$attr:meta])*
-        pub struct $outer:ident($inner:ident) {
-            $(pub $field:ident: $kind:ty,)*
-        }
+        pub struct $outer:ident($inner:ident) $body:tt
     ) => (
         $(#[$attr])*
         pub struct $outer(::std::rc::Rc<$inner>);
 
-        $(#[$attr])*
-        pub struct $inner {
-            $(pub $field: $kind,)*
+        rewrite! {
+            [$(#[$attr])* pub struct $inner] [] $body
         }
 
         impl ::std::ops::Deref for $outer {
@@ -85,14 +102,10 @@ macro_rules! rc(
 macro_rules! time(
     (
         $(#[$attr:meta])*
-        pub struct $name:ident {
-            $(pub $field:ident: $kind:ty,)*
-        }
+        pub struct $name:ident $body:tt
     ) => (
-        $(#[$attr])*
-        pub struct $name {
-            pub time: f64,
-            $(pub $field: $kind,)*
+        rewrite! {
+            [$(#[$attr])* pub struct $name] [pub time: f64,] $body
         }
 
         impl ::std::cmp::Eq for $name {

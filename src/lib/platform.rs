@@ -12,7 +12,7 @@ pub struct Platform {
     pub temperature: Simulator,
 }
 
-time!{
+time! {
     #[derive(Clone, Copy, Debug)]
     pub struct Element {
         pub id: ID,

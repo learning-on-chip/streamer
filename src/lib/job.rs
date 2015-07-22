@@ -3,7 +3,7 @@ use std::fmt;
 use ID;
 use workload::Pattern;
 
-rc!{
+rc! {
     #[derive(Clone, Debug)]
     pub struct Job(Content) {
         pub id: ID,

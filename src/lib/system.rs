@@ -15,7 +15,7 @@ pub struct System {
     queue: BinaryHeap<Event>,
 }
 
-time!{
+time! {
     #[derive(Clone, Debug)]
     pub struct Event {
         pub kind: EventKind,
