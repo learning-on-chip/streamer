@@ -54,7 +54,7 @@ macro_rules! rc(
     (
         $(#[$attr:meta])*
         pub struct $outer:ident($inner:ident) {
-            $(pub $name:ident: $kind:ty,)*
+            $(pub $field:ident: $kind:ty,)*
         }
     ) => (
         $(#[$attr])*
@@ -62,7 +62,7 @@ macro_rules! rc(
 
         $(#[$attr])*
         pub struct $inner {
-            $(pub $name: $kind,)*
+            $(pub $field: $kind,)*
         }
 
         impl ::std::ops::Deref for $outer {
@@ -74,13 +74,65 @@ macro_rules! rc(
             }
         }
     );
-    ($outer:ident($inner:ident { $($name:ident: $value:expr),* })) => (
-        $outer(::std::rc::Rc::new($inner { $($name: $value),* }))
+    ($outer:ident($inner:ident { $($field:ident: $value:expr),* })) => (
+        rc!($outer($inner { $($field: $value,)* }))
+    );
+    ($outer:ident($inner:ident { $($field:ident: $value:expr,)* })) => (
+        $outer(::std::rc::Rc::new($inner { $($field: $value,)* }))
+    );
+);
+
+macro_rules! time(
+    (
+        $(#[$attr:meta])*
+        pub struct $name:ident {
+            $(pub $field:ident: $kind:ty,)*
+        }
+    ) => (
+        $(#[$attr])*
+        pub struct $name {
+            pub time: f64,
+            $(pub $field: $kind,)*
+        }
+
+        impl ::std::cmp::Eq for $name {
+        }
+
+        impl ::std::cmp::Ord for $name {
+            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+                if self.time < other.time {
+                    ::std::cmp::Ordering::Greater
+                } else if self.time > other.time {
+                    ::std::cmp::Ordering::Less
+                } else {
+                    ::std::cmp::Ordering::Equal
+                }
+            }
+        }
+
+        impl ::std::cmp::PartialEq for $name {
+            #[inline]
+            fn eq(&self, other: &Self) -> bool {
+                self.time == other.time
+            }
+        }
+
+        impl ::std::cmp::PartialOrd for $name {
+            #[inline]
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                Some(self.cmp(other))
+            }
+        }
+    );
+    ($time:expr, $name:ident { $($field:ident: $value:expr),* }) => (
+        time!($time, $name { $($field: $value,)* })
+    );
+    ($time:expr, $name:ident { $($field:ident: $value:expr,)* }) => (
+        $name { time: $time, $($field: $value,)* }
     );
 );
 
 mod config;
-mod event;
 mod id;
 mod job;
 mod platform;
@@ -88,7 +140,6 @@ mod system;
 mod traffic;
 mod workload;
 
-pub use event::{Event, EventKind};
 pub use id::ID;
 pub use job::Job;
 pub use system::System;

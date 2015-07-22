@@ -1,23 +1,26 @@
+use std::collections::{BinaryHeap, HashMap};
+use std::str::FromStr;
 use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
-use std::str::FromStr;
 
 use config::Config;
-use {Error, ID, Result};
+use {Error, ID, Job, Result};
 
 pub struct Platform {
-    pub elements: Vec<Element>,
+    pub elements: HashMap<ElementKind, BinaryHeap<Element>>,
     pub temperature: Simulator,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub struct Element {
-    pub id: ID,
-    pub kind: ElementKind,
+time!{
+    #[derive(Clone, Copy, Debug)]
+    pub struct Element {
+        pub id: ID,
+        pub kind: ElementKind,
+    }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum ElementKind {
     Core,
     L3,
@@ -30,17 +33,17 @@ impl Platform {
         info!(target: "platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
 
-        let mut elements = vec![];
+        let mut elements = HashMap::new();
         for element in system.stack.elements.iter().rev() {
             let die = match element {
                 &StackElement::Die(ref die) => die,
                 _ => continue,
             };
             for element in die.floorplan.elements.iter() {
-                elements.push(Element {
-                    id: ID::new("element"),
-                    kind: try!(element.id.parse()),
-                });
+                let kind = try!(ElementKind::from_str(&element.id));
+                let id = ID::new(kind.as_str());
+                let heap = elements.entry(kind).or_insert_with(|| BinaryHeap::new());
+                heap.push(time!(0.0, Element { id: id, kind: kind }));
             }
         }
 
@@ -53,6 +56,26 @@ impl Platform {
         };
 
         Ok(Platform { elements: elements, temperature: temperature })
+    }
+
+    pub fn next(&mut self, job: Job) -> Option<f64> {
+        let _ = job.pattern.span();
+
+        for element in &job.pattern.elements {
+            for _ in &self.elements[&element.kind] {
+            }
+        }
+
+        None
+    }
+}
+
+impl ElementKind {
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            ElementKind::Core => "core",
+            ElementKind::L3 => "l3",
+        }
     }
 }
 
@@ -80,15 +103,14 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use config::Config;
-    use super::ElementKind::{Core, L3};
-    use super::Platform;
+    use super::{ElementKind, Platform};
 
     #[test]
     fn new() {
         let config = Config::new("tests/fixtures/streamer.toml").unwrap()
                             .branch("platform").unwrap();
         let platform = Platform::new(&config).unwrap();
-        assert_eq!(&platform.elements.iter().map(|element| element.kind).collect::<Vec<_>>(),
-                   &[Core, Core, Core, Core, L3]);
+        assert_eq!(platform.elements[&ElementKind::Core].len(), 4);
+        assert_eq!(platform.elements[&ElementKind::L3].len(), 1);
     }
 }

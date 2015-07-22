@@ -1,17 +1,30 @@
 use std::collections::BinaryHeap;
+use std::fmt;
 use std::path::Path;
 
 use config::Config;
 use platform::Platform;
 use traffic::Traffic;
 use workload::Workload;
-use {Event, EventKind, Job, Result, Source};
+use {Job, Result, Source};
 
 pub struct System {
     platform: Platform,
     traffic: Traffic,
     workload: Workload,
     queue: BinaryHeap<Event>,
+}
+
+time!{
+    #[derive(Clone, Debug)]
+    pub struct Event {
+        pub kind: EventKind,
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum EventKind {
+    Arrival(Job),
 }
 
 impl System {
@@ -43,7 +56,7 @@ impl System {
 impl Iterator for System {
     type Item = Event;
 
-    fn next(&mut self) -> Option<Event> {
+    fn next(&mut self) -> Option<Self::Item> {
         let time = match self.traffic.next() {
             Some(time) => time,
             _ => return None,
@@ -52,8 +65,24 @@ impl Iterator for System {
             Some(pattern) => Job::new(pattern),
             _ => return None,
         };
-        self.queue.push(Event { time: time, kind: EventKind::JobArrival(job) });
+        self.queue.push(time!(time, Event { kind: EventKind::Arrival(job.clone()) }));
+
+        self.platform.next(job);
 
         self.queue.pop()
+    }
+}
+
+impl fmt::Display for Event {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        write!(formatter, "{:9.2} s: {}", self.time, &self.kind)
+    }
+}
+
+impl fmt::Display for EventKind {
+    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            &EventKind::Arrival(ref job) => write!(formatter, "{} arrival", job),
+        }
     }
 }

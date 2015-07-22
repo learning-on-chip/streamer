@@ -16,6 +16,8 @@ rc!{
     #[derive(Clone, Debug)]
     pub struct Pattern(Content) {
         pub name: String,
+        pub length: usize,
+        pub time_step: f64,
         pub elements: Vec<Element>,
     }
 }
@@ -61,6 +63,7 @@ impl Pattern {
             Some(name) => name.to_string(),
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
         };
+        let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
         let mut names = {
             let query = some!(config.get::<String>("query_names"),
                               "an SQL query for reading elements’ names is required");
@@ -85,13 +88,31 @@ impl Pattern {
             elements.push(Element {
                 kind: try!(names.remove(&id).unwrap().parse()),
                 dynamic_power: some!(dynamic_power.remove(&id),
-                                     "cannot find the dynamic power of a component"),
+                                     "cannot find the dynamic power of a processing element"),
                 leakage_power: some!(leakage_power.remove(&id),
-                                     "cannot find the leakage power of a component"),
+                                     "cannot find the leakage power of a processing element"),
             });
         }
+        if elements.is_empty() {
+            raise!("found a workload pattern without processing elements");
+        }
 
-        Ok(rc!(Pattern(Content { name: name, elements: elements })))
+        let length = elements[0].dynamic_power.len();
+        if length == 0 {
+            raise!("found a workload pattern without dynamic-power data");
+        }
+
+        Ok(rc!(Pattern(Content {
+            name: name,
+            length: length,
+            time_step: time_step,
+            elements: elements,
+        })))
+    }
+
+    #[inline]
+    pub fn span(&self) -> f64 {
+        self.length as f64 * self.time_step
     }
 }
 
