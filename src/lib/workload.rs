@@ -111,7 +111,7 @@ impl Pattern {
     }
 
     #[inline]
-    pub fn span(&self) -> f64 {
+    pub fn duration(&self) -> f64 {
         self.length as f64 * self.time_step
     }
 }

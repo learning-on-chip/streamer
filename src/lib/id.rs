@@ -27,6 +27,6 @@ impl ID {
 impl fmt::Display for ID {
     #[inline]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(formatter)
+        write!(formatter, "#{}", self.0)
     }
 }

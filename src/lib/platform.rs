@@ -58,15 +58,50 @@ impl Platform {
         Ok(Platform { elements: elements, temperature: temperature })
     }
 
-    pub fn next(&mut self, job: Job) -> Option<f64> {
-        let _ = job.pattern.span();
+    pub fn next(&mut self, job: &Job) -> Option<(f64, f64)> {
+        use std::f64::EPSILON;
 
+        let mut available = 0f64;
+        let mut hosts = vec![];
         for element in &job.pattern.elements {
-            for _ in &self.elements[&element.kind] {
+            match self.elements.get_mut(&element.kind).and_then(|heap| heap.pop()) {
+                Some(host) => {
+                    if host.is_exclusive() {
+                        available = available.max(host.time);
+                    }
+                    hosts.push(host);
+                },
+                _ => break,
             }
         }
 
-        None
+        macro_rules! push_back(
+            () => (for host in hosts.drain(..) {
+                self.elements.get_mut(&host.kind).unwrap().push(host);
+            })
+        );
+
+        if hosts.len() != job.pattern.elements.len() {
+            error!(target: "platform", "Failed to allocate resources for {}.", job);
+            push_back!();
+            return None;
+        }
+
+        let start = job.arrival.max(available) + EPSILON;
+        let finish = start + job.pattern.duration();
+        for host in &mut hosts {
+            host.time = finish;
+        }
+
+        push_back!();
+        Some((start, finish))
+    }
+}
+
+impl Element {
+    #[inline]
+    pub fn is_exclusive(&self) -> bool {
+        self.kind == ElementKind::Core
     }
 }
 

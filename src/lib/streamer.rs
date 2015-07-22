@@ -1,3 +1,5 @@
+#![feature(drain)]
+
 #[cfg(test)]
 extern crate assert;
 

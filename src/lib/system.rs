@@ -25,6 +25,8 @@ time! {
 #[derive(Clone, Debug)]
 pub enum EventKind {
     Arrival(Job),
+    Start(Job),
+    Finish(Job),
 }
 
 impl System {
@@ -57,17 +59,26 @@ impl Iterator for System {
     type Item = Event;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let time = match self.traffic.next() {
-            Some(time) => time,
+        let job = match (self.traffic.next(), self.workload.next()) {
+            (Some(arrival), Some(pattern)) => Job::new(arrival, pattern),
             _ => return None,
         };
-        let job = match self.workload.next() {
-            Some(pattern) => Job::new(pattern),
-            _ => return None,
-        };
-        self.queue.push(time!(time, Event { kind: EventKind::Arrival(job.clone()) }));
 
-        self.platform.next(job);
+        self.queue.push(time!(job.arrival, Event {
+            kind: EventKind::Arrival(job.clone()),
+        }));
+
+        let (start, finish) = match self.platform.next(&job) {
+            Some((start, finish)) => (start, finish),
+            _ => return None,
+        };
+
+        self.queue.push(time!(start, Event {
+            kind: EventKind::Start(job.clone()),
+        }));
+        self.queue.push(time!(finish, Event {
+            kind: EventKind::Finish(job),
+        }));
 
         self.queue.pop()
     }
@@ -75,14 +86,22 @@ impl Iterator for System {
 
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:9.2} s: {}", self.time, &self.kind)
+        write!(formatter, "{:9.2} s: {:<30}", self.time, &self.kind)
     }
 }
 
 impl fmt::Display for EventKind {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        macro_rules! job(
+            ($job:expr, $note:expr) => (
+                write!(formatter, "{} {}", $job, $note)
+            )
+        );
+
         match self {
-            &EventKind::Arrival(ref job) => write!(formatter, "{} arrival", job),
+            &EventKind::Arrival(ref job) => job!(job, "arrival"),
+            &EventKind::Start(ref job) => job!(job, "start"),
+            &EventKind::Finish(ref job) => job!(job, "finish"),
         }
     }
 }
