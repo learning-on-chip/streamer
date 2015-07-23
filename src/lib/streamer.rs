@@ -151,6 +151,7 @@ mod config;
 mod id;
 mod job;
 mod platform;
+mod profile;
 mod system;
 mod traffic;
 mod workload;

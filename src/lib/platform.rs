@@ -5,11 +5,15 @@ use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
 use config::Config;
+use profile::Profile;
 use {Error, ID, Job, Result};
 
 pub struct Platform {
+    pub units: usize,
     pub elements: HashMap<ElementKind, BinaryHeap<Element>>,
-    pub temperature: Simulator,
+    pub simulator: Simulator,
+    pub power: Profile,
+    pub temperature: Profile,
 }
 
 time! {
@@ -33,6 +37,7 @@ impl Platform {
         info!(target: "platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
 
+        let mut units = 0;
         let mut elements = HashMap::new();
         for element in system.stack.elements.iter().rev() {
             let die = match element {
@@ -41,29 +46,45 @@ impl Platform {
             };
             for element in die.floorplan.elements.iter() {
                 let kind = try!(ElementKind::from_str(&element.id));
-                let id = ID::new(kind.as_str());
+                let id = ID::new("element");
                 let heap = elements.entry(kind).or_insert_with(|| BinaryHeap::new());
                 heap.push(time!(0.0, Element { id: id, kind: kind }));
+                units += 1;
             }
         }
 
-        info!(target: "platform", "Constructing a thermal circuit...");
-        let temperature = {
+        let config = {
             let config = some!(config.branch("temperature"),
                                "a temperature configuration is required");
-            ok!(Simulator::new(&ok!(ThreeDICE::from(&system)),
-                               &try!(new_temperature_config(&config))))
+            try!(new_temperature_config(&config))
         };
 
-        Ok(Platform { elements: elements, temperature: temperature })
+        info!(target: "platform", "Constructing a thermal circuit...");
+        let simulator = ok!(Simulator::new(&ok!(ThreeDICE::from(&system)), &config));
+
+        Ok(Platform {
+            units: units,
+            elements: elements,
+            simulator: simulator,
+            power: Profile::new(units, config.time_step),
+            temperature: Profile::new(units, config.time_step),
+        })
     }
 
     pub fn next(&mut self, job: &Job) -> Option<(f64, f64)> {
         use std::f64::EPSILON;
 
+        let pattern = &job.pattern;
+
+        let units = pattern.units;
+        if self.units < units {
+            error!(target: "platform", "There are no enough processing elements for {}.", job);
+            return None;
+        }
+
         let mut available = 0f64;
         let mut hosts = vec![];
-        for element in &job.pattern.elements {
+        for element in &pattern.elements {
             match self.elements.get_mut(&element.kind).and_then(|heap| heap.pop()) {
                 Some(host) => {
                     if host.is_exclusive() {
@@ -81,36 +102,42 @@ impl Platform {
             })
         );
 
-        if hosts.len() != job.pattern.elements.len() {
+        if hosts.len() != units {
             error!(target: "platform", "Failed to allocate resources for {}.", job);
             push_back!();
             return None;
         }
 
         let start = job.arrival.max(available) + EPSILON;
-        let finish = start + job.pattern.duration();
+        let finish = start + pattern.duration();
+
+        for i in 0..units {
+            let element = &pattern.elements[i];
+            let mut data = element.dynamic_power.clone();
+            for value in &mut data {
+                *value += element.leakage_power;
+            }
+            self.power.accumulate(hosts[i].number(), start, pattern.time_step, &data);
+        }
+
         for host in &mut hosts {
             host.time = finish;
         }
-
         push_back!();
+
         Some((start, finish))
     }
 }
 
 impl Element {
-    #[inline]
+    #[inline(always)]
+    pub fn number(&self) -> usize {
+        self.id.number()
+    }
+
+    #[inline(always)]
     pub fn is_exclusive(&self) -> bool {
         self.kind == ElementKind::Core
-    }
-}
-
-impl ElementKind {
-    pub fn as_str(&self) -> &'static str {
-        match *self {
-            ElementKind::Core => "core",
-            ElementKind::L3 => "l3",
-        }
     }
 }
 

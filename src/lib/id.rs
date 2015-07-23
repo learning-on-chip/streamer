@@ -22,6 +22,11 @@ impl ID {
             ID(id)
         }
     }
+
+    #[inline(always)]
+    pub fn number(&self) -> usize {
+        self.0
+    }
 }
 
 impl fmt::Display for ID {

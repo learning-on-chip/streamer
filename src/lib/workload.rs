@@ -16,7 +16,8 @@ rc! {
     #[derive(Clone, Debug)]
     pub struct Pattern(Content) {
         pub name: String,
-        pub length: usize,
+        pub units: usize,
+        pub steps: usize,
         pub time_step: f64,
         pub elements: Vec<Element>,
     }
@@ -93,18 +94,21 @@ impl Pattern {
                                      "cannot find the leakage power of a processing element"),
             });
         }
-        if elements.is_empty() {
+
+        let units = elements.len();
+        if units == 0 {
             raise!("found a workload pattern without processing elements");
         }
 
-        let length = elements[0].dynamic_power.len();
-        if length == 0 {
+        let steps = elements[0].dynamic_power.len();
+        if steps == 0 {
             raise!("found a workload pattern without dynamic-power data");
         }
 
         Ok(rc!(Pattern(Content {
             name: name,
-            length: length,
+            units: units,
+            steps: steps,
             time_step: time_step,
             elements: elements,
         })))
@@ -112,7 +116,7 @@ impl Pattern {
 
     #[inline]
     pub fn duration(&self) -> f64 {
-        self.length as f64 * self.time_step
+        self.steps as f64 * self.time_step
     }
 }
 
