@@ -53,22 +53,22 @@ impl System {
             queue: BinaryHeap::new(),
         })
     }
-}
 
-impl Iterator for System {
-    type Item = Event;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    fn update(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
-            (Some(&arrival), Some(&Event { time, .. })) => if time < arrival {
-                return self.queue.pop();
+            (Some(_), None) => try!(self.enqueue_job()),
+            (Some(&arrival), Some(&Event { time, .. })) => if arrival < time {
+                try!(self.enqueue_job());
             },
             _ => {},
         }
+        Ok(())
+    }
 
+    fn enqueue_job(&mut self) -> Result<()> {
         let job = match (self.traffic.next(), self.workload.next()) {
             (Some(arrival), Some(pattern)) => Job::new(arrival, pattern),
-            _ => return None,
+            _ => raise!("failed to generate a new job"),
         };
 
         self.queue.push(time!(job.arrival, Event {
@@ -77,7 +77,7 @@ impl Iterator for System {
 
         let (start, finish) = match self.platform.next(&job) {
             Some((start, finish)) => (start, finish),
-            _ => return None,
+            _ => raise!("failed to schedule {}", job),
         };
 
         self.queue.push(time!(start, Event {
@@ -87,6 +87,17 @@ impl Iterator for System {
             kind: EventKind::Finish(job),
         }));
 
+        Ok(())
+    }
+}
+
+impl Iterator for System {
+    type Item = Event;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Err(error) = self.update() {
+            error!(target: "system", "Failed to update the state ({}).", error);
+        }
         self.queue.pop()
     }
 }
