@@ -45,6 +45,14 @@ impl Traffic {
         self.arrivals.pop_front()
     }
 
+    pub fn peek(&mut self) -> Option<&f64> {
+        if let Err(error) = self.refill() {
+            error!(target: "traffic", "Failed to refill the queue ({}).", error);
+            return None;
+        }
+        self.arrivals.get(0)
+    }
+
     fn refill(&mut self) -> Result<()> {
         if self.arrivals.is_empty() {
             info!(target: "traffic", "Refilling the queue...");

@@ -59,6 +59,13 @@ impl Iterator for System {
     type Item = Event;
 
     fn next(&mut self) -> Option<Self::Item> {
+        match (self.traffic.peek(), self.queue.peek()) {
+            (Some(&arrival), Some(&Event { time, .. })) => if time < arrival {
+                return self.queue.pop();
+            },
+            _ => {},
+        }
+
         let job = match (self.traffic.next(), self.workload.next()) {
             (Some(arrival), Some(pattern)) => Job::new(arrival, pattern),
             _ => return None,
