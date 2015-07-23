@@ -42,9 +42,6 @@ path = "parsec/dedup.sqlite3"
 path = "parsec/facesim.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/ferret.sqlite3"
-
-[[workload.patterns]]
 path = "parsec/fluidanimate.sqlite3"
 
 [[workload.patterns]]
