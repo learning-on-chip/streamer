@@ -1,4 +1,5 @@
 use std::mem;
+use std::ops::{Deref, DerefMut};
 
 pub struct Profile {
     units: usize,
@@ -10,12 +11,16 @@ pub struct Profile {
 
 impl Profile {
     pub fn new(units: usize, time_step: f64) -> Profile {
+        Profile { units: units, steps: 0, time: 0.0, time_step: time_step, data: vec![] }
+    }
+
+    pub fn clone_zero(&self) -> Profile {
         Profile {
-            units: units,
-            steps: 0,
-            time: 0.0,
-            time_step: time_step,
-            data: Vec::with_capacity(units),
+            units: self.units,
+            steps: self.steps,
+            time: self.time,
+            time_step: self.time_step,
+            data: vec![0.0; self.units * self.steps],
         }
     }
 
@@ -94,6 +99,22 @@ impl Into<Vec<f64>> for Profile {
     #[inline]
     fn into(self) -> Vec<f64> {
         self.data
+    }
+}
+
+impl Deref for Profile {
+    type Target = [f64];
+
+    #[inline(always)]
+    fn deref(&self) -> &Self::Target {
+        &self.data
+    }
+}
+
+impl DerefMut for Profile {
+    #[inline(always)]
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.data
     }
 }
 

@@ -13,7 +13,6 @@ pub struct Platform {
     pub elements: HashMap<ElementKind, BinaryHeap<Element>>,
     pub simulator: Simulator,
     pub power: Profile,
-    pub temperature: Profile,
 }
 
 time! {
@@ -67,7 +66,6 @@ impl Platform {
             elements: elements,
             simulator: simulator,
             power: Profile::new(units, config.time_step),
-            temperature: Profile::new(units, config.time_step),
         })
     }
 
@@ -124,6 +122,13 @@ impl Platform {
         push_back!();
 
         Ok((start, finish))
+    }
+
+    pub fn next(&mut self, time: f64) -> Option<(Profile, Profile)> {
+        let power = self.power.discharge(time);
+        let mut temperature = power.clone_zero();
+        self.simulator.step(&power, &mut temperature);
+        Some((power, temperature))
     }
 }
 
