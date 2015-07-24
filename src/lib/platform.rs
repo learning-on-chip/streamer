@@ -99,7 +99,7 @@ impl Platform {
         macro_rules! push_back(
             () => (for host in hosts.drain(..) {
                 self.elements.get_mut(&host.kind).unwrap().push(host);
-            })
+            });
         );
 
         if hosts.len() != units {
@@ -113,11 +113,11 @@ impl Platform {
 
         for i in 0..units {
             let element = &pattern.elements[i];
-            let mut data = element.dynamic_power.clone();
-            for value in &mut data {
-                *value += element.leakage_power;
+            let mut power = element.dynamic_power.clone();
+            for power in &mut power {
+                *power += element.leakage_power;
             }
-            self.power.accumulate(hosts[i].number(), start, pattern.time_step, &data);
+            self.power.accumulate(hosts[i].number(), start, pattern.time_step, &power);
         }
 
         for host in &mut hosts {
