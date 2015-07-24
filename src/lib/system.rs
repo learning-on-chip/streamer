@@ -4,6 +4,7 @@ use std::path::Path;
 
 use config::Config;
 use platform::Platform;
+use profile::Profile;
 use traffic::Traffic;
 use workload::Workload;
 use {Job, Result, Source};
@@ -89,13 +90,21 @@ impl System {
 }
 
 impl Iterator for System {
-    type Item = Event;
+    type Item = (Event, Profile, Profile);
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Err(error) = self.update() {
             error!(target: "system", "Failed to update the state ({}).", error);
         }
-        self.queue.pop()
+        let event = match self.queue.pop() {
+            Some(event) => event,
+            _ => return None,
+        };
+        let (power, temperature) = match self.platform.next(event.time) {
+            Some((power, temperature)) => (power, temperature),
+            _ => return None,
+        };
+        Some((event, power, temperature))
     }
 }
 

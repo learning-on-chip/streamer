@@ -53,7 +53,7 @@ fn start() -> Result<()> {
         try!(System::new(PathBuf::from(config), &random::default().seed([69, 42])))
     };
 
-    for event in system.take(100) {
+    for (event, _, _) in system.take(100) {
         println!("{}", event);
     }
 
