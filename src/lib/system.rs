@@ -75,10 +75,7 @@ impl System {
             kind: EventKind::Arrival(job.clone()),
         }));
 
-        let (start, finish) = match self.platform.next(&job) {
-            Some((start, finish)) => (start, finish),
-            _ => raise!("failed to schedule {}", job),
-        };
+        let (start, finish) = try!(self.platform.push(&job));
 
         self.queue.push(time!(start, Event {
             kind: EventKind::Start(job.clone()),

@@ -71,15 +71,14 @@ impl Platform {
         })
     }
 
-    pub fn next(&mut self, job: &Job) -> Option<(f64, f64)> {
+    pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
         use std::f64::EPSILON;
 
         let pattern = &job.pattern;
 
         let units = pattern.units;
         if self.units < units {
-            error!(target: "platform", "There are no enough processing elements for {}.", job);
-            return None;
+            raise!("do not have enough resources for {}", job);
         }
 
         let mut available = 0f64;
@@ -103,9 +102,8 @@ impl Platform {
         );
 
         if hosts.len() != units {
-            error!(target: "platform", "Failed to allocate resources for {}.", job);
             push_back!();
-            return None;
+            raise!("failed to allocate resources for {}", job);
         }
 
         let start = job.arrival.max(available) + EPSILON;
@@ -125,7 +123,7 @@ impl Platform {
         }
         push_back!();
 
-        Some((start, finish))
+        Ok((start, finish))
     }
 }
 
