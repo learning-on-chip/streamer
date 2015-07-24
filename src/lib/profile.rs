@@ -68,19 +68,32 @@ impl Profile {
         }
     }
 
-    pub fn discharge(&mut self, time: f64) -> Vec<f64> {
+    pub fn discharge(&mut self, time: f64) -> Self {
         debug_assert!(time >= self.time);
         let steps = ((time - self.time) / self.time_step).floor() as usize;
         debug_assert!(self.steps >= steps);
 
-        let tail = self.data[(steps * self.units)..].to_vec();
-        let mut data = mem::replace(&mut self.data, tail);
-        data.truncate(steps * self.units);
+        let mut profile = Profile {
+            units: self.units,
+            steps: self.steps - steps,
+            time: (time / self.time_step).floor() * self.time_step,
+            time_step: self.time_step,
+            data: self.data[(steps * self.units)..].to_vec(),
+        };
 
-        self.steps = self.steps - steps;
-        self.time = (time / self.time_step).floor() * self.time_step;
+        mem::swap(self, &mut profile);
 
-        data
+        profile.steps = steps;
+        profile.data.truncate(steps * self.units);
+
+        profile
+    }
+}
+
+impl Into<Vec<f64>> for Profile {
+    #[inline]
+    fn into(self) -> Vec<f64> {
+        self.data
     }
 }
 
@@ -175,23 +188,23 @@ mod tests {
         assert_eq!(profile.time, 0.0);
         assert_eq!(profile.steps, 42);
 
-        assert_eq!(profile.discharge(0.0), vec![]);
+        assert_eq!(profile.discharge(0.0).data, vec![]);
         assert_eq!(profile.time, 0.0);
         assert_eq!(profile.steps, 42);
 
-        assert_eq!(profile.discharge(0.75), vec![]);
+        assert_eq!(profile.discharge(0.75).data, vec![]);
         assert_eq!(profile.time, 0.0);
         assert_eq!(profile.steps, 42);
 
-        assert_eq!(profile.discharge(1.0), vec![42.0, 0.0]);
+        assert_eq!(profile.discharge(1.0).data, vec![42.0, 0.0]);
         assert_eq!(profile.time, 1.0);
         assert_eq!(profile.steps, 41);
 
-        assert_eq!(profile.discharge(1.5), vec![]);
+        assert_eq!(profile.discharge(1.5).data, vec![]);
         assert_eq!(profile.time, 1.0);
         assert_eq!(profile.steps, 41);
 
-        assert_eq!(profile.discharge(3.5), vec![42.0, 0.0, 42.0, 0.0]);
+        assert_eq!(profile.discharge(3.5).data, vec![42.0, 0.0, 42.0, 0.0]);
         assert_eq!(profile.time, 3.0);
         assert_eq!(profile.steps, 39);
     }
