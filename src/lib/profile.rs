@@ -22,35 +22,47 @@ impl Profile {
         debug_assert!(time >= self.time);
 
         let (t1, t2) = (self.time, time);
-        let (s1, s2) = (self.time_step, time_step);
-        let end_time = t2 + (data.len() as f64) * s2;
+        let (d1, d2) = (self.time_step, time_step);
 
-        let steps = ((end_time - t1) / s1).ceil() as usize;
-        if steps > self.steps {
-            self.data.extend(vec![0.0; (steps - self.steps) * self.units]);
-            self.steps = steps;
+        let s2 = data.len();
+        let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
+
+        if s1 > self.steps {
+            self.data.extend(vec![0.0; (s1 - self.steps) * self.units]);
+            self.steps = s1;
         }
 
-        let offset = (time / s2).fract();
-        let mut time = t2;
-        while time < end_time {
-            let l1 = (time / s1).floor() * s1;
-            let l2 = offset + ((time - offset) / s2).floor() * s2;
+        let mut j1 = ((t2 - t1) / d1) as usize;
+        let mut j2 = 0;
 
-            let r1 = l1 + s1;
-            let r2 = l2 + s2;
+        macro_rules! add(
+            ($weight:expr) => (self.data[j1 * self.units + unit] += $weight * data[j2]);
+        );
 
-            let weight = if l1 <= l2 {
-                if r2 <= r1 { 1.0 } else { (r1 - l2) / s2 }
+        while j1 < s1 && j2 < s2 {
+            let l1 = t1 + (j1 as f64) * d1;
+            let l2 = t2 + (j2 as f64) * d2;
+
+            let r1 = l1 + d1;
+            let r2 = l2 + d2;
+
+            if l1 < l2 {
+                if r2 < r1 {
+                    add!(1.0);
+                    j2 += 1;
+                } else {
+                    add!((r1 - l2) / d2);
+                    j1 += 1;
+                }
             } else {
-                if r1 <= r2 { s1 / s2 } else { (r2 - l1) / s2 }
-            };
-
-            let j1 = ((time - t1) / s1) as usize;
-            let j2 = ((time - t2) / s2) as usize;
-            self.data[j1 * self.units + unit] += weight * data[j2];
-
-            time = r1.min(r2);
+                if r1 < r2 {
+                    add!(d1 / d2);
+                    j1 += 1;
+                } else {
+                    add!((r2 - l1) / d2);
+                    j2 += 1;
+                }
+            }
         }
     }
 }
