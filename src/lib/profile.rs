@@ -1,3 +1,5 @@
+use std::mem;
+
 pub struct Profile {
     units: usize,
     steps: usize,
@@ -64,6 +66,21 @@ impl Profile {
                 }
             }
         }
+    }
+
+    pub fn discharge(&mut self, time: f64) -> Vec<f64> {
+        debug_assert!(time >= self.time);
+        let steps = ((time - self.time) / self.time_step).floor() as usize;
+        debug_assert!(self.steps >= steps);
+
+        let tail = self.data[(steps * self.units)..].to_vec();
+        let mut data = mem::replace(&mut self.data, tail);
+        data.truncate(steps * self.units);
+
+        self.steps = self.steps - steps;
+        self.time = (time / self.time_step).floor() * self.time_step;
+
+        data
     }
 }
 
@@ -149,5 +166,33 @@ mod tests {
            3.00, 0.0,
            1.00, 0.0,
         ]);
+    }
+
+    #[test]
+    fn discharge() {
+        let mut profile = Profile::new(2, 1.0);
+        profile.accumulate(0, 0.0, 1.0, &vec![42.0; 42]);
+        assert_eq!(profile.time, 0.0);
+        assert_eq!(profile.steps, 42);
+
+        assert_eq!(profile.discharge(0.0), vec![]);
+        assert_eq!(profile.time, 0.0);
+        assert_eq!(profile.steps, 42);
+
+        assert_eq!(profile.discharge(0.75), vec![]);
+        assert_eq!(profile.time, 0.0);
+        assert_eq!(profile.steps, 42);
+
+        assert_eq!(profile.discharge(1.0), vec![42.0, 0.0]);
+        assert_eq!(profile.time, 1.0);
+        assert_eq!(profile.steps, 41);
+
+        assert_eq!(profile.discharge(1.5), vec![]);
+        assert_eq!(profile.time, 1.0);
+        assert_eq!(profile.steps, 41);
+
+        assert_eq!(profile.discharge(3.5), vec![42.0, 0.0, 42.0, 0.0]);
+        assert_eq!(profile.time, 3.0);
+        assert_eq!(profile.steps, 39);
     }
 }
