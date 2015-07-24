@@ -53,8 +53,12 @@ fn start() -> Result<()> {
         try!(System::new(PathBuf::from(config), &random::default().seed([69, 42])))
     };
 
-    for (event, _, _) in system.take(100) {
-        println!("{}", event);
+    for (event, power, _) in system.take(100) {
+        if power.steps > 0 {
+            println!("{} - {} samples", event, power.steps);
+        } else {
+            println!("{}", event);
+        }
     }
 
     Ok(())

@@ -2,11 +2,11 @@ use std::mem;
 use std::ops::{Deref, DerefMut};
 
 pub struct Profile {
-    units: usize,
-    steps: usize,
-    time: f64,
-    time_step: f64,
-    data: Vec<f64>,
+    pub units: usize,
+    pub steps: usize,
+    pub time: f64,
+    pub time_step: f64,
+    pub data: Vec<f64>,
 }
 
 impl Profile {
