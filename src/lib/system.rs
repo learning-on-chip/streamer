@@ -94,7 +94,7 @@ impl Iterator for System {
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Err(error) = self.update() {
-            error!(target: "system", "Failed to update the state ({}).", error);
+            error!(target: "System", "Failed to update the state ({}).", error);
         }
         let event = match self.queue.pop() {
             Some(event) => event,

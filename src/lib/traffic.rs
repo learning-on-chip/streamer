@@ -17,7 +17,7 @@ impl Traffic {
         let path = path!(config, "a workload pattern database");
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
-        info!(target: "traffic", "Reading {:?}...", &path);
+        info!(target: "Traffic", "Reading {:?}...", &path);
         let data = {
             let query = some!(config.get::<String>("query"),
                               "an SQL query for reading the traffic data");
@@ -28,7 +28,7 @@ impl Traffic {
             ncoarse => ncoarse as usize,
         };
 
-        info!(target: "traffic", "Read {} arrivals. Fitting the model...", data.len());
+        info!(target: "Traffic", "Read {} arrivals. Fitting the model...", data.len());
         Ok(Traffic {
             time: 0.0,
             model: ok!(Beta::new(&data, ncoarse)),
@@ -39,7 +39,7 @@ impl Traffic {
 
     pub fn next(&mut self) -> Option<f64> {
         if let Err(error) = self.refill() {
-            error!(target: "traffic", "Failed to refill the queue ({}).", error);
+            error!(target: "Traffic", "Failed to refill the queue ({}).", error);
             return None;
         }
         self.arrivals.pop_front()
@@ -47,7 +47,7 @@ impl Traffic {
 
     pub fn peek(&mut self) -> Option<&f64> {
         if let Err(error) = self.refill() {
-            error!(target: "traffic", "Failed to refill the queue ({}).", error);
+            error!(target: "Traffic", "Failed to refill the queue ({}).", error);
             return None;
         }
         self.arrivals.get(0)
@@ -55,12 +55,12 @@ impl Traffic {
 
     fn refill(&mut self) -> Result<()> {
         if self.arrivals.is_empty() {
-            info!(target: "traffic", "Refilling the queue...");
+            info!(target: "Traffic", "Refilling the queue...");
             for step in ok!(self.model.sample(&mut self.source)) {
                 self.time += step;
                 self.arrivals.push_back(self.time);
             }
-            info!(target: "traffic", "The queue contains {} arrivals.", self.arrivals.len());
+            info!(target: "Traffic", "The queue contains {} arrivals.", self.arrivals.len());
         }
         Ok(())
     }

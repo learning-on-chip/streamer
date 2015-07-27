@@ -2,7 +2,9 @@ extern crate arguments;
 extern crate log;
 extern crate random;
 extern crate streamer;
+extern crate term;
 
+use log::LogLevel;
 use std::error::Error;
 use std::path::PathBuf;
 use streamer::{ErrorString, Result, System};
@@ -15,6 +17,7 @@ Usage: streamer [options]
 Options:
     --config <path>          Configuration file (required).
 
+    --verbose                Display progress information.
     --help                   Display this message.
 ";
 
@@ -37,7 +40,6 @@ macro_rules! some(
 );
 
 fn main() {
-    logger::setup();
     start().unwrap_or_else(|error| fail(&*error));
 }
 
@@ -46,6 +48,12 @@ fn start() -> Result<()> {
 
     if arguments.get::<bool>("help").unwrap_or(false) {
         help();
+    }
+
+    if arguments.get::<bool>("verbose").unwrap_or(false) {
+        logger::setup(LogLevel::Info);
+    } else {
+        logger::setup(LogLevel::Warn);
     }
 
     let system = {

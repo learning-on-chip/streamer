@@ -59,7 +59,7 @@ impl Pattern {
         let path = path!(config, "a workload pattern database");
         let backend = ok!(Connection::open(&path));
 
-        info!(target: "workload", "Reading {:?}...", &path);
+        info!(target: "Workload", "Reading {:?}...", &path);
         let name = match config.get::<String>("name") {
             Some(name) => name.to_string(),
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),

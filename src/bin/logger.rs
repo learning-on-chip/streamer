@@ -1,22 +1,31 @@
-use log::{self, Log, LogLevel, LogLevelFilter, LogMetadata, LogRecord};
+use log::{self, Log, LogLevel, LogMetadata, LogRecord};
+use term;
 
-pub struct Logger;
+pub struct Terminal(LogLevel);
 
-impl Log for Logger {
+impl Log for Terminal {
     fn enabled(&self, metadata: &LogMetadata) -> bool {
-        metadata.level() <= LogLevel::Info
+        metadata.level() <= self.0
     }
 
     fn log(&self, record: &LogRecord) {
         if self.enabled(record.metadata()) {
-            println!("[{:10}] {}", record.target(), record.args());
+            let mut stdout = term::stdout();
+            if record.metadata().level() < LogLevel::Info {
+                stdout.as_mut().map(|stdout| stdout.fg(term::color::RED));
+            } else {
+                stdout.as_mut().map(|stdout| stdout.fg(term::color::GREEN));
+            }
+            print!("{:>12}", record.target());
+            stdout.as_mut().map(|stdout| stdout.reset());
+            println!(" {}", record.args());
         }
     }
 }
 
-pub fn setup() {
+pub fn setup(level: LogLevel) {
     let _ = log::set_logger(|max_log_level| {
-        max_log_level.set(LogLevelFilter::Info);
-        Box::new(Logger)
+        max_log_level.set(level.to_log_level_filter());
+        Box::new(Terminal(level))
     });
 }

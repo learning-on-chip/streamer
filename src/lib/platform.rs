@@ -33,7 +33,7 @@ impl Platform {
     pub fn new(config: &Config) -> Result<Platform> {
         let path = path!(config, "a stack description");
 
-        info!(target: "platform", "Reading {:?}...", &path);
+        info!(target: "Platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
 
         let mut units = 0;
@@ -58,7 +58,7 @@ impl Platform {
             try!(new_temperature_config(&config))
         };
 
-        info!(target: "platform", "Constructing a thermal circuit...");
+        info!(target: "Platform", "Constructing a thermal circuit...");
         let simulator = ok!(Simulator::new(&ok!(ThreeDICE::from(&system)), &config));
 
         Ok(Platform {
