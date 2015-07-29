@@ -158,7 +158,7 @@ mod workload;
 
 pub use id::ID;
 pub use job::Job;
-pub use system::System;
+pub use system::{Increment, System};
 
 pub type Error = Box<std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;

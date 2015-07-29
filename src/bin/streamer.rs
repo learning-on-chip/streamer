@@ -9,13 +9,13 @@ use std::error::Error;
 use std::path::PathBuf;
 use streamer::{ErrorString, Result, System};
 
-mod logger;
-
 const USAGE: &'static str = "
 Usage: streamer [options]
 
 Options:
     --config <path>          Configuration file (required).
+    --length <time>          Time span to simulate in seconds [default: 10].
+    --output <path>          Output file for power and temperature profiles.
 
     --verbose                Display progress information.
     --help                   Display this message.
@@ -39,6 +39,11 @@ macro_rules! some(
     });
 );
 
+mod logger;
+mod output;
+
+use output::Output;
+
 fn main() {
     start().unwrap_or_else(|error| fail(&*error));
 }
@@ -61,12 +66,18 @@ fn start() -> Result<()> {
         try!(System::new(PathBuf::from(config), &random::default().seed([69, 42])))
     };
 
-    for (event, power, _) in system.take(100) {
-        if power.steps > 0 {
-            println!("{} - {} samples", event, power.steps);
-        } else {
-            println!("{}", event);
+    let length = arguments.get::<f64>("length").unwrap_or(10.0);
+    if length <= 0.0 {
+        raise!("the time span should be positive");
+    }
+
+    let mut output = try!(output::new(&arguments));
+
+    for (event, power, temperature) in system {
+        if event.time > length {
+            break;
         }
+        try!(output.next((event, power, temperature)));
     }
 
     Ok(())

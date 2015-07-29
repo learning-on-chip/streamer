@@ -30,6 +30,8 @@ pub enum EventKind {
     Finish(Job),
 }
 
+pub type Increment = (Event, Profile, Profile);
+
 impl System {
     pub fn new<T: AsRef<Path>>(config: T, source: &Source) -> Result<System> {
         let config = try!(Config::new(config));
@@ -90,7 +92,7 @@ impl System {
 }
 
 impl Iterator for System {
-    type Item = (Event, Profile, Profile);
+    type Item = Increment;
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Err(error) = self.update() {
