@@ -76,7 +76,7 @@ fn read_interarrivals(backend: &Connection, query: &str) -> Result<Vec<f64>> {
         }
         ok!(statement.read::<f64>(0))
     };
-    while State::Row == ok!(statement.step()) {
+    while let State::Row = ok!(statement.step()) {
         let time = ok!(statement.read::<f64>(0));
         data.push(time - last_time);
         last_time = time;
