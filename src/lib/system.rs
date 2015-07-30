@@ -10,9 +10,9 @@ use workload::Workload;
 use {Job, Result, Source};
 
 pub struct System {
-    platform: Platform,
-    traffic: Traffic,
-    workload: Workload,
+    pub platform: Platform,
+    pub traffic: Traffic,
+    pub workload: Workload,
     queue: BinaryHeap<Event>,
 }
 

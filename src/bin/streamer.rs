@@ -72,7 +72,7 @@ fn start() -> Result<()> {
         raise!("the time span should be positive");
     }
 
-    let mut output = try!(output::new(&arguments));
+    let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
     for (event, power, temperature) in system {
         if event.time > length {
