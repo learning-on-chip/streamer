@@ -158,6 +158,7 @@ mod workload;
 
 pub use id::ID;
 pub use job::Job;
+pub use profile::Profile;
 pub use system::{Increment, System};
 
 pub type Error = Box<std::error::Error>;

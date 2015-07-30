@@ -1,13 +1,14 @@
 extern crate arguments;
 extern crate log;
 extern crate random;
+extern crate sqlite;
 extern crate streamer;
 extern crate term;
 
 use log::LogLevel;
 use std::error::Error;
 use std::path::PathBuf;
-use streamer::{ErrorString, Result, System};
+use streamer::{Result, System};
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -22,7 +23,7 @@ Options:
 ";
 
 macro_rules! raise(
-    ($message:expr) => (return Err(Box::new(ErrorString($message.to_string()))));
+    ($message:expr) => (return Err(Box::new(::streamer::ErrorString($message.to_string()))));
 );
 
 macro_rules! ok(
