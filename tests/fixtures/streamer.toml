@@ -8,8 +8,7 @@ time_step = 1e-3
 [traffic]
 path = "google.sqlite3"
 query = """
-SELECT 1e-6 * `time` FROM `job_events`
-WHERE `time` IS NOT 0 AND `event type` IS 0
+SELECT `time` FROM `arrivals`
 ORDER BY `time` ASC;
 """
 

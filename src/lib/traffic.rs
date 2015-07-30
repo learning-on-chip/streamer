@@ -71,7 +71,7 @@ fn read_interarrivals(backend: &Connection, query: &str) -> Result<Vec<f64>> {
 
     let mut data = Vec::new();
     let mut last_time = {
-        if State::Row != ok!(statement.step()) {
+        if let State::Done = ok!(statement.step()) {
             return Ok(data);
         }
         ok!(statement.read::<f64>(0))
@@ -93,10 +93,9 @@ mod tests {
     fn read_interarrivals() {
         let backend = Connection::open("tests/fixtures/google.sqlite3").unwrap();
         let data = super::read_interarrivals(&backend, "
-            SELECT 1e-6 * `time` FROM `job_events`
-            WHERE `time` IS NOT 0 AND `event type` IS 0
+            SELECT `time` FROM `arrivals`
             ORDER BY `time` ASC;
-        ").ok().unwrap();
+        ").unwrap();
         assert_eq!(data.len(), 667926);
     }
 }
