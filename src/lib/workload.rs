@@ -6,6 +6,19 @@ use config::Config;
 use platform::ElementKind;
 use {Result, Source};
 
+const QUERY_NAMES: &'static str = "
+    SELECT `component_id`, `name` FROM `static`;
+";
+
+const QUERY_DYNAMIC_POWER: &'static str = "
+    SELECT `component_id`, `dynamic_power` FROM `dynamic`
+    ORDER BY `time` ASC;
+";
+
+const QUERY_LEAKAGE_POWER: &'static str = "
+    SELECT `component_id`, `leakage_power` FROM `static`;
+";
+
 pub struct Workload {
     patterns: Vec<Pattern>,
     source: Source,
@@ -66,18 +79,18 @@ impl Pattern {
         };
         let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
         let mut names = {
-            let query = some!(config.get::<String>("query_names"),
-                              "an SQL query for reading elements’ names is required");
+            let query = config.get::<String>("query_names").map(|query| &query[..])
+                                                           .unwrap_or(QUERY_NAMES);
             try!(read_names(&backend, query))
         };
         let mut dynamic_power = {
-            let query = some!(config.get::<String>("query_dynamic_power"),
-                              "an SQL query for reading the dynamic power is required");
+            let query = config.get::<String>("query_dynamic_power").map(|query| &query[..])
+                                                                   .unwrap_or(QUERY_DYNAMIC_POWER);
             try!(read_dynamic_power(&backend, query))
         };
         let mut leakage_power = {
-            let query = some!(config.get::<String>("query_leakage_power"),
-                              "an SQL query for reading the leakage power is required");
+            let query = config.get::<String>("query_leakage_power").map(|query| &query[..])
+                                                                   .unwrap_or(QUERY_LEAKAGE_POWER);
             try!(read_leakage_power(&backend, query))
         };
 
@@ -156,9 +169,7 @@ mod tests {
     #[test]
     fn read_names() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_names(&backend, "
-            SELECT `component_id`, `name` FROM `static`;
-        ").unwrap();
+        let data = super::read_names(&backend, super::QUERY_NAMES).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), "core0");
@@ -169,10 +180,7 @@ mod tests {
     #[test]
     fn read_dynamic_power() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_dynamic_power(&backend, "
-            SELECT `component_id`, `dynamic_power` FROM `dynamic`
-            ORDER BY `time` ASC;
-        ").unwrap();
+        let data = super::read_dynamic_power(&backend, super::QUERY_DYNAMIC_POWER).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         for (_, data) in &data {
@@ -186,9 +194,7 @@ mod tests {
     #[test]
     fn read_leakage_power() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_leakage_power(&backend, "
-            SELECT `component_id`, `leakage_power` FROM `static`;
-        ").unwrap();
+        let data = super::read_leakage_power(&backend, super::QUERY_LEAKAGE_POWER).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), data.get(&1).unwrap());

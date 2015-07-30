@@ -5,6 +5,11 @@ use std::collections::VecDeque;
 use config::Config;
 use {Result, Source};
 
+const QUERY: &'static str = "
+    SELECT `time` FROM `arrivals`
+    ORDER BY `time` ASC;
+";
+
 pub struct Traffic {
     time: f64,
     model: Beta,
@@ -19,8 +24,8 @@ impl Traffic {
 
         info!(target: "Traffic", "Reading {:?}...", &path);
         let data = {
-            let query = some!(config.get::<String>("query"),
-                              "an SQL query for reading the traffic data");
+            let query = config.get::<String>("query").map(|query| &query[..])
+                                                     .unwrap_or(QUERY);
             try!(read_interarrivals(&backend, query))
         };
         let ncoarse = match (data.len() as f64).log2().floor() {
@@ -92,10 +97,7 @@ mod tests {
     #[test]
     fn read_interarrivals() {
         let backend = Connection::open("tests/fixtures/google.sqlite3").unwrap();
-        let data = super::read_interarrivals(&backend, "
-            SELECT `time` FROM `arrivals`
-            ORDER BY `time` ASC;
-        ").unwrap();
+        let data = super::read_interarrivals(&backend, super::QUERY).unwrap();
         assert_eq!(data.len(), 667926);
     }
 }

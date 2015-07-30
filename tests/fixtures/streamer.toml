@@ -7,23 +7,9 @@ time_step = 1e-3
 
 [traffic]
 path = "google.sqlite3"
-query = """
-SELECT `time` FROM `arrivals`
-ORDER BY `time` ASC;
-"""
 
 [workload]
 time_step = 1e-3
-query_names = """
-SELECT `component_id`, `name` FROM `static`;
-"""
-query_dynamic_power = """
-SELECT `component_id`, `dynamic_power` FROM `dynamic`
-ORDER BY `time` ASC;
-"""
-query_leakage_power = """
-SELECT `component_id`, `leakage_power` FROM `static`;
-"""
 
 [[workload.patterns]]
 path = "parsec/blackscholes.sqlite3"
