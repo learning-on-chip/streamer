@@ -1,5 +1,5 @@
 use probability::distribution::{Categorical, Sample};
-use sqlite::{Connection, State};
+use sqlite::Connection;
 use std::collections::HashMap;
 
 use config::Config;
@@ -135,28 +135,48 @@ impl Pattern {
 
 fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>> {
     let mut data = HashMap::new();
-    let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.next()) {
-        data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<String>(1)));
+    let mut cursor = ok!(backend.prepare(query)).cursor();
+    if cursor.columns() != 2 {
+        raise!("expected the query to return two columns");
+    }
+    while let Some(row) = ok!(cursor.next()) {
+        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_string()) {
+            data.insert(id, value.to_string());
+        } else {
+            raise!("failed to read the names of processing elements");
+        }
     }
     Ok(data)
 }
 
 fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, Vec<f64>>> {
     let mut data = HashMap::new();
-    let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.next()) {
-        data.entry(ok!(statement.read::<i64>(0))).or_insert_with(|| vec![])
-                                                 .push(ok!(statement.read::<f64>(1)));
+    let mut cursor = ok!(backend.prepare(query)).cursor();
+    if cursor.columns() != 2 {
+        raise!("expected the query to return two columns");
+    }
+    while let Some(row) = ok!(cursor.next()) {
+        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
+            data.entry(id).or_insert_with(|| vec![]).push(value);
+        } else {
+            raise!("failed to read the dynamic power");
+        }
     }
     Ok(data)
 }
 
 fn read_leakage_power(backend: &Connection, query: &str) -> Result<HashMap<i64, f64>> {
     let mut data = HashMap::new();
-    let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.next()) {
-        data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<f64>(1)));
+    let mut cursor = ok!(backend.prepare(query)).cursor();
+    if cursor.columns() != 2 {
+        raise!("expected the query to return two columns");
+    }
+    while let Some(row) = ok!(cursor.next()) {
+        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
+            data.insert(id, value);
+        } else {
+            raise!("failed to read the leakage power");
+        }
     }
     Ok(data)
 }

@@ -9,7 +9,7 @@ dependencies = [
  "options 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sqlite 0.19.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sqlite 0.19.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "term 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice 0.9.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -164,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "sqlite"
-version = "0.19.2"
+version = "0.19.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
