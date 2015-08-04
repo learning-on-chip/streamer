@@ -19,6 +19,7 @@ log = "*"
 options = "*"
 probability = "*"
 random = "*"
+sql = { git = "https://github.com/stainless-steel/sql.git" }
 sqlite = "*"
 temperature = { version = "*", features = ["threed-ice"], default-features = false }
 term = "*"

@@ -1,6 +1,7 @@
 extern crate arguments;
 extern crate log;
 extern crate random;
+extern crate sql;
 extern crate sqlite;
 extern crate streamer;
 extern crate term;

@@ -1,55 +1,49 @@
-use sqlite::{Connection, State, Statement};
+use sqlite::{Connection, Statement, State};
 use std::mem;
 use std::path::Path;
 use streamer::{Increment, Profile, Result, System};
-
-const QUERY_CREATE: &'static str = "
-    CREATE TABLE IF NOT EXISTS `dynamic` (
-        `time` REAL NOT NULL,
-        `component_id` INTEGER NOT NULL,
-        `power` REAL NOT NULL,
-        `temperature` REAL NOT NULL
-    );
-    DELETE FROM `dynamic`;
-";
-
-const QUERY_INSERT: &'static str = "
-    INSERT INTO `dynamic` (`time`, `component_id`, `power`, `temperature`) VALUES (?, ?, ?, ?)
-";
-
-const QUERY_INSERT_MORE: &'static str = "
-    , (?, ?, ?, ?)
-";
 
 pub trait Output {
     fn next(&mut self, Increment) -> Result<()>;
 }
 
-pub struct Database<'l> {
+pub struct Database {
     #[allow(dead_code)]
-    connection: Connection<'l>,
+    connection: Connection,
     statement: Statement<'static>,
 }
 
 pub struct Terminal;
 
-impl<'l> Database<'l> {
-    pub fn new<T: AsRef<Path>>(system: &System, path: T) -> Result<Database<'l>> {
-        let units = system.platform.units;
+impl Database {
+    pub fn new<T: AsRef<Path>>(system: &System, path: T) -> Result<Database> {
+        use sql::prelude::*;
+
         let connection = ok!(Connection::open(path));
-        ok!(connection.execute(QUERY_CREATE));
+
+        ok!(connection.execute({
+            ok!(create_table().name("dynamic").if_not_exists().columns(&[
+                column().name("time").kind(Type::Float).not_null(),
+                column().name("component_id").kind(Type::Integer).not_null(),
+                column().name("power").kind(Type::Float).not_null(),
+                column().name("temperature").kind(Type::Float).not_null(),
+            ]).compile())
+        }));
+
         let statement = {
-            let mut statement = QUERY_INSERT.to_string();
-            for _ in 1..units {
-                statement.push_str(QUERY_INSERT_MORE);
-            }
-            unsafe { mem::transmute(ok!(connection.prepare(&statement))) }
+            let statement = ok!(connection.prepare({
+                ok!(insert_into().table("dynamic").columns(&[
+                    "time", "component_id", "power", "temperature",
+                ]).batch(system.platform.units).compile())
+            }));
+            unsafe { mem::transmute(statement) }
         };
+
         Ok(Database { connection: connection, statement: statement })
     }
 }
 
-impl<'l> Output for Database<'l> {
+impl Output for Database {
     fn next(&mut self, (_, power, temperature): Increment) -> Result<()> {
         let Profile { units, steps, time, time_step, data: power } = power;
         let Profile { data: temperature, .. } = temperature;
@@ -65,7 +59,7 @@ impl<'l> Output for Database<'l> {
                 ok!(statement.bind(k + 3, temperature[i * units + j]));
                 k += 4;
             }
-            if State::Done != ok!(statement.step()) {
+            if State::Done != ok!(statement.next()) {
                 raise!("failed to write into the database");
             }
         }
