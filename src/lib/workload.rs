@@ -136,7 +136,7 @@ impl Pattern {
 fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>> {
     let mut data = HashMap::new();
     let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.step()) {
+    while let State::Row = ok!(statement.next()) {
         data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<String>(1)));
     }
     Ok(data)
@@ -145,7 +145,7 @@ fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>>
 fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, Vec<f64>>> {
     let mut data = HashMap::new();
     let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.step()) {
+    while let State::Row = ok!(statement.next()) {
         data.entry(ok!(statement.read::<i64>(0))).or_insert_with(|| vec![])
                                                  .push(ok!(statement.read::<f64>(1)));
     }
@@ -155,7 +155,7 @@ fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, 
 fn read_leakage_power(backend: &Connection, query: &str) -> Result<HashMap<i64, f64>> {
     let mut data = HashMap::new();
     let mut statement = ok!(backend.prepare(query));
-    while let State::Row = ok!(statement.step()) {
+    while let State::Row = ok!(statement.next()) {
         data.insert(ok!(statement.read::<i64>(0)), ok!(statement.read::<f64>(1)));
     }
     Ok(data)

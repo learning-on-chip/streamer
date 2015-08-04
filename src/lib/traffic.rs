@@ -76,12 +76,12 @@ fn read_interarrivals(backend: &Connection, query: &str) -> Result<Vec<f64>> {
 
     let mut data = Vec::new();
     let mut last_time = {
-        if let State::Done = ok!(statement.step()) {
+        if let State::Done = ok!(statement.next()) {
             return Ok(data);
         }
         ok!(statement.read::<f64>(0))
     };
-    while let State::Row = ok!(statement.step()) {
+    while let State::Row = ok!(statement.next()) {
         let time = ok!(statement.read::<f64>(0));
         data.push(time - last_time);
         last_time = time;
