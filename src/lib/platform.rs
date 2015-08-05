@@ -51,6 +51,7 @@ impl Platform {
                 units += 1;
             }
         }
+        info!(target: "Platform", "Found {} processing elements.", units);
 
         let config = {
             let config = some!(config.branch("temperature"),
@@ -59,7 +60,11 @@ impl Platform {
         };
 
         info!(target: "Platform", "Constructing a thermal circuit...");
-        let simulator = ok!(Simulator::new(&ok!(ThreeDICE::from(&system)), &config));
+        let circuit = ok!(ThreeDICE::from(&system));
+        info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
+
+        info!(target: "Platform", "Initializing the temperature simulator...");
+        let simulator = ok!(Simulator::new(&circuit, &config));
 
         Ok(Platform {
             units: units,
@@ -129,6 +134,11 @@ impl Platform {
         let mut temperature = power.clone_zero();
         self.simulator.step(&power, &mut temperature);
         Some((power, temperature))
+    }
+
+    #[inline]
+    pub fn time_step(&self) -> f64 {
+        self.power.time_step
     }
 }
 

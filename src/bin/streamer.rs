@@ -1,10 +1,13 @@
-extern crate arguments;
+#[macro_use]
 extern crate log;
+
+extern crate arguments;
 extern crate random;
 extern crate sql;
 extern crate sqlite;
 extern crate streamer;
 extern crate term;
+extern crate time;
 
 use log::LogLevel;
 use std::error::Error;
@@ -75,12 +78,19 @@ fn start() -> Result<()> {
 
     let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
+    info!(target: "Streamer", "Simulating {} seconds ({} steps)...", length,
+          (length / system.time_step()) as usize);
+    let start = time::now();
+
     for (event, power, temperature) in system {
         if event.time > length {
             break;
         }
         try!(output.next((event, power, temperature)));
     }
+
+    info!(target: "Streamer", "Well done in {:.2} seconds.",
+          (time::now() - start).num_milliseconds() as f64 / 1000.0);
 
     Ok(())
 }

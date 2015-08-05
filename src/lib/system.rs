@@ -57,6 +57,11 @@ impl System {
         })
     }
 
+    #[inline]
+    pub fn time_step(&self) -> f64 {
+        self.platform.time_step()
+    }
+
     fn update(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => try!(self.enqueue_job()),

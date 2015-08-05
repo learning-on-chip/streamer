@@ -24,6 +24,7 @@ sqlite = "*"
 temperature = { version = "*", features = ["threed-ice"], default-features = false }
 term = "*"
 threed-ice = "*"
+time = "*"
 toml = "*"
 
 [dev-dependencies]
