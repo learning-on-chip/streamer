@@ -10,6 +10,7 @@ extern crate fractal;
 extern crate options;
 extern crate probability;
 extern crate random;
+extern crate sql;
 extern crate sqlite;
 extern crate temperature;
 extern crate threed_ice;

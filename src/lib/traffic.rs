@@ -5,11 +5,6 @@ use std::collections::VecDeque;
 use config::Config;
 use {Result, Source};
 
-const QUERY: &'static str = "
-    SELECT `time` FROM `arrivals`
-    ORDER BY `time` ASC;
-";
-
 pub struct Traffic {
     time: f64,
     model: Beta,
@@ -23,11 +18,7 @@ impl Traffic {
         let backend = ok!(Connection::open(&path!(config, "a traffic database")));
 
         info!(target: "Traffic", "Reading {:?}...", &path);
-        let data = {
-            let query = config.get::<String>("query").map(|query| &query[..])
-                                                     .unwrap_or(QUERY);
-            try!(read_interarrivals(&backend, query))
-        };
+        let data = try!(read_interarrivals(&backend));
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),
             ncoarse => ncoarse as usize,
@@ -71,8 +62,11 @@ impl Traffic {
     }
 }
 
-fn read_interarrivals(backend: &Connection, query: &str) -> Result<Vec<f64>> {
-    let mut statement = ok!(backend.prepare(query));
+fn read_interarrivals(backend: &Connection) -> Result<Vec<f64>> {
+    use sql::prelude::*;
+
+    let statement = select_from("arrivals").column("time").order_by(column("time").ascending());
+    let mut statement = ok!(backend.prepare(ok!(statement.compile())));
 
     let mut data = Vec::new();
     let mut last_time = {
@@ -97,7 +91,7 @@ mod tests {
     #[test]
     fn read_interarrivals() {
         let backend = Connection::open("tests/fixtures/google.sqlite3").unwrap();
-        let data = super::read_interarrivals(&backend, super::QUERY).unwrap();
+        let data = super::read_interarrivals(&backend).unwrap();
         assert_eq!(data.len(), 667926);
     }
 }

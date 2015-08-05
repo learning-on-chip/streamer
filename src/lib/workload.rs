@@ -6,19 +6,6 @@ use config::Config;
 use platform::ElementKind;
 use {Result, Source};
 
-const QUERY_NAMES: &'static str = "
-    SELECT `component_id`, `name` FROM `static`;
-";
-
-const QUERY_DYNAMIC_POWER: &'static str = "
-    SELECT `component_id`, `dynamic_power` FROM `dynamic`
-    ORDER BY `time` ASC;
-";
-
-const QUERY_LEAKAGE_POWER: &'static str = "
-    SELECT `component_id`, `leakage_power` FROM `static`;
-";
-
 pub struct Workload {
     patterns: Vec<Pattern>,
     source: Source,
@@ -78,21 +65,9 @@ impl Pattern {
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
         };
         let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
-        let mut names = {
-            let query = config.get::<String>("query_names").map(|query| &query[..])
-                                                           .unwrap_or(QUERY_NAMES);
-            try!(read_names(&backend, query))
-        };
-        let mut dynamic_power = {
-            let query = config.get::<String>("query_dynamic_power").map(|query| &query[..])
-                                                                   .unwrap_or(QUERY_DYNAMIC_POWER);
-            try!(read_dynamic_power(&backend, query))
-        };
-        let mut leakage_power = {
-            let query = config.get::<String>("query_leakage_power").map(|query| &query[..])
-                                                                   .unwrap_or(QUERY_LEAKAGE_POWER);
-            try!(read_leakage_power(&backend, query))
-        };
+        let mut names = try!(read_names(&backend));
+        let mut dynamic_power = try!(read_dynamic_power(&backend));
+        let mut leakage_power = try!(read_leakage_power(&backend));
 
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
@@ -133,12 +108,12 @@ impl Pattern {
     }
 }
 
-fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>> {
+fn read_names(backend: &Connection) -> Result<HashMap<i64, String>> {
+    use sql::prelude::*;
+
     let mut data = HashMap::new();
-    let mut cursor = ok!(backend.prepare(query)).cursor();
-    if cursor.columns() != 2 {
-        raise!("expected the query to return two columns");
-    }
+    let statement = select_from("static").columns(&["component_id", "name"]);
+    let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
     while let Some(row) = ok!(cursor.next()) {
         if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_string()) {
             data.insert(id, value.to_string());
@@ -149,12 +124,12 @@ fn read_names(backend: &Connection, query: &str) -> Result<HashMap<i64, String>>
     Ok(data)
 }
 
-fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, Vec<f64>>> {
+fn read_dynamic_power(backend: &Connection) -> Result<HashMap<i64, Vec<f64>>> {
+    use sql::prelude::*;
+
     let mut data = HashMap::new();
-    let mut cursor = ok!(backend.prepare(query)).cursor();
-    if cursor.columns() != 2 {
-        raise!("expected the query to return two columns");
-    }
+    let statement = select_from("dynamic").columns(&["component_id", "dynamic_power"]);
+    let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
     while let Some(row) = ok!(cursor.next()) {
         if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
             data.entry(id).or_insert_with(|| vec![]).push(value);
@@ -165,12 +140,12 @@ fn read_dynamic_power(backend: &Connection, query: &str) -> Result<HashMap<i64, 
     Ok(data)
 }
 
-fn read_leakage_power(backend: &Connection, query: &str) -> Result<HashMap<i64, f64>> {
+fn read_leakage_power(backend: &Connection) -> Result<HashMap<i64, f64>> {
+    use sql::prelude::*;
+
     let mut data = HashMap::new();
-    let mut cursor = ok!(backend.prepare(query)).cursor();
-    if cursor.columns() != 2 {
-        raise!("expected the query to return two columns");
-    }
+    let statement = select_from("static").columns(&["component_id", "leakage_power"]);
+    let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
     while let Some(row) = ok!(cursor.next()) {
         if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
             data.insert(id, value);
@@ -189,7 +164,7 @@ mod tests {
     #[test]
     fn read_names() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_names(&backend, super::QUERY_NAMES).unwrap();
+        let data = super::read_names(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), "core0");
@@ -200,7 +175,7 @@ mod tests {
     #[test]
     fn read_dynamic_power() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_dynamic_power(&backend, super::QUERY_DYNAMIC_POWER).unwrap();
+        let data = super::read_dynamic_power(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         for (_, data) in &data {
@@ -214,7 +189,7 @@ mod tests {
     #[test]
     fn read_leakage_power() {
         let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
-        let data = super::read_leakage_power(&backend, super::QUERY_LEAKAGE_POWER).unwrap();
+        let data = super::read_leakage_power(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), data.get(&1).unwrap());

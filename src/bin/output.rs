@@ -22,17 +22,15 @@ impl Database {
         let connection = ok!(Connection::open(path));
 
         ok!(connection.execute({
-            ok!(create_table().name("dynamic").if_not_exists().columns(&[
-                column().name("time").kind(Type::Float).not_null(),
-                column().name("component_id").kind(Type::Integer).not_null(),
-                column().name("power").kind(Type::Float).not_null(),
-                column().name("temperature").kind(Type::Float).not_null(),
+            ok!(create_table("dynamic").if_not_exists().columns(&[
+                "time".float().not_null(), "component_id".integer().not_null(),
+                "power".float().not_null(), "temperature".float().not_null(),
             ]).compile())
         }));
 
         let statement = {
             let statement = ok!(connection.prepare({
-                ok!(insert_into().table("dynamic").columns(&[
+                ok!(insert_into("dynamic").columns(&[
                     "time", "component_id", "power", "temperature",
                 ]).batch(system.platform.units).compile())
             }));
