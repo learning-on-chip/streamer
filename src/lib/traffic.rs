@@ -65,7 +65,7 @@ impl Traffic {
 fn read_interarrivals(backend: &Connection) -> Result<Vec<f64>> {
     use sql::prelude::*;
 
-    let statement = select_from("arrivals").column("time").order_by(column("time").ascending());
+    let statement = select_from("arrivals").column("time").order_by(column("time").ascend());
     let mut statement = ok!(backend.prepare(ok!(statement.compile())));
 
     let mut data = Vec::new();
