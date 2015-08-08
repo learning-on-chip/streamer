@@ -32,7 +32,7 @@ stack:
    die DIE1 DIE floorplan "tests/fixtures/gainestown.flp";
 
 solver:
-   transient step 0.001, slot 0.001;
+   steady;
    initial temperature 318.15;
 
 output:
