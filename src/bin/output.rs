@@ -28,6 +28,8 @@ impl Database {
             ]).compile())
         }));
 
+        ok!(connection.execute(ok!(delete_from("dynamic").compile())));
+
         let statement = {
             let statement = ok!(connection.prepare({
                 ok!(insert_into("dynamic").columns(&[
