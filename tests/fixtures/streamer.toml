@@ -1,18 +1,16 @@
 seed = 10
+time_step = 1e-3
 
 [platform]
 path = "gainestown.stk"
 
 [platform.temperature]
 ambience = 318.15
-time_step = 1e-3
 
 [traffic]
 path = "google.sqlite3"
 
 [workload]
-time_step = 1e-3
-
 [[workload.patterns]]
 path = "parsec/blackscholes.sqlite3"
 
