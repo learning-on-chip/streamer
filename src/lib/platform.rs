@@ -4,9 +4,8 @@ use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
-use config::Config;
 use profile::Profile;
-use {Error, ID, Job, Result};
+use {Config, Error, ID, Job, Result};
 
 pub struct Platform {
     pub units: usize,

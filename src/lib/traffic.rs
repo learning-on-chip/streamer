@@ -2,8 +2,7 @@ use fractal::Beta;
 use sqlite::{Connection, State};
 use std::collections::VecDeque;
 
-use config::Config;
-use {Result, Source};
+use {Config, Result, Source};
 
 pub struct Traffic {
     time: f64,

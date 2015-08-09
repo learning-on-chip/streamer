@@ -1,13 +1,11 @@
 use std::collections::BinaryHeap;
 use std::fmt;
-use std::path::Path;
 
-use config::Config;
 use platform::Platform;
 use profile::Profile;
 use traffic::Traffic;
 use workload::Workload;
-use {Job, Result, Source};
+use {Config, Job, Result, Source};
 
 pub struct System {
     pub platform: Platform,
@@ -33,9 +31,7 @@ pub enum EventKind {
 pub type Increment = (Event, Profile, Profile);
 
 impl System {
-    pub fn new<T: AsRef<Path>>(config: T, source: &Source) -> Result<System> {
-        let config = try!(Config::new(config));
-
+    pub fn new(config: &Config, source: &Source) -> Result<System> {
         let platform = {
             let config = some!(config.branch("platform"), "a platform configuration is required");
             try!(Platform::new(&config))

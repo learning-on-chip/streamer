@@ -157,6 +157,7 @@ mod system;
 mod traffic;
 mod workload;
 
+pub use config::Config;
 pub use id::ID;
 pub use job::Job;
 pub use profile::Profile;

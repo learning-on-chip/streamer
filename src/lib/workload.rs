@@ -2,9 +2,8 @@ use probability::distribution::{Categorical, Sample};
 use sqlite::Connection;
 use std::collections::HashMap;
 
-use config::Config;
 use platform::ElementKind;
-use {Result, Source};
+use {Config, Result, Source};
 
 pub struct Workload {
     patterns: Vec<Pattern>,
