@@ -91,6 +91,6 @@ mod tests {
     fn read_interarrivals() {
         let backend = Connection::open("tests/fixtures/google.sqlite3").unwrap();
         let data = super::read_interarrivals(&backend).unwrap();
-        assert_eq!(data.len(), 667926);
+        assert_eq!(data.len(), 668088);
     }
 }
