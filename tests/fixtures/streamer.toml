@@ -46,3 +46,69 @@ path = "parsec/vips.sqlite3"
 
 [[workload.patterns]]
 path = "parsec/x264.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/astar.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/bwaves.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/bzip2.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/cactusADM.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/calculix.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/dealII.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/gamess.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/gcc.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/gobmk.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/gromacs.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/hmmer.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/lbm.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/leslie3d.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/libquantum.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/mcf.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/milc.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/namd.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/perlbench.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/povray.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/soplex.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/sphinx3.sqlite3"
+
+[[workload.patterns]]
+path = "cpu2006/zeusmp.sqlite3"
