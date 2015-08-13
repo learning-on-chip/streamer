@@ -80,7 +80,7 @@ impl Platform {
 
         let units = pattern.units;
         if self.units < units {
-            raise!("do not have enough resources for {}", job);
+            raise!("do not have enough resources for a job");
         }
 
         let mut available = 0f64;
@@ -105,7 +105,7 @@ impl Platform {
 
         if hosts.len() != units {
             push_back!();
-            raise!("failed to allocate resources for {}", job);
+            raise!("failed to allocate resources for a job");
         }
 
         let start = job.arrival.max(available) + EPSILON;

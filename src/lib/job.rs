@@ -1,5 +1,3 @@
-use std::fmt;
-
 use ID;
 use workload::Pattern;
 
@@ -16,11 +14,5 @@ impl Job {
     #[inline]
     pub fn new(arrival: f64, pattern: Pattern) -> Job {
         rc!(Job(Content { id: ID::new("job"), arrival: arrival, pattern: pattern }))
-    }
-}
-
-impl fmt::Display for Job {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "Job {} ({})", self.id, self.pattern.name)
     }
 }
