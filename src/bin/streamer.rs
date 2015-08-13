@@ -81,14 +81,15 @@ fn start() -> Result<()> {
 
     let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
-    info!(target: "Streamer", "Simulating {} seconds ({} steps)...", length,
-          (length / system.time_step()) as usize);
+    info!(target: "Streamer", "Simulating {} seconds with a time step of {} seconds...", length,
+          system.time_step());
     let start = time::now();
 
     for (event, power, temperature) in system {
         if event.time > length {
             break;
         }
+        info!(target: "Streamer", "{}", event);
         try!(output.next((event, power, temperature)));
     }
 

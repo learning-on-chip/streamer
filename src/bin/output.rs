@@ -13,7 +13,7 @@ pub struct Database {
     statement: Statement<'static>,
 }
 
-pub struct Terminal;
+pub struct Null;
 
 impl Database {
     pub fn new<T: AsRef<Path>>(system: &System, path: T) -> Result<Database> {
@@ -67,13 +67,8 @@ impl Output for Database {
     }
 }
 
-impl Output for Terminal {
-    fn next(&mut self, (event, power, _): Increment) -> Result<()> {
-        if power.steps > 0 {
-            println!("{} - {} samples", event, power.steps);
-        } else {
-            println!("{}", event);
-        }
+impl Output for Null {
+    fn next(&mut self, _: Increment) -> Result<()> {
         Ok(())
     }
 }
@@ -81,6 +76,6 @@ impl Output for Terminal {
 pub fn new<T: AsRef<Path>>(system: &System, output: Option<T>) -> Result<Box<Output>> {
     Ok(match output {
         Some(output) => Box::new(try!(Database::new(system, output))),
-        _ => Box::new(Terminal),
+        _ => Box::new(Null),
     })
 }

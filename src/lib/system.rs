@@ -113,7 +113,7 @@ impl Iterator for System {
 
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{:9.2} s: {:<30}", self.time, &self.kind)
+        write!(formatter, "{:.2} s -> {}", self.time, &self.kind)
     }
 }
 
@@ -126,9 +126,9 @@ impl fmt::Display for EventKind {
         );
 
         match self {
-            &EventKind::Arrival(ref job) => job!(job, "arrival"),
-            &EventKind::Start(ref job) => job!(job, "start"),
-            &EventKind::Finish(ref job) => job!(job, "finish"),
+            &EventKind::Arrival(ref job) => job!(job, "arrived"),
+            &EventKind::Start(ref job) => job!(job, "started"),
+            &EventKind::Finish(ref job) => job!(job, "finished"),
         }
     }
 }
