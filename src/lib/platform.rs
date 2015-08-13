@@ -113,11 +113,8 @@ impl Platform {
 
         for i in 0..units {
             let element = &pattern.elements[i];
-            let mut power = element.dynamic_power.clone();
-            for power in &mut power {
-                *power += element.leakage_power;
-            }
-            self.power.accumulate(hosts[i].number(), start, pattern.time_step, &power);
+            self.power.accumulate(hosts[i].number(), start, pattern.time_step,
+                                  &element.dynamic_power, element.leakage_power);
         }
 
         for host in &mut hosts {

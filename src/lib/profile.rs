@@ -24,18 +24,20 @@ impl Profile {
         }
     }
 
-    pub fn accumulate(&mut self, unit: usize, time: f64, time_step: f64, data: &[f64]) {
+    pub fn accumulate(&mut self, unit: usize, time: f64, time_step: f64, dynamic: &[f64],
+                      statik: f64) {
+
         debug_assert!(unit < self.units);
         debug_assert!(time >= self.time);
 
         let (t1, t2) = (self.time, time);
         let (d1, d2) = (self.time_step, time_step);
 
-        let s2 = data.len();
+        let s2 = dynamic.len();
         let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
 
         if s1 > self.steps {
-            self.data.extend(vec![0.0; (s1 - self.steps) * self.units]);
+            self.data.extend(vec![statik; (s1 - self.steps) * self.units]);
             self.steps = s1;
         }
 
@@ -43,7 +45,7 @@ impl Profile {
         let mut j2 = 0;
 
         macro_rules! add(
-            ($weight:expr) => (self.data[j1 * self.units + unit] += $weight * data[j2]);
+            ($weight:expr) => (self.data[j1 * self.units + unit] += $weight * dynamic[j2]);
         );
 
         while j1 < s1 && j2 < s2 {
@@ -126,28 +128,28 @@ mod tests {
     fn accumulate_padding() {
         let mut profile = Profile::new(2, 0.5);
 
-        profile.accumulate(0, 4.0, 1.0, &[]);
+        profile.accumulate(0, 4.0, 1.0, &[], 42.0);
         assert_eq!(profile.steps, 8);
-        assert_eq!(&profile.data, &vec![0.0; 2 * 8]);
+        assert_eq!(&profile.data, &vec![42.0; 2 * 8]);
 
-        profile.accumulate(0, 2.5, 1.0, &[]);
+        profile.accumulate(0, 2.5, 1.0, &[], 0.0);
         assert_eq!(profile.steps, 8);
-        assert_eq!(&profile.data, &vec![0.0; 2 * 8]);
+        assert_eq!(&profile.data, &vec![42.0; 2 * 8]);
 
-        profile.accumulate(0, 6.5, 1.0, &[]);
+        profile.accumulate(0, 6.5, 1.0, &[], 42.0);
         assert_eq!(profile.steps, 13);
-        assert_eq!(&profile.data, &vec![0.0; 2 * 13]);
+        assert_eq!(&profile.data, &vec![42.0; 2 * 13]);
 
-        profile.accumulate(0, 6.55, 1.0, &[]);
+        profile.accumulate(0, 6.55, 1.0, &[], 42.0);
         assert_eq!(profile.steps, 14);
-        assert_eq!(&profile.data, &vec![0.0; 2 * 14]);
+        assert_eq!(&profile.data, &vec![42.0; 2 * 14]);
     }
 
     #[test]
     fn accumulate_synchronous() {
         let mut profile = Profile::new(2, 1.0);
 
-        profile.accumulate(0, 1.0, 1.0, &[1.0, 2.0]);
+        profile.accumulate(0, 1.0, 1.0, &[1.0, 2.0], 0.0);
         assert_eq!(profile.steps, 3);
         assert_eq!(&profile.data, &vec![
            0.0, 0.0,
@@ -155,7 +157,7 @@ mod tests {
            2.0, 0.0,
         ]);
 
-        profile.accumulate(0, 1.0, 1.0, &[1.0, 2.0, 3.0]);
+        profile.accumulate(0, 1.0, 1.0, &[1.0, 2.0, 3.0], 0.0);
         assert_eq!(profile.steps, 4);
         assert_eq!(&profile.data, &vec![
            0.0, 0.0,
@@ -169,7 +171,7 @@ mod tests {
     fn accumulate_asynchronous() {
         let mut profile = Profile::new(2, 1.0);
 
-        profile.accumulate(1, 1.5, 1.0, &[1.0, 2.0, 3.0]);
+        profile.accumulate(1, 1.5, 1.0, &[1.0, 2.0, 3.0], 0.0);
         assert_eq!(profile.steps, 5);
         assert_eq!(&profile.data, &vec![
            0.0, 0.0,
@@ -179,7 +181,7 @@ mod tests {
            0.0, 1.5,
         ]);
 
-        profile.accumulate(0, 0.5, 0.25, &[1.0, 2.0, 3.0, 1.0, 3.0]);
+        profile.accumulate(0, 0.5, 0.25, &[1.0, 2.0, 3.0, 1.0, 3.0], 0.0);
         assert_eq!(profile.steps, 5);
         assert_eq!(&profile.data, &vec![
            3.0, 0.0,
@@ -189,7 +191,7 @@ mod tests {
            0.0, 1.5,
         ]);
 
-        profile.accumulate(0, 1.25, 1.0, &[1.0, 2.0, 3.0, 0.0, 4.0]);
+        profile.accumulate(0, 1.25, 1.0, &[1.0, 2.0, 3.0, 0.0, 4.0], 0.0);
         assert_eq!(profile.steps, 7);
         assert_eq!(&profile.data, &vec![
            3.00, 0.0,
@@ -205,7 +207,7 @@ mod tests {
     #[test]
     fn discharge() {
         let mut profile = Profile::new(2, 1.0);
-        profile.accumulate(0, 0.0, 1.0, &vec![42.0; 42]);
+        profile.accumulate(0, 0.0, 1.0, &vec![42.0; 42], 0.0);
         assert_eq!(profile.time, 0.0);
         assert_eq!(profile.steps, 42);
 
