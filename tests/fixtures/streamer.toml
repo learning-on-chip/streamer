@@ -12,103 +12,103 @@ path = "google.sqlite3"
 
 [workload]
 [[workload.patterns]]
-path = "parsec/blackscholes.sqlite3"
+path = "parsec/small/blackscholes.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/bodytrack.sqlite3"
+path = "parsec/small/bodytrack.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/canneal.sqlite3"
+path = "parsec/small/canneal.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/dedup.sqlite3"
+path = "parsec/small/dedup.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/facesim.sqlite3"
+path = "parsec/small/facesim.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/fluidanimate.sqlite3"
+path = "parsec/small/fluidanimate.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/freqmine.sqlite3"
+path = "parsec/small/freqmine.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/raytrace.sqlite3"
+path = "parsec/small/raytrace.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/streamcluster.sqlite3"
+path = "parsec/small/streamcluster.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/swaptions.sqlite3"
+path = "parsec/small/swaptions.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/vips.sqlite3"
+path = "parsec/small/vips.sqlite3"
 
 [[workload.patterns]]
-path = "parsec/x264.sqlite3"
+path = "parsec/small/x264.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/astar.sqlite3"
+path = "cpu2006/large/astar.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/bwaves.sqlite3"
+path = "cpu2006/large/bwaves.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/bzip2.sqlite3"
+path = "cpu2006/large/bzip2.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/cactusADM.sqlite3"
+path = "cpu2006/large/cactusADM.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/calculix.sqlite3"
+path = "cpu2006/large/calculix.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/dealII.sqlite3"
+path = "cpu2006/large/dealII.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/gamess.sqlite3"
+path = "cpu2006/large/gamess.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/gcc.sqlite3"
+path = "cpu2006/large/gcc.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/gobmk.sqlite3"
+path = "cpu2006/large/gobmk.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/gromacs.sqlite3"
+path = "cpu2006/large/gromacs.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/hmmer.sqlite3"
+path = "cpu2006/large/hmmer.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/lbm.sqlite3"
+path = "cpu2006/large/lbm.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/leslie3d.sqlite3"
+path = "cpu2006/large/leslie3d.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/libquantum.sqlite3"
+path = "cpu2006/large/libquantum.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/mcf.sqlite3"
+path = "cpu2006/large/mcf.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/milc.sqlite3"
+path = "cpu2006/large/milc.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/namd.sqlite3"
+path = "cpu2006/large/namd.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/perlbench.sqlite3"
+path = "cpu2006/large/perlbench.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/povray.sqlite3"
+path = "cpu2006/large/povray.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/soplex.sqlite3"
+path = "cpu2006/large/soplex.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/sphinx3.sqlite3"
+path = "cpu2006/large/sphinx3.sqlite3"
 
 [[workload.patterns]]
-path = "cpu2006/zeusmp.sqlite3"
+path = "cpu2006/large/zeusmp.sqlite3"
