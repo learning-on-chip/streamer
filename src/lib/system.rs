@@ -11,6 +11,7 @@ pub struct System {
     pub platform: Platform,
     pub traffic: Traffic,
     pub workload: Workload,
+    pub stats: Stats,
     queue: BinaryHeap<Event>,
 }
 
@@ -27,6 +28,13 @@ pub enum EventKind {
     Arrival,
     Start,
     Finish,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct Stats {
+    pub arrived: usize,
+    pub started: usize,
+    pub finished: usize,
 }
 
 pub type Increment = (Event, Profile, Profile);
@@ -50,6 +58,7 @@ impl System {
             platform: platform,
             traffic: traffic,
             workload: workload,
+            stats: Stats::default(),
             queue: BinaryHeap::new(),
         })
     }
@@ -102,6 +111,7 @@ impl Iterator for System {
             Some((power, temperature)) => (power, temperature),
             _ => return None,
         };
+        self.stats.account(&event);
         Some((event, power, temperature))
     }
 }
@@ -109,7 +119,7 @@ impl Iterator for System {
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         let pattern = &self.job.pattern;
-        write!(formatter, "{:7.2} s | job #{:3} | {:20} | {:2} units | {:6.2} s | {}",
+        write!(formatter, "{:7.2} s | job #{:3} | {:20} | {:2} units | {:6.2} s | {:7}",
                self.time, self.job.id, pattern.name, pattern.units,
                (pattern.steps as f64) * pattern.time_step, self.kind)
     }
@@ -121,6 +131,16 @@ impl fmt::Display for EventKind {
             EventKind::Arrival => "arrival".fmt(formatter),
             EventKind::Start => "start".fmt(formatter),
             EventKind::Finish => "finish".fmt(formatter),
+        }
+    }
+}
+
+impl Stats {
+    fn account(&mut self, event: &Event) {
+        match event.kind {
+            EventKind::Arrival => self.arrived += 1,
+            EventKind::Start => self.started += 1,
+            EventKind::Finish => self.finished += 1,
         }
     }
 }

@@ -65,7 +65,7 @@ fn start() -> Result<()> {
         logger::setup(LogLevel::Warn);
     }
 
-    let system = {
+    let mut system = {
         let config = some!(arguments.get::<String>("config"), "a configuration file is required");
         let config = try!(Config::new(config));
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
@@ -85,11 +85,12 @@ fn start() -> Result<()> {
           system.time_step());
     let start = time::now();
 
-    for (event, power, temperature) in system {
+    while let Some((event, power, temperature)) = system.next() {
         if event.time > length {
             break;
         }
-        info!(target: "Streamer", "{}", event);
+        info!(target: "Streamer", "{} | {:2} queued", event,
+              system.stats.arrived - system.stats.started);
         try!(output.next((event, power, temperature)));
     }
 
