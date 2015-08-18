@@ -69,7 +69,7 @@ fn start() -> Result<()> {
         let config = some!(arguments.get::<String>("config"), "a configuration file is required");
         let config = try!(Config::new(config));
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
-        let seed = if seed > 0 { seed } else { 0x04020609 };
+        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
         let seed = [0x12345678 & seed, 0x87654321 & seed];
         try!(System::new(&config, &random::default().seed(seed)))
     };
