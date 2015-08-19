@@ -138,7 +138,7 @@ macro_rules! time {
 mod config;
 mod platform;
 mod profile;
-mod scheduler;
+mod schedule;
 mod system;
 mod traffic;
 mod workload;

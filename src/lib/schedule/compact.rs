@@ -2,32 +2,34 @@ use std::collections::{BinaryHeap, HashMap};
 use std::ops::Deref;
 
 use platform::{Element, ElementKind};
+use schedule::Schedule;
 use {Job, Result};
 
-pub struct Scheduler {
-    pub units: usize,
-    pub hosts: HashMap<ElementKind, BinaryHeap<Host>>,
+pub struct Compact {
+    units: usize,
+    hosts: HashMap<ElementKind, BinaryHeap<Host>>,
 }
 
-#[derive(Clone, Copy, Debug)]
 pub struct Host {
-    pub time: f64,
-    pub element: Element,
+    time: f64,
+    element: Element,
 }
 
 time!(Host);
 
-impl Scheduler {
-    pub fn new(elements: &[Element]) -> Result<Scheduler> {
+impl Compact {
+    pub fn new(elements: &[Element]) -> Result<Compact> {
         let mut hosts = HashMap::new();
         for element in elements {
             let heap = hosts.entry(element.kind).or_insert_with(|| BinaryHeap::new());
             heap.push(Host { time: 0.0, element: element.clone() });
         }
-        Ok(Scheduler { units: elements.len(), hosts: hosts })
+        Ok(Compact { units: elements.len(), hosts: hosts })
     }
+}
 
-    pub fn push(&mut self, job: &Job) -> Result<(f64, f64, Vec<(usize, usize)>)> {
+impl Schedule for Compact {
+    fn push(&mut self, job: &Job) -> Result<(f64, f64, Vec<(usize, usize)>)> {
         use std::f64::EPSILON;
 
         let pattern = &job.pattern;

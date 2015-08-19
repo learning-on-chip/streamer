@@ -4,12 +4,12 @@ use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
 use profile::Profile;
-use scheduler::Scheduler;
+use schedule::{self, Schedule};
 use {Config, Error, Job, Result};
 
 pub struct Platform {
     pub elements: Vec<Element>,
-    pub scheduler: Scheduler,
+    pub schedule: Box<Schedule>,
     pub simulator: Simulator,
     pub power: Profile,
 }
@@ -47,7 +47,7 @@ impl Platform {
         }
         info!(target: "Platform", "Found {} processing elements.", elements.len());
 
-        let scheduler = try!(Scheduler::new(&elements));
+        let schedule = Box::new(try!(schedule::Compact::new(&elements)));
 
         let config = {
             let config = some!(config.branch("temperature"),
@@ -66,14 +66,14 @@ impl Platform {
 
         Ok(Platform {
             elements: elements,
-            scheduler: scheduler,
+            schedule: schedule,
             simulator: simulator,
             power: power,
         })
     }
 
     pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
-        let (start, finish, mapping) = try!(self.scheduler.push(job));
+        let (start, finish, mapping) = try!(self.schedule.push(job));
         let (from, onto) = (&job.pattern.elements, &self.elements);
         for (i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
