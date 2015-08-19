@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn read_names() {
-        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
+        let backend = open();
         let data = super::read_names(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
@@ -173,7 +173,7 @@ mod tests {
 
     #[test]
     fn read_dynamic_power() {
-        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
+        let backend = open();
         let data = super::read_dynamic_power(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
@@ -187,10 +187,14 @@ mod tests {
 
     #[test]
     fn read_leakage_power() {
-        let backend = Connection::open("tests/fixtures/parsec/blackscholes.sqlite3").unwrap();
+        let backend = open();
         let data = super::read_leakage_power(&backend).unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), data.get(&1).unwrap());
+    }
+
+    fn open() -> Connection {
+        Connection::open("tests/fixtures/parsec/small/blackscholes.sqlite3").unwrap()
     }
 }

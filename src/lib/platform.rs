@@ -1,25 +1,23 @@
-use std::collections::{BinaryHeap, HashMap};
 use std::str::FromStr;
 use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
 use profile::Profile;
-use {Config, Error, ID, Job, Result};
+use scheduler::Scheduler;
+use {Config, Error, Job, Result};
 
 pub struct Platform {
-    pub units: usize,
-    pub elements: HashMap<ElementKind, BinaryHeap<Element>>,
+    pub elements: Vec<Element>,
+    pub scheduler: Scheduler,
     pub simulator: Simulator,
     pub power: Profile,
 }
 
-time! {
-    #[derive(Clone, Copy, Debug)]
-    pub struct Element {
-        pub id: ID,
-        pub kind: ElementKind,
-    }
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct Element {
+    pub id: usize,
+    pub kind: ElementKind,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -35,22 +33,21 @@ impl Platform {
         info!(target: "Platform", "Reading {:?}...", &path);
         let system = ok!(System::new(&path));
 
-        let mut units = 0;
-        let mut elements = HashMap::new();
+        let mut elements = vec![];
         for element in system.stack.elements.iter().rev() {
             let die = match element {
                 &StackElement::Die(ref die) => die,
                 _ => continue,
             };
             for element in die.floorplan.elements.iter() {
+                let id = elements.len();
                 let kind = try!(ElementKind::from_str(&element.id));
-                let id = ID::new("element");
-                let heap = elements.entry(kind).or_insert_with(|| BinaryHeap::new());
-                heap.push(time!(0.0, Element { id: id, kind: kind }));
-                units += 1;
+                elements.push(Element { id: id, kind: kind });
             }
         }
-        info!(target: "Platform", "Found {} processing elements.", units);
+        info!(target: "Platform", "Found {} processing elements.", elements.len());
+
+        let scheduler = try!(Scheduler::new(&elements));
 
         let config = {
             let config = some!(config.branch("temperature"),
@@ -65,63 +62,24 @@ impl Platform {
         info!(target: "Platform", "Initializing the temperature simulator...");
         let simulator = ok!(Simulator::new(&circuit, &config));
 
+        let power = Profile::new(elements.len(), config.time_step);
+
         Ok(Platform {
-            units: units,
             elements: elements,
+            scheduler: scheduler,
             simulator: simulator,
-            power: Profile::new(units, config.time_step),
+            power: power,
         })
     }
 
     pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
-        use std::f64::EPSILON;
-
-        let pattern = &job.pattern;
-
-        let units = pattern.units;
-        if self.units < units {
-            raise!("do not have enough resources for a job");
+        let (start, finish, mapping) = try!(self.scheduler.push(job));
+        let (from, onto) = (&job.pattern.elements, &self.elements);
+        for (i, j) in mapping {
+            let (from, onto) = (&from[i], &onto[j]);
+            self.power.accumulate(onto.id, start, job.pattern.time_step, &from.dynamic_power,
+                                  from.leakage_power);
         }
-
-        let mut available = 0f64;
-        let mut hosts = vec![];
-        for element in &pattern.elements {
-            match self.elements.get_mut(&element.kind).and_then(|heap| heap.pop()) {
-                Some(host) => {
-                    if host.is_exclusive() {
-                        available = available.max(host.time);
-                    }
-                    hosts.push(host);
-                },
-                _ => break,
-            }
-        }
-
-        macro_rules! push_back(
-            () => (for host in hosts.drain(..) {
-                self.elements.get_mut(&host.kind).unwrap().push(host);
-            });
-        );
-
-        if hosts.len() != units {
-            push_back!();
-            raise!("failed to allocate resources for a job");
-        }
-
-        let start = job.arrival.max(available) + EPSILON;
-        let finish = start + pattern.duration();
-
-        for i in 0..units {
-            let element = &pattern.elements[i];
-            self.power.accumulate(hosts[i].number(), start, pattern.time_step,
-                                  &element.dynamic_power, element.leakage_power);
-        }
-
-        for host in &mut hosts {
-            host.time = finish;
-        }
-        push_back!();
-
         Ok((start, finish))
     }
 
@@ -133,17 +91,17 @@ impl Platform {
     }
 
     #[inline]
+    pub fn len(&self) -> usize {
+        self.elements.len()
+    }
+
+    #[inline]
     pub fn time_step(&self) -> f64 {
         self.power.time_step
     }
 }
 
 impl Element {
-    #[inline(always)]
-    pub fn number(&self) -> usize {
-        self.id.number()
-    }
-
     #[inline(always)]
     pub fn is_exclusive(&self) -> bool {
         self.kind == ElementKind::Core
@@ -174,14 +132,19 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use config::Config;
-    use super::{ElementKind, Platform};
+    use super::{Element, ElementKind, Platform};
 
     #[test]
     fn new() {
         let config = Config::new("tests/fixtures/streamer.toml").unwrap()
                             .branch("platform").unwrap();
         let platform = Platform::new(&config).unwrap();
-        assert_eq!(platform.elements[&ElementKind::Core].len(), 4);
-        assert_eq!(platform.elements[&ElementKind::L3].len(), 1);
+        assert_eq!(platform.elements, &[
+            Element { id: 0, kind: ElementKind::Core },
+            Element { id: 1, kind: ElementKind::Core },
+            Element { id: 2, kind: ElementKind::Core },
+            Element { id: 3, kind: ElementKind::Core },
+            Element { id: 4, kind: ElementKind::L3 },
+        ]);
     }
 }

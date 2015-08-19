@@ -102,15 +102,8 @@ macro_rules! rc(
     );
 );
 
-macro_rules! time(
-    (
-        $(#[$attr:meta])*
-        pub struct $name:ident $body:tt
-    ) => (
-        rewrite! {
-            [$(#[$attr])* pub struct $name] [pub time: f64,] $body
-        }
-
+macro_rules! time {
+    ($name:ident) => (
         impl ::std::cmp::Eq for $name {
         }
 
@@ -140,19 +133,14 @@ macro_rules! time(
             }
         }
     );
-    ($time:expr, $name:ident { $($field:ident: $value:expr),* }) => (
-        time!($time, $name { $($field: $value,)* })
-    );
-    ($time:expr, $name:ident { $($field:ident: $value:expr,)* }) => (
-        $name { time: $time, $($field: $value,)* }
-    );
-);
+}
 
 mod config;
 mod id;
 mod job;
 mod platform;
 mod profile;
+mod scheduler;
 mod system;
 mod traffic;
 mod workload;
@@ -160,6 +148,7 @@ mod workload;
 pub use config::Config;
 pub use id::ID;
 pub use job::Job;
+pub use platform::Platform;
 pub use profile::Profile;
 pub use system::{Increment, System};
 

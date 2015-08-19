@@ -15,13 +15,14 @@ pub struct System {
     queue: BinaryHeap<Event>,
 }
 
-time! {
-    #[derive(Clone, Debug)]
-    pub struct Event {
-        pub job: Job,
-        pub kind: EventKind,
-    }
+#[derive(Clone, Debug)]
+pub struct Event {
+    pub time: f64,
+    pub job: Job,
+    pub kind: EventKind,
 }
+
+time!(Event);
 
 #[derive(Clone, Copy, Debug)]
 pub enum EventKind {
@@ -85,12 +86,12 @@ impl System {
             _ => raise!("failed to generate a new job"),
         };
 
-        self.queue.push(time!(job.arrival, Event { job: job.clone(), kind: EventKind::Arrival }));
+        self.queue.push(Event { time: job.arrival, job: job.clone(), kind: EventKind::Arrival });
 
         let (start, finish) = try!(self.platform.push(&job));
 
-        self.queue.push(time!(start, Event { job: job.clone(), kind: EventKind::Start }));
-        self.queue.push(time!(finish, Event { job: job, kind: EventKind::Finish }));
+        self.queue.push(Event { time: start, job: job.clone(), kind: EventKind::Start });
+        self.queue.push(Event { time: finish, job: job, kind: EventKind::Finish });
 
         Ok(())
     }
