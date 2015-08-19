@@ -51,6 +51,7 @@ patterns = [
   { name = "vips-large",          path = "parsec/large/vips.sqlite3" },
   { name = "x264-large",          path = "parsec/large/x264.sqlite3" },
 
+  { name = "GemsFDTD-large",   path = "cpu2006/large/GemsFDTD.sqlite3" },
   { name = "astar-large",      path = "cpu2006/large/astar.sqlite3" },
   { name = "bwaves-large",     path = "cpu2006/large/bwaves.sqlite3" },
   { name = "bzip2-large",      path = "cpu2006/large/bzip2.sqlite3" },
@@ -68,6 +69,7 @@ patterns = [
   { name = "mcf-large",        path = "cpu2006/large/mcf.sqlite3" },
   { name = "milc-large",       path = "cpu2006/large/milc.sqlite3" },
   { name = "namd-large",       path = "cpu2006/large/namd.sqlite3" },
+  { name = "omnetpp-large",    path = "cpu2006/large/omnetpp.sqlite3" },
   { name = "perlbench-large",  path = "cpu2006/large/perlbench.sqlite3" },
   { name = "povray-large",     path = "cpu2006/large/povray.sqlite3" },
   { name = "soplex-large",     path = "cpu2006/large/soplex.sqlite3" },
