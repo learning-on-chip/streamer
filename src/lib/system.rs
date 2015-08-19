@@ -4,8 +4,8 @@ use std::fmt;
 use platform::Platform;
 use profile::Profile;
 use traffic::Traffic;
-use workload::Workload;
-use {Config, Job, Result, Source};
+use workload::{Pattern, Workload};
+use {Config, Result, Source};
 
 pub struct System {
     pub platform: Platform,
@@ -13,6 +13,13 @@ pub struct System {
     pub workload: Workload,
     pub stats: Stats,
     queue: BinaryHeap<Event>,
+}
+
+#[derive(Clone, Debug)]
+pub struct Job {
+    pub id: usize,
+    pub arrival: f64,
+    pub pattern: Pattern,
 }
 
 #[derive(Clone, Debug)]
@@ -33,6 +40,7 @@ pub enum EventKind {
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Stats {
+    pub created: usize,
     pub arrived: usize,
     pub started: usize,
     pub finished: usize,
@@ -80,9 +88,15 @@ impl System {
         Ok(())
     }
 
+    fn create_job(&mut self, arrival: f64, pattern: Pattern) -> Job {
+        let id = self.stats.created;
+        self.stats.created += 1;
+        Job { id: id, arrival: arrival, pattern: pattern }
+    }
+
     fn enqueue_job(&mut self) -> Result<()> {
         let job = match (self.traffic.next(), self.workload.next()) {
-            (Some(arrival), Some(pattern)) => Job::new(arrival, pattern),
+            (Some(arrival), Some(pattern)) => self.create_job(arrival, pattern),
             _ => raise!("failed to generate a new job"),
         };
 
