@@ -53,7 +53,6 @@ macro_rules! path(
     });
 );
 
-macro_rules! itemize(($blob:item) => ($blob));
 macro_rules! rewrite(
     ($header:tt [$($member:tt)*] {}) => (
         rewrite!(output $header [$($member)*]);
@@ -103,15 +102,15 @@ macro_rules! rc(
 );
 
 macro_rules! time {
-    ($name:ident) => (
+    ($name:ident($field:tt)) => (itemize! {
         impl ::std::cmp::Eq for $name {
         }
 
         impl ::std::cmp::Ord for $name {
             fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
-                if self.time < other.time {
+                if self.$field < other.$field {
                     ::std::cmp::Ordering::Greater
-                } else if self.time > other.time {
+                } else if self.$field > other.$field {
                     ::std::cmp::Ordering::Less
                 } else {
                     ::std::cmp::Ordering::Equal
@@ -122,7 +121,7 @@ macro_rules! time {
         impl ::std::cmp::PartialEq for $name {
             #[inline]
             fn eq(&self, other: &Self) -> bool {
-                self.time == other.time
+                self.$field == other.$field
             }
         }
 
@@ -132,8 +131,11 @@ macro_rules! time {
                 Some(self.cmp(other))
             }
         }
-    );
+    });
+    ($name:ident) => (time! { $name(time) });
 }
+
+macro_rules! itemize(($($blob:item)*) => ($($blob)*));
 
 mod config;
 mod platform;
