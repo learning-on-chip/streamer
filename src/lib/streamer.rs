@@ -101,8 +101,38 @@ macro_rules! rc(
     );
 );
 
-macro_rules! time {
-    ($name:ident($field:tt)) => (itemize! {
+macro_rules! order {
+    ($name:ident($field:tt) ascending) => (itemize! {
+        impl ::std::cmp::Eq for $name {
+        }
+
+        impl ::std::cmp::Ord for $name {
+            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
+                if self.$field < other.$field {
+                    ::std::cmp::Ordering::Less
+                } else if self.$field > other.$field {
+                    ::std::cmp::Ordering::Greater
+                } else {
+                    ::std::cmp::Ordering::Equal
+                }
+            }
+        }
+
+        impl ::std::cmp::PartialEq for $name {
+            #[inline]
+            fn eq(&self, other: &Self) -> bool {
+                self.$field == other.$field
+            }
+        }
+
+        impl ::std::cmp::PartialOrd for $name {
+            #[inline]
+            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
+                Some(self.cmp(other))
+            }
+        }
+    });
+    ($name:ident($field:tt) descending) => (itemize! {
         impl ::std::cmp::Eq for $name {
         }
 
@@ -132,7 +162,6 @@ macro_rules! time {
             }
         }
     });
-    ($name:ident) => (time! { $name(time) });
 }
 
 macro_rules! itemize(($($blob:item)*) => ($($blob)*));

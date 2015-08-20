@@ -29,7 +29,7 @@ pub struct Event {
     pub kind: EventKind,
 }
 
-time!(Event);
+order!(Event(time) descending);
 
 #[derive(Clone, Copy, Debug)]
 pub enum EventKind {

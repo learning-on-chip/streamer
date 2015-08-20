@@ -15,7 +15,7 @@ pub struct Host {
     element: Element,
 }
 
-time!(Host);
+order!(Host(time) descending);
 
 impl Compact {
     pub fn new(elements: &[Element]) -> Result<Compact> {
