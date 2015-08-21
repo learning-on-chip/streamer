@@ -60,7 +60,7 @@ impl Schedule for Compact {
             let finish = start + length;
             let mut mapping = Vec::with_capacity(need);
             for i in 0..need {
-                let j = found[i].unwrap();
+                let j = some!(found[i]);
                 self.queues[j].push((start, finish));
                 mapping.push((i, hosts[j].id));
             }

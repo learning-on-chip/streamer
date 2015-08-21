@@ -159,7 +159,7 @@ impl Node {
                 return None;
             }
         }
-        unreachable!()
+        unreachable!();
     }
 }
 

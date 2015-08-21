@@ -29,7 +29,11 @@ macro_rules! ok(
 );
 
 macro_rules! some(
-    ($option:expr, $($arg:tt)*) => (match $option {
+    ($option:expr) => (match $option {
+        Some(value) => value,
+        _ => raise!("encountered a logic error"),
+    });
+    ($option:expr, $($arg:tt)+) => (match $option {
         Some(value) => value,
         _ => raise!($($arg)*),
     });
