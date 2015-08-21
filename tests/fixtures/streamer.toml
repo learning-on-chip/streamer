@@ -1,4 +1,4 @@
-seed = 10
+seed = 0
 time_step = 1e-3
 
 [platform]
