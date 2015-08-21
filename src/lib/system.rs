@@ -142,7 +142,7 @@ deref! { Job::pattern => Pattern }
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         let pattern = &self.job.pattern;
-        write!(formatter, "{:7.2} s | job #{:3} | {:20} | {:2} units | {:6.2} s | {:7}",
+        write!(formatter, "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:7}",
                self.time, self.job.id, pattern.name, pattern.units,
                (pattern.steps as f64) * pattern.time_step, self.kind)
     }

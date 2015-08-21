@@ -2,7 +2,7 @@ use probability::distribution::{Categorical, Sample};
 use sqlite::Connection;
 use std::collections::HashMap;
 
-use platform::Class;
+use platform::{self, Class};
 use {Config, Result, Source};
 
 pub struct Workload {
@@ -104,6 +104,12 @@ impl Pattern {
     #[inline]
     pub fn duration(&self) -> f64 {
         self.steps as f64 * self.time_step
+    }
+}
+
+impl Element {
+    pub fn accept(&self, element: &platform::Element) -> bool {
+        self.class == element.class
     }
 }
 
