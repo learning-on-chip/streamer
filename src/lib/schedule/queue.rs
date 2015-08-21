@@ -1,68 +1,80 @@
-use std::collections::btree_map::{BTreeMap, Values};
+use std::collections::btree_set::{BTreeSet, Iter};
 use std::f64::INFINITY;
-use std::ops::Deref;
+
+use math;
+use platform::Capacity;
 
 pub struct Queue {
-    occupied: BTreeMap<Start, Interval>,
+    capacity: Capacity,
+    occupied: BTreeSet<Interval>,
 }
-
-pub struct Vacancies<'l> {
-    from: f64,
-    last: Option<Interval>,
-    inner: Values<'l, Start, Interval>,
-}
-
-#[derive(Clone, Copy)]
-struct Start(f64);
-
-order!(Start(0) ascending);
 
 #[derive(Clone, Copy, Debug)]
-pub struct Interval(pub f64, pub f64);
+pub struct Interval(f64, f64);
 
 order!(Interval(0) ascending);
 
+struct Holes<'l> {
+    from: f64,
+    inner: Iter<'l, Interval>,
+}
+
 impl Queue {
     #[inline]
-    pub fn new() -> Queue {
-        Queue { occupied: BTreeMap::new() }
+    pub fn new(capacity: Capacity) -> Queue {
+        Queue { capacity: capacity, occupied: BTreeSet::new() }
+    }
+
+    pub fn next(&self, from: f64, length: f64) -> Interval {
+        if let Capacity::Infinite = self.capacity {
+             return Interval(from, INFINITY);
+        }
+        match self.holes(from).find(|&Interval(start, finish)| start + length <= finish) {
+            Some(interval) => interval,
+            _ => unreachable!(),
+        }
     }
 
     pub fn push(&mut self, (mut start, finish): (f64, f64)) {
-        while self.occupied.contains_key(&Start(start)) {
-            start = unsafe { m::nextafter(start, INFINITY) };
+        debug_assert!(0.0 <= start && start <= finish);
+        while self.occupied.contains(&Interval(start, 0.0)) {
+            start = math::next_after(start);
         }
-        self.occupied.insert(Start(start), Interval(start, finish));
+        self.occupied.insert(Interval(start, start.max(finish)));
+    }
+
+    pub fn trim(&mut self, time: f64) {
+        let mut redundant = vec![];
+        for &interval in &self.occupied {
+            if interval.finish() > time {
+                break;
+            }
+            redundant.push(interval);
+        }
+        for interval in redundant {
+            self.occupied.remove(&interval);
+        }
     }
 
     #[inline]
-    pub fn vacancies(&self, from: f64) -> Vacancies {
-        Vacancies { from: from, last: None, inner: self.occupied.values() }
+    fn holes(&self, from: f64) -> Holes {
+        Holes { from: from, inner: self.occupied.iter() }
     }
 }
 
-impl<'l> Vacancies<'l> {
-    #[inline]
-    fn last(&self) -> Option<Self::Item> {
-        self.last
-    }
-}
-
-impl<'l> Iterator for Vacancies<'l> {
+impl<'l> Iterator for Holes<'l> {
     type Item = Interval;
 
     fn next(&mut self) -> Option<Self::Item> {
         let from = self.from;
         if from.is_infinite() {
-            self.last = None;
-            return self.last;
+            return None;
         }
         match self.inner.next() {
-            Some(&(start, finish)) => {
+            Some(&Interval(start, finish)) => {
                 if from < start {
                     self.from = finish;
-                    self.last = Some(Interval(from, start));
-                    return self.last;
+                    return Some(Interval(from, start));
                 }
                 if from < finish {
                     self.from = finish;
@@ -71,42 +83,40 @@ impl<'l> Iterator for Vacancies<'l> {
             },
             _ => {
                 self.from = INFINITY;
-                self.last = Some(Interval(from, INFINITY));
-                return self.last;
+                return Some(Interval(from, INFINITY));
             },
         }
     }
 }
 
 impl Interval {
-    #[inline]
-    pub fn allows(&self, start: f64, length: f64) -> bool {
-        if start <= self.0 { self.0 + length <= self.1 } else { start + length <= self.1 }
+    #[inline(always)]
+    pub fn start(&self) -> f64 {
+        self.0
     }
-}
 
-mod m {
-    #[link_name = "m"]
-    extern {
-        pub fn nextafter(x: f64, y: f64) -> f64;
+    #[inline(always)]
+    pub fn finish(&self) -> f64 {
+        self.1
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use platform::Capacity;
+    use schedule::queue::{Interval, Queue};
     use std::f64::INFINITY;
-    use super::{Interval, Queue};
 
     macro_rules! test(
         ($queue:ident, $from:expr, [$(($start:expr, $finish:expr)),+]) => ({
-            let intervals = $queue.vacancies($from).collect::<Vec<_>>();
+            let intervals = $queue.holes($from).collect::<Vec<_>>();
             assert_eq!(intervals, vec![$(Interval($start, $finish)),+]);
         });
     );
 
     #[test]
-    fn vacancies() {
-        let mut queue = Queue::new();
+    fn push() {
+        let mut queue = Queue::new(Capacity::Single);
 
         test!(queue, 0.0, [(0.0, INFINITY)]);
         test!(queue, 10.0, [(10.0, INFINITY)]);
@@ -125,12 +135,36 @@ mod tests {
 
     #[test]
     fn push_duplicate() {
-        let mut queue = Queue::new();
+        let mut queue = Queue::new(Capacity::Single);
 
         queue.push((1.0, 2.0));
         queue.push((1.0, 4.0));
 
         assert_eq!(queue.occupied.len(), 2);
         test!(queue, 0.0, [(0.0, 1.0), (4.0, INFINITY)]);
+    }
+
+    #[test]
+    fn trim() {
+        let mut queue = Queue::new(Capacity::Single);
+
+        queue.push((10.0, 15.0));
+        queue.push((15.0, 20.0));
+        queue.push((25.0, 30.0));
+
+        queue.trim(10.0);
+        test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
+
+        queue.trim(11.0);
+        test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
+
+        queue.trim(15.0);
+        test!(queue, 0.0, [(0.0, 15.0), (20.0, 25.0), (30.0, INFINITY)]);
+
+        queue.trim(20.0);
+        test!(queue, 0.0, [(0.0, 25.0), (30.0, INFINITY)]);
+
+        queue.trim(30.0);
+        test!(queue, 0.0, [(0.0, INFINITY)]);
     }
 }

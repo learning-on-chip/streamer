@@ -1,8 +1,9 @@
 use std::cmp::Ord;
-use std::collections::BinaryHeap;
 
-use platform::{Element, ElementKind};
-use schedule::{Interval, Schedule, Queue};
+use math;
+use platform::Element;
+use schedule::Schedule;
+use schedule::queue::Queue;
 use {Job, Result};
 
 pub struct Compact {
@@ -12,70 +13,66 @@ pub struct Compact {
 
 impl Compact {
     pub fn new(elements: &[Element]) -> Result<Compact> {
-        Ok(Compact { elements: elements.clone(), queues: vec![Queue::new(); elements.len()] })
+        Ok(Compact {
+            elements: elements.to_vec(),
+            queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
+        })
     }
 }
 
 impl Schedule for Compact {
     fn push(&mut self, job: &Job) -> Result<(f64, f64, Vec<(usize, usize)>)> {
-        use std::f64::EPSILON;
-
-        let pattern = &job.pattern;
-
-        let (have, need) = (self.elements.len(), pattern.elements.len());
-        if have < need {
-            raise!("do not have enough resources for a job");
-        }
+        let hosts = &self.elements;
+        let guests = &job.pattern.elements;
+        let (have, need) = (hosts.len(), guests.len());
 
         let mut start = job.arrival;
-        let length = pattern.duration();
+        let length = job.pattern.duration();
 
-        let mut intervals = vec![Interval(0.0, 0.0); have];
-        let mut vacancies = self.queues.iter().map(|queue| queue.vacancies(start))
+        'outer: loop {
+            let intervals = self.queues.iter().map(|queue| queue.next(start, length))
                                               .collect::<Vec<_>>();
 
-        loop {
-            for i in 0..have {
-                while !intervals[i].allows(start, length) {
-                    intervals[i] = match vacancies.next() {
-                        Some(interval) => interval,
-                        _ => raise!("failed to find a long enough time interval"),
-                    }
-                }
-            }
             let order = sort(&intervals);
+            start = intervals[order[0]].start();
+
             let mut found = vec![None; need];
             let mut taken = vec![false; have];
-            for i in 0..need {
-                let requested = &pattern.elements[i];
+
+            'inner: for i in 0..need {
                 for &j in &order {
-                    if taken[j] {
-                        continue;
-                    }
-                    let candidate = &self.elements[j];
-                    if candidate.kind != requested.kind {
-                        continue;
-                    }
-                    if candidate.shared() {
+                    if !taken[j] && hosts[j].kind == guests[i].kind && intervals[j].start() == start {
                         found[i] = Some(j);
                         taken[j] = true;
-                        break;
+                        continue 'inner;
                     }
                 }
+                for &j in &order[1..] {
+                    if intervals[j].start() > start {
+                        start = intervals[j].start();
+                        continue 'outer;
+                    }
+                }
+                raise!("failed to allocated resouces for a job");
             }
-            if found.iter().all(|&found| found) {
-                break;
+
+            start = start.max(math::next_after(job.arrival));
+            let finish = start + length;
+            let mut mapping = Vec::with_capacity(need);
+            for i in 0..need {
+                let j = found[i].unwrap();
+                self.queues[j].push((start, finish));
+                mapping.push((i, hosts[j].id));
             }
-        }
 
-        let start = job.arrival.max(available) + EPSILON;
-        let finish = start + length;
-        let mut mapping = Vec::with_capacity(units);
-        for i in 0..units {
-            mapping.push((i, hosts[i].element.id));
+            return Ok((start, finish, mapping));
         }
+    }
 
-        Ok((start, finish, mapping))
+    fn trim(&mut self, time: f64) {
+        for queue in &mut self.queues {
+            queue.trim(time);
+        }
     }
 }
 

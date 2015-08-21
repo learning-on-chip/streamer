@@ -1,5 +1,3 @@
-#![feature(drain)]
-
 #[cfg(test)]
 extern crate assert;
 
@@ -99,8 +97,8 @@ macro_rules! rc(
 );
 
 macro_rules! order {
-    ($name:ident($field:tt) ascending) => (order!($name($field) Less < Greater)),
-    ($name:ident($field:tt) descending) => (order!($name($field) Greater < Less)),
+    ($name:ident($field:tt) ascending) => (order! { $name($field) Less < Greater });
+    ($name:ident($field:tt) descending) => (order! { $name($field) Greater < Less });
     ($name:ident($field:tt) $less:ident < $greater:ident) => (itemize! {
         impl ::std::cmp::Eq for $name {
         }
@@ -134,6 +132,20 @@ macro_rules! order {
 }
 
 macro_rules! itemize(($($blob:item)*) => ($($blob)*));
+
+mod math {
+    use std::f64::INFINITY;
+
+    #[link_name = "m"]
+    extern {
+        fn nextafter(x: f64, y: f64) -> f64;
+    }
+
+    #[inline]
+    pub fn next_after(x: f64) -> f64 {
+        unsafe { nextafter(x, INFINITY) }
+    }
+}
 
 mod config;
 mod platform;

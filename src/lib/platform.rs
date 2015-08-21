@@ -20,10 +20,16 @@ pub struct Element {
     pub kind: ElementKind,
 }
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ElementKind {
     Core,
     L3,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Capacity {
+    Single,
+    Infinite,
 }
 
 impl Platform {
@@ -77,14 +83,15 @@ impl Platform {
         let (from, onto) = (&job.pattern.elements, &self.elements);
         for (i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.power.accumulate(onto.id, start, job.pattern.time_step, &from.dynamic_power,
-                                  from.leakage_power);
+            self.power.push(onto.id, start, job.pattern.time_step, &from.dynamic_power,
+                            from.leakage_power);
         }
         Ok((start, finish))
     }
 
     pub fn next(&mut self, time: f64) -> Option<(Profile, Profile)> {
-        let power = self.power.discharge(time);
+        self.schedule.trim(time);
+        let power = self.power.pull(time);
         let mut temperature = power.clone_zero();
         self.simulator.step(&power, &mut temperature);
         Some((power, temperature))
@@ -103,8 +110,12 @@ impl Platform {
 
 impl Element {
     #[inline(always)]
-    pub fn shared(&self) -> bool {
-        self.kind == ElementKind::L3
+    pub fn capacity(&self) -> Capacity {
+        if self.kind == ElementKind::Core {
+            Capacity::Single
+        } else {
+            Capacity::Infinite
+        }
     }
 }
 
