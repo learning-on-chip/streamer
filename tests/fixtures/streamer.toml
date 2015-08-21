@@ -74,6 +74,7 @@ patterns = [
   { name = "povray-large",     path = "cpu2006/large/povray.sqlite3" },
   { name = "soplex-large",     path = "cpu2006/large/soplex.sqlite3" },
   { name = "sphinx3-large",    path = "cpu2006/large/sphinx3.sqlite3" },
+  { name = "wrf-large",        path = "cpu2006/large/wrf.sqlite3" },
   { name = "xalancbmk-large",  path = "cpu2006/large/xalancbmk.sqlite3" },
   { name = "zeusmp-large",     path = "cpu2006/large/zeusmp.sqlite3" },
 ]
