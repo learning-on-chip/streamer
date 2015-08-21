@@ -8,10 +8,10 @@ use schedule::{self, Schedule};
 use {Config, Error, Job, Result};
 
 pub struct Platform {
-    pub elements: Vec<Element>,
-    pub schedule: Box<Schedule>,
-    pub simulator: Simulator,
-    pub power: Profile,
+    elements: Vec<Element>,
+    schedule: Box<Schedule>,
+    simulator: Simulator,
+    power: Profile,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -70,12 +70,7 @@ impl Platform {
 
         let power = Profile::new(elements.len(), config.time_step);
 
-        Ok(Platform {
-            elements: elements,
-            schedule: schedule,
-            simulator: simulator,
-            power: power,
-        })
+        Ok(Platform { elements: elements, schedule: schedule, simulator: simulator, power: power })
     }
 
     pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
