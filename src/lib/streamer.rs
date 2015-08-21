@@ -26,7 +26,8 @@ macro_rules! deref {
                 &self.$field
             }
         }
-
+    });
+    (mut $name:ident::$field:tt => $target:ty) => (itemize! {
         impl ::std::ops::DerefMut for $name {
             #[inline]
             fn deref_mut(&mut self) -> &mut Self::Target {
@@ -114,18 +115,8 @@ macro_rules! rc(
         $(#[$attr])*
         pub struct $outer(::std::rc::Rc<$inner>);
 
-        rewrite! {
-            [$(#[$attr])* pub struct $inner] [] $body
-        }
-
-        impl ::std::ops::Deref for $outer {
-            type Target = $inner;
-
-            #[inline]
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
+        rewrite! { [$(#[$attr])* pub struct $inner] [] $body }
+        deref! { $outer::0 => $inner }
     );
     ($outer:ident($inner:ident { $($field:ident: $value:expr),* })) => (
         rc!($outer($inner { $($field: $value,)* }))

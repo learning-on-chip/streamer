@@ -163,6 +163,7 @@ impl Node {
 }
 
 deref! { Node::0 => Options }
+deref! { mut Node::0 => Options }
 
 #[cfg(test)]
 mod tests {

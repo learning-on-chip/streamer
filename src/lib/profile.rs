@@ -102,6 +102,7 @@ impl Into<Vec<f64>> for Profile {
 }
 
 deref! { Profile::data => [f64] }
+deref! { mut Profile::data => [f64] }
 
 #[cfg(test)]
 mod tests {
