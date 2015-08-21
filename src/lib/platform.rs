@@ -103,8 +103,8 @@ impl Platform {
 
 impl Element {
     #[inline(always)]
-    pub fn is_exclusive(&self) -> bool {
-        self.kind == ElementKind::Core
+    pub fn shared(&self) -> bool {
+        self.kind == ElementKind::L3
     }
 }
 

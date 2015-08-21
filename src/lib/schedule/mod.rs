@@ -5,5 +5,6 @@ pub trait Schedule {
 }
 
 mod compact;
+mod queue;
 
 pub use self::compact::Compact;

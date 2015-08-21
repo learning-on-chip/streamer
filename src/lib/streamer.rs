@@ -73,10 +73,7 @@ macro_rules! rewrite(
 );
 
 macro_rules! rc(
-    (
-        $(#[$attr:meta])*
-        pub struct $outer:ident($inner:ident) $body:tt
-    ) => (
+    ($(#[$attr:meta])* pub struct $outer:ident($inner:ident) $body:tt) => (
         $(#[$attr])*
         pub struct $outer(::std::rc::Rc<$inner>);
 
@@ -102,46 +99,18 @@ macro_rules! rc(
 );
 
 macro_rules! order {
-    ($name:ident($field:tt) ascending) => (itemize! {
+    ($name:ident($field:tt) ascending) => (order!($name($field) Less < Greater)),
+    ($name:ident($field:tt) descending) => (order!($name($field) Greater < Less)),
+    ($name:ident($field:tt) $less:ident < $greater:ident) => (itemize! {
         impl ::std::cmp::Eq for $name {
         }
 
         impl ::std::cmp::Ord for $name {
             fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
                 if self.$field < other.$field {
-                    ::std::cmp::Ordering::Less
+                    ::std::cmp::Ordering::$less
                 } else if self.$field > other.$field {
-                    ::std::cmp::Ordering::Greater
-                } else {
-                    ::std::cmp::Ordering::Equal
-                }
-            }
-        }
-
-        impl ::std::cmp::PartialEq for $name {
-            #[inline]
-            fn eq(&self, other: &Self) -> bool {
-                self.$field == other.$field
-            }
-        }
-
-        impl ::std::cmp::PartialOrd for $name {
-            #[inline]
-            fn partial_cmp(&self, other: &Self) -> Option<::std::cmp::Ordering> {
-                Some(self.cmp(other))
-            }
-        }
-    });
-    ($name:ident($field:tt) descending) => (itemize! {
-        impl ::std::cmp::Eq for $name {
-        }
-
-        impl ::std::cmp::Ord for $name {
-            fn cmp(&self, other: &Self) -> ::std::cmp::Ordering {
-                if self.$field < other.$field {
-                    ::std::cmp::Ordering::Greater
-                } else if self.$field > other.$field {
-                    ::std::cmp::Ordering::Less
+                    ::std::cmp::Ordering::$greater
                 } else {
                     ::std::cmp::Ordering::Equal
                 }
