@@ -80,10 +80,10 @@ impl Platform {
 
     pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
         let (start, finish, mapping) = try!(self.schedule.push(job));
-        let (from, onto) = (&job.pattern.elements, &self.elements);
+        let (from, onto) = (&job.elements, &self.elements);
         for (i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.power.push(onto.id, start, job.pattern.time_step, &from.dynamic_power,
+            self.power.push(onto.id, start, job.time_step, &from.dynamic_power,
                             from.leakage_power);
         }
         Ok((start, finish))

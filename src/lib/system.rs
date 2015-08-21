@@ -1,5 +1,5 @@
 use std::collections::BinaryHeap;
-use std::fmt;
+use std::{fmt, ops};
 
 use platform::Platform;
 use profile::Profile;
@@ -128,6 +128,15 @@ impl Iterator for System {
         };
         self.stats.account(&event);
         Some((event, power, temperature))
+    }
+}
+
+impl ops::Deref for Job {
+    type Target = Pattern;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.pattern
     }
 }
 
