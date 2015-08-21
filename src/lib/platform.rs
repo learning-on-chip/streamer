@@ -93,7 +93,7 @@ impl Platform {
         self.schedule.trim(time);
         let power = self.power.pull(time);
         let mut temperature = power.clone_zero();
-        self.simulator.step(&power, &mut temperature);
+        self.simulator.next(&power, &mut temperature);
         Some((power, temperature))
     }
 
