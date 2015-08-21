@@ -34,7 +34,7 @@ impl Database {
             let statement = ok!(connection.prepare({
                 ok!(insert_into("dynamic").columns(&[
                     "time", "component_id", "power", "temperature",
-                ]).batch(system.platform.len()).compile())
+                ]).batch(system.units()).compile())
             }));
             unsafe { mem::transmute(statement) }
         };

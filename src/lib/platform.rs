@@ -98,7 +98,7 @@ impl Platform {
     }
 
     #[inline]
-    pub fn len(&self) -> usize {
+    pub fn units(&self) -> usize {
         self.elements.len()
     }
 

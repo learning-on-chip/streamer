@@ -26,7 +26,7 @@ impl Schedule for Compact {
         let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
 
-        let mut start = job.arrival;
+        let mut start = job.arrival();
         let length = job.duration();
 
         'outer: loop {
@@ -56,7 +56,7 @@ impl Schedule for Compact {
                 raise!("failed to allocated resouces for a job");
             }
 
-            start = start.max(math::next_after(job.arrival));
+            start = start.max(math::next_after(job.arrival()));
             let finish = start + length;
             let mut mapping = Vec::with_capacity(need);
             for i in 0..need {

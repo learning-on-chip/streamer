@@ -1,5 +1,5 @@
 use std::collections::BinaryHeap;
-use std::{fmt, ops};
+use std::fmt;
 
 use platform::Platform;
 use profile::Profile;
@@ -8,18 +8,18 @@ use workload::{Pattern, Workload};
 use {Config, Result, Source};
 
 pub struct System {
-    pub platform: Platform,
-    pub traffic: Traffic,
-    pub workload: Workload,
-    pub stats: Stats,
+    platform: Platform,
+    traffic: Traffic,
+    workload: Workload,
+    stats: Stats,
     queue: BinaryHeap<Event>,
 }
 
 #[derive(Clone, Debug)]
 pub struct Job {
-    pub id: usize,
-    pub arrival: f64,
-    pub pattern: Pattern,
+    id: usize,
+    arrival: f64,
+    pattern: Pattern,
 }
 
 #[derive(Clone, Debug)]
@@ -77,6 +77,15 @@ impl System {
         self.platform.time_step()
     }
 
+    #[inline]
+    pub fn units(&self) -> usize {
+        self.platform.units()
+    }
+
+    getter! { ref stats: Stats }
+}
+
+impl System {
     fn tick(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => {}
@@ -124,14 +133,11 @@ impl Iterator for System {
     }
 }
 
-impl ops::Deref for Job {
-    type Target = Pattern;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.pattern
-    }
+impl Job {
+    getter! { arrival: f64 }
 }
+
+deref! { Job::pattern => Pattern }
 
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {

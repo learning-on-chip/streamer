@@ -90,7 +90,7 @@ fn start() -> Result<()> {
             break;
         }
         info!(target: "Streamer", "{} | {:2} queued", event,
-              system.stats.arrived - system.stats.started);
+              system.stats().arrived - system.stats().started);
         try!(output.next((event, power, temperature)));
     }
 

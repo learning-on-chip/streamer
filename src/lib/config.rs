@@ -1,7 +1,6 @@
 use options::Options;
 use std::any::Any;
 use std::fs::File;
-use std::ops::{Deref, DerefMut};
 use std::path::Path;
 use std::rc::Rc;
 use toml::{self, Value};
@@ -163,21 +162,7 @@ impl Node {
     }
 }
 
-impl Deref for Node {
-    type Target = Options;
-
-    #[inline]
-    fn deref(&self) -> &Options {
-        &self.0
-    }
-}
-
-impl DerefMut for Node {
-    #[inline]
-    fn deref_mut(&mut self) -> &mut Options {
-        &mut self.0
-    }
-}
+deref! { Node::0 => Options }
 
 #[cfg(test)]
 mod tests {

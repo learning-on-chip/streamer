@@ -1,5 +1,4 @@
 use std::mem;
-use std::ops::{Deref, DerefMut};
 
 pub struct Profile {
     pub units: usize,
@@ -102,21 +101,7 @@ impl Into<Vec<f64>> for Profile {
     }
 }
 
-impl Deref for Profile {
-    type Target = [f64];
-
-    #[inline(always)]
-    fn deref(&self) -> &Self::Target {
-        &self.data
-    }
-}
-
-impl DerefMut for Profile {
-    #[inline(always)]
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.data
-    }
-}
+deref! { Profile::data => [f64] }
 
 #[cfg(test)]
 mod tests {

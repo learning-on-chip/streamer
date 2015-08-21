@@ -16,6 +16,41 @@ extern crate toml;
 
 use std::{error, fmt};
 
+macro_rules! deref {
+    ($name:ident::$field:tt => $target:ty) => (itemize! {
+        impl ::std::ops::Deref for $name {
+            type Target = $target;
+
+            #[inline]
+            fn deref(&self) -> &Self::Target {
+                &self.$field
+            }
+        }
+
+        impl ::std::ops::DerefMut for $name {
+            #[inline]
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.$field
+            }
+        }
+    });
+}
+
+macro_rules! getter {
+    (ref $name:ident: $kind:ty) => (
+        #[inline(always)]
+        pub fn $name(&self) -> &$kind {
+            &self.$name
+        }
+    );
+    ($name:ident: $kind:ty) => (
+        #[inline(always)]
+        pub fn $name(&self) -> $kind {
+            self.$name
+        }
+    );
+}
+
 macro_rules! raise(
     ($message:expr) => (return Err(Box::new(::ErrorString($message.to_string()))));
     ($($arg:tt)*) => (return Err(Box::new(::ErrorString(format!($($arg)*)))));
