@@ -1,3 +1,4 @@
+use std::cmp::Ord;
 use std::collections::BinaryHeap;
 
 use platform::{Element, ElementKind};
@@ -27,7 +28,7 @@ impl Schedule for Compact {
         }
 
         let mut start = job.arrival;
-        let duration = pattern.duration();
+        let length = pattern.duration();
 
         let mut intervals = vec![Interval(0.0, 0.0); have];
         let mut vacancies = self.queues.iter().map(|queue| queue.vacancies(start))
@@ -35,23 +36,29 @@ impl Schedule for Compact {
 
         loop {
             for i in 0..have {
-                while intervals[i].length() < duration {
+                while !intervals[i].allows(start, length) {
                     intervals[i] = match vacancies.next() {
                         Some(interval) => interval,
                         _ => raise!("failed to find a long enough time interval"),
                     }
                 }
             }
+            let order = sort(&intervals);
             let mut found = vec![None; need];
+            let mut taken = vec![false; have];
             for i in 0..need {
                 let requested = &pattern.elements[i];
-                for j in 0..have {
+                for &j in &order {
+                    if taken[j] {
+                        continue;
+                    }
                     let candidate = &self.elements[j];
                     if candidate.kind != requested.kind {
                         continue;
                     }
                     if candidate.shared() {
                         found[i] = Some(j);
+                        taken[j] = true;
                         break;
                     }
                 }
@@ -62,7 +69,7 @@ impl Schedule for Compact {
         }
 
         let start = job.arrival.max(available) + EPSILON;
-        let finish = start + duration;
+        let finish = start + length;
         let mut mapping = Vec::with_capacity(units);
         for i in 0..units {
             mapping.push((i, hosts[i].element.id));
@@ -70,4 +77,10 @@ impl Schedule for Compact {
 
         Ok((start, finish, mapping))
     }
+}
+
+fn sort<T: Ord>(items: &[T]) -> Vec<usize> {
+    let mut items = items.iter().enumerate().collect::<Vec<_>>();
+    items.sort_by(|one, other| one.1.cmp(&other.1));
+    items.iter().map(|item| item.0).collect()
 }

@@ -80,13 +80,8 @@ impl<'l> Iterator for Vacancies<'l> {
 
 impl Interval {
     #[inline]
-    pub fn contains(&self, other: &Interval) -> bool {
-        self.0 <= other.0 && other.1 <= self.1
-    }
-
-    #[inline]
-    pub fn length(&self) -> f64 {
-        self.1 - self.0
+    pub fn allows(&self, start: f64, length: f64) -> bool {
+        if start <= self.0 { self.0 + length <= self.1 } else { start + length <= self.1 }
     }
 }
 
