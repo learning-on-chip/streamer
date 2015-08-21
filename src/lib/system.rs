@@ -77,26 +77,19 @@ impl System {
         self.platform.time_step()
     }
 
-    fn update(&mut self) -> Result<()> {
+    fn tick(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
-            (Some(_), None) => try!(self.enqueue_job()),
-            (Some(&arrival), Some(&Event { time, .. })) => if arrival < time {
-                try!(self.enqueue_job());
-            },
-            _ => {},
+            (Some(_), None) => {}
+            (Some(&arrival), Some(&Event { time, .. })) => if arrival < time {},
+            _ => return Ok(()),
         }
-        Ok(())
-    }
 
-    fn create_job(&mut self, arrival: f64, pattern: Pattern) -> Job {
-        let id = self.stats.created;
-        self.stats.created += 1;
-        Job { id: id, arrival: arrival, pattern: pattern }
-    }
-
-    fn enqueue_job(&mut self) -> Result<()> {
         let job = match (self.traffic.next(), self.workload.next()) {
-            (Some(arrival), Some(pattern)) => self.create_job(arrival, pattern),
+            (Some(arrival), Some(pattern)) => {
+                let id = self.stats.created;
+                self.stats.created += 1;
+                Job { id: id, arrival: arrival, pattern: pattern }
+            },
             _ => raise!("failed to generate a new job"),
         };
 
@@ -115,7 +108,7 @@ impl Iterator for System {
     type Item = Increment;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Err(error) = self.update() {
+        if let Err(error) = self.tick() {
             error!(target: "System", "Failed to update the state ({}).", error);
         }
         let event = match self.queue.pop() {
