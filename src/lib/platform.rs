@@ -17,11 +17,11 @@ pub struct Platform {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Element {
     pub id: usize,
-    pub kind: ElementKind,
+    pub class: Class,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum ElementKind {
+pub enum Class {
     Core,
     L3,
 }
@@ -47,8 +47,8 @@ impl Platform {
             };
             for element in die.floorplan.elements.iter() {
                 let id = elements.len();
-                let kind = try!(ElementKind::from_str(&element.id));
-                elements.push(Element { id: id, kind: kind });
+                let class = try!(Class::from_str(&element.id));
+                elements.push(Element { id: id, class: class });
             }
         }
         info!(target: "Platform", "Found {} processing elements.", elements.len());
@@ -111,7 +111,7 @@ impl Platform {
 impl Element {
     #[inline(always)]
     pub fn capacity(&self) -> Capacity {
-        if self.kind == ElementKind::Core {
+        if self.class == Class::Core {
             Capacity::Single
         } else {
             Capacity::Infinite
@@ -119,15 +119,15 @@ impl Element {
     }
 }
 
-impl FromStr for ElementKind {
+impl FromStr for Class {
     type Err = Error;
 
     fn from_str(id: &str) -> Result<Self> {
         let lower = id.to_lowercase();
         if lower.starts_with("core") {
-            return Ok(ElementKind::Core);
+            return Ok(Class::Core);
         } else if lower.starts_with("l3") {
-            return Ok(ElementKind::L3);
+            return Ok(Class::L3);
         }
         raise!("found an unknown id {:?}", id);
     }
@@ -143,7 +143,7 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use config::Config;
-    use super::{Element, ElementKind, Platform};
+    use super::{Class, Element, Platform};
 
     #[test]
     fn new() {
@@ -151,11 +151,11 @@ mod tests {
                             .branch("platform").unwrap();
         let platform = Platform::new(&config).unwrap();
         assert_eq!(platform.elements, &[
-            Element { id: 0, kind: ElementKind::Core },
-            Element { id: 1, kind: ElementKind::Core },
-            Element { id: 2, kind: ElementKind::Core },
-            Element { id: 3, kind: ElementKind::Core },
-            Element { id: 4, kind: ElementKind::L3 },
+            Element { id: 0, class: Class::Core },
+            Element { id: 1, class: Class::Core },
+            Element { id: 2, class: Class::Core },
+            Element { id: 3, class: Class::Core },
+            Element { id: 4, class: Class::L3 },
         ]);
     }
 }

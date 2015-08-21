@@ -2,7 +2,7 @@ use probability::distribution::{Categorical, Sample};
 use sqlite::Connection;
 use std::collections::HashMap;
 
-use platform::ElementKind;
+use platform::Class;
 use {Config, Result, Source};
 
 pub struct Workload {
@@ -24,7 +24,7 @@ rc! {
 
 #[derive(Clone, Debug)]
 pub struct Element {
-    pub kind: ElementKind,
+    pub class: Class,
     pub dynamic_power: Vec<f64>,
     pub leakage_power: f64,
 }
@@ -74,7 +74,7 @@ impl Pattern {
         let mut elements = vec![];
         for id in ids {
             elements.push(Element {
-                kind: try!(names.remove(&id).unwrap().parse()),
+                class: try!(names.remove(&id).unwrap().parse()),
                 dynamic_power: some!(dynamic_power.remove(&id),
                                      "cannot find the dynamic power of a processing element"),
                 leakage_power: some!(leakage_power.remove(&id),

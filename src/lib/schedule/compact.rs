@@ -41,7 +41,7 @@ impl Schedule for Compact {
 
             'inner: for i in 0..need {
                 for &j in &order {
-                    if !taken[j] && hosts[j].kind == guests[i].kind && intervals[j].start() == start {
+                    if !taken[j] && hosts[j].class == guests[i].class && intervals[j].start() == start {
                         found[i] = Some(j);
                         taken[j] = true;
                         continue 'inner;
