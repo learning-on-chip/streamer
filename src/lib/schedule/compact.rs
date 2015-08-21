@@ -69,9 +69,9 @@ impl Schedule for Compact {
         }
     }
 
-    fn trim(&mut self, time: f64) {
+    fn pass(&mut self, time: f64) {
         for queue in &mut self.queues {
-            queue.trim(time);
+            queue.pass(time);
         }
     }
 }

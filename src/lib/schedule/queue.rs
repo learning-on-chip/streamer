@@ -43,7 +43,7 @@ impl Queue {
         self.occupied.insert(Interval(start, start.max(finish)));
     }
 
-    pub fn trim(&mut self, time: f64) {
+    pub fn pass(&mut self, time: f64) {
         let mut redundant = vec![];
         for &interval in &self.occupied {
             if interval.finish() > time {
@@ -145,26 +145,26 @@ mod tests {
     }
 
     #[test]
-    fn trim() {
+    fn pass() {
         let mut queue = Queue::new(Capacity::Single);
 
         queue.push((10.0, 15.0));
         queue.push((15.0, 20.0));
         queue.push((25.0, 30.0));
 
-        queue.trim(10.0);
+        queue.pass(10.0);
         test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.trim(11.0);
+        queue.pass(11.0);
         test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.trim(15.0);
+        queue.pass(15.0);
         test!(queue, 0.0, [(0.0, 15.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.trim(20.0);
+        queue.pass(20.0);
         test!(queue, 0.0, [(0.0, 25.0), (30.0, INFINITY)]);
 
-        queue.trim(30.0);
+        queue.pass(30.0);
         test!(queue, 0.0, [(0.0, INFINITY)]);
     }
 }

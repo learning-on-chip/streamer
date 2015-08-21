@@ -90,7 +90,7 @@ impl Platform {
     }
 
     pub fn next(&mut self, time: f64) -> Option<(Profile, Profile)> {
-        self.schedule.trim(time);
+        self.schedule.pass(time);
         let power = self.power.pull(time);
         let mut temperature = power.clone_zero();
         self.simulator.next(&power, &mut temperature);
