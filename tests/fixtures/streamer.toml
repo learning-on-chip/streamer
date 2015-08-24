@@ -72,6 +72,7 @@ patterns = [
   { name = "omnetpp-large",    path = "cpu2006/large/omnetpp.sqlite3" },
   { name = "perlbench-large",  path = "cpu2006/large/perlbench.sqlite3" },
   { name = "povray-large",     path = "cpu2006/large/povray.sqlite3" },
+  { name = "sjeng-large",      path = "cpu2006/large/sjeng.sqlite3" },
   { name = "soplex-large",     path = "cpu2006/large/soplex.sqlite3" },
   { name = "sphinx3-large",    path = "cpu2006/large/sphinx3.sqlite3" },
   { name = "wrf-large",        path = "cpu2006/large/wrf.sqlite3" },
