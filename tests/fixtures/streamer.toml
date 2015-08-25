@@ -62,6 +62,7 @@ patterns = [
   { name = "gcc-large",        path = "cpu2006/large/gcc.sqlite3" },
   { name = "gobmk-large",      path = "cpu2006/large/gobmk.sqlite3" },
   { name = "gromacs-large",    path = "cpu2006/large/gromacs.sqlite3" },
+  { name = "h264ref-large",    path = "cpu2006/large/h264ref.sqlite3" },
   { name = "hmmer-large",      path = "cpu2006/large/hmmer.sqlite3" },
   { name = "lbm-large",        path = "cpu2006/large/lbm.sqlite3" },
   { name = "leslie3d-large",   path = "cpu2006/large/leslie3d.sqlite3" },
