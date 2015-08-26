@@ -89,7 +89,7 @@ impl System {
     fn tick(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => {}
-            (Some(&arrival), Some(&Event { time, .. })) => if arrival < time {},
+            (Some(&arrival), Some(&Event { time, .. })) if arrival < time => {},
             _ => return Ok(()),
         }
 
