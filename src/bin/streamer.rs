@@ -86,12 +86,13 @@ fn start() -> Result<()> {
     let start = time::now();
 
     while let Some((event, power, temperature)) = system.next() {
-        if event.time > length {
-            break;
-        }
+        let last = event.time > length;
         info!(target: "Streamer", "{} | {:2} queued", event,
               system.stats().arrived - system.stats().started);
         try!(output.next((event, power, temperature)));
+        if last {
+            break;
+        }
     }
 
     info!(target: "Streamer", "Well done in {:.2} seconds.",
