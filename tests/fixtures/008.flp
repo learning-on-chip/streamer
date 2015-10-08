@@ -1,0 +1,59 @@
+Core0:
+  position 0, 0;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core1:
+  position 3976, 0;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core2:
+  position 7952, 0;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core3:
+  position 11928, 0;
+  dimension 3976, 7950;
+
+  power values 0;
+
+L30:
+  position 0, 7950;
+  dimension 15904, 3894;
+
+  power values 0;
+
+L31:
+  position 0, 11844;
+  dimension 15904, 3894;
+
+  power values 0;
+
+Core4:
+  position 0, 15738;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core5:
+  position 3976, 15738;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core6:
+  position 7952, 15738;
+  dimension 3976, 7950;
+
+  power values 0;
+
+Core7:
+  position 11928, 15738;
+  dimension 3976, 7950;
+
+  power values 0;
