@@ -74,7 +74,6 @@ impl error::Error for ErrorString {
     }
 }
 
-#[inline]
 pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
     let config = try!(configure(path));
     let source = {
@@ -87,10 +86,8 @@ pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
 }
 
 fn configure<T: AsRef<Path>>(path: T) -> Result<Config> {
-    use configuration::format::toml;
-
     let path = path.as_ref();
-    let mut config = try!(toml::open(path));
+    let mut config = try!(configuration::format::toml::open(path));
     if let Some(root) = path.parent() {
         if config.set("root", root.to_path_buf()).is_none() {
             raise!("failed to set the root directory");
