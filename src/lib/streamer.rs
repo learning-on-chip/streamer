@@ -15,7 +15,6 @@ extern crate threed_ice;
 extern crate time;
 
 use std::path::Path;
-use std::{error, fmt};
 
 #[macro_use]
 mod macros;
@@ -23,6 +22,7 @@ mod macros;
 mod math;
 mod platform;
 mod profile;
+mod result;
 mod schedule;
 mod system;
 mod traffic;
@@ -30,41 +30,11 @@ mod workload;
 
 pub use platform::Platform;
 pub use profile::Profile;
+pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
-
-pub struct Error(String);
-pub type Result<T> = std::result::Result<T, Error>;
 
 pub type Config = configuration::Tree;
 pub type Source = random::Default;
-
-impl Error {
-    #[inline]
-    pub fn new<T: ToString>(message: T) -> Error {
-        Error(message.to_string())
-    }
-}
-
-impl fmt::Debug for Error {
-    #[inline]
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(formatter)
-    }
-}
-
-impl fmt::Display for Error {
-    #[inline]
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(formatter)
-    }
-}
-
-impl error::Error for Error {
-    #[inline]
-    fn description(&self) -> &str {
-        &self.0
-    }
-}
 
 pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
     let config = try!(configure(path));
