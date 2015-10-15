@@ -14,9 +14,9 @@ test = false
 
 [dependencies]
 arguments = "*"
+configuration = "*"
 fractal = "*"
 log = "*"
-options = "*"
 probability = "*"
 random = "*"
 sql = "*"
@@ -25,7 +25,6 @@ temperature = { version = "*", features = ["threed-ice"], default-features = fal
 term = "*"
 threed-ice = "*"
 time = "*"
-toml = "*"
 
 [dev-dependencies]
 assert = "*"

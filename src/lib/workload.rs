@@ -32,7 +32,7 @@ pub struct Element {
 impl Workload {
     pub fn new(config: &Config, source: &Source) -> Result<Workload> {
         let mut patterns = vec![];
-        if let Some(ref configs) = config.collection("patterns") {
+        if let Some(ref configs) = config.forest("patterns") {
             for config in configs {
                 patterns.push(try!(Pattern::new(config)));
             }
@@ -185,11 +185,11 @@ mod tests {
 
         assert_eq!(data.len(), 2 + 1);
         for (_, data) in &data {
-            assert_eq!(data.len(), 76);
+            assert_eq!(data.len(), 69);
         }
-        assert::close(&[data.get(&0).unwrap()[2]], &[0.608065803127267], 1e-14);
-        assert::close(&[data.get(&1).unwrap()[4]], &[9.19809606345627], 1e-14);
-        assert::close(&[data.get(&2).unwrap()[0]], &[0.00613345574868796], 1e-14);
+        assert::close(&[data.get(&0).unwrap()[2]], &[0.60806580312727], 1e-14);
+        assert::close(&[data.get(&1).unwrap()[4]], &[8.68983889250007], 1e-14);
+        assert::close(&[data.get(&2).unwrap()[0]], &[0.00620192518435], 1e-14);
     }
 
     #[test]
@@ -202,6 +202,6 @@ mod tests {
     }
 
     fn open() -> Connection {
-        Connection::open("tests/fixtures/parsec/small/blackscholes.sqlite3").unwrap()
+        Connection::open("tests/fixtures/blackscholes.sqlite3").unwrap()
     }
 }

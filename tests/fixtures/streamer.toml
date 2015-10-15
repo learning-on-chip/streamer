@@ -1,0 +1,15 @@
+seed = 0
+time_step = 1e-3
+
+[platform]
+path = "004.stk"
+
+[platform.temperature]
+ambience = 318.15
+
+[traffic]
+path = "google.sqlite3"
+
+[[workload.patterns]]
+name = "blackscholes-small"
+path = "blackscholes.sqlite3"

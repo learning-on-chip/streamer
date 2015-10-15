@@ -49,18 +49,18 @@ pub struct Stats {
 pub type Increment = (Event, Profile, Profile);
 
 impl System {
-    pub fn new(config: &Config, source: &Source) -> Result<System> {
+    pub fn new(config: Config, source: Source) -> Result<System> {
         let platform = {
             let config = some!(config.branch("platform"), "a platform configuration is required");
             try!(Platform::new(&config))
         };
         let traffic = {
             let config = some!(config.branch("traffic"), "a traffic configuration is required");
-            try!(Traffic::new(&config, source))
+            try!(Traffic::new(&config, &source))
         };
         let workload = {
             let config = some!(config.branch("workload"), "a workload configuration is required");
-            try!(Workload::new(&config, source))
+            try!(Workload::new(&config, &source))
         };
 
         Ok(System {

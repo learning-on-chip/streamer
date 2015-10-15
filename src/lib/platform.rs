@@ -137,13 +137,14 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 
 #[cfg(test)]
 mod tests {
-    use config::Config;
+    use configure;
     use super::{Class, Element, Platform};
 
     #[test]
     fn new() {
-        let config = Config::new("tests/fixtures/streamer.toml").unwrap()
-                            .branch("platform").unwrap();
+        let config = configure("tests/fixtures/streamer.toml").unwrap()
+                                                              .branch("platform")
+                                                              .unwrap();
         let platform = Platform::new(&config).unwrap();
         assert_eq!(platform.elements, &[
             Element { id: 0, class: Class::Core },

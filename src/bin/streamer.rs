@@ -2,7 +2,6 @@
 extern crate log;
 
 extern crate arguments;
-extern crate random;
 extern crate sql;
 extern crate sqlite;
 extern crate streamer;
@@ -11,7 +10,7 @@ extern crate time;
 
 use log::LogLevel;
 use std::error::Error;
-use streamer::{Config, Result, System};
+use streamer::Result;
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -65,14 +64,8 @@ fn start() -> Result<()> {
         logger::setup(LogLevel::Warn);
     }
 
-    let mut system = {
-        let config = some!(arguments.get::<String>("config"), "a configuration file is required");
-        let config = try!(Config::new(config));
-        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
-        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
-        let seed = [0x12345678 & seed, 0x87654321 & seed];
-        try!(System::new(&config, &random::default().seed(seed)))
-    };
+    let mut system = try!(streamer::open(some!(arguments.get::<String>("config"),
+                                               "a configuration file is required")));
 
     let length = arguments.get::<f64>("length").unwrap_or(10.0);
     if length <= 0.0 {
