@@ -9,8 +9,7 @@ extern crate term;
 extern crate time;
 
 use log::LogLevel;
-use std::error::Error;
-use streamer::Result;
+use streamer::{Error, Result};
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -25,13 +24,13 @@ Options:
 ";
 
 macro_rules! raise(
-    ($message:expr) => (return Err(Box::new(::streamer::ErrorString($message.to_string()))));
+    ($message:expr) => (return Err(::streamer::Error::new($message)));
 );
 
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
-        Err(error) => return Err(Box::new(error)),
+        Err(error) => raise!(error),
     });
 );
 
@@ -48,7 +47,7 @@ mod output;
 use output::Output;
 
 fn main() {
-    start().unwrap_or_else(|error| fail(&*error));
+    start().unwrap_or_else(|error| fail(error));
 }
 
 fn start() -> Result<()> {
@@ -99,7 +98,7 @@ fn help() -> ! {
     std::process::exit(0);
 }
 
-fn fail(error: &Error) -> ! {
+fn fail(error: Error) -> ! {
     use std::io::{stderr, Write};
     stderr().write_all(format!("Error: {}.\n", error).as_bytes()).unwrap();
     std::process::exit(1);

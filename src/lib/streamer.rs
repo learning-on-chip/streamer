@@ -45,29 +45,34 @@ pub use platform::Platform;
 pub use profile::Profile;
 pub use system::{Increment, Job, System};
 
-pub type Error = Box<std::error::Error>;
+pub struct Error(String);
 pub type Result<T> = std::result::Result<T, Error>;
-
-pub struct ErrorString(pub String);
 
 pub type Config = configuration::Tree;
 pub type Source = random::Default;
 
-impl fmt::Debug for ErrorString {
+impl Error {
+    #[inline]
+    pub fn new<T: ToString>(message: T) -> Error {
+        Error(message.to_string())
+    }
+}
+
+impl fmt::Debug for Error {
     #[inline]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(formatter)
     }
 }
 
-impl fmt::Display for ErrorString {
+impl fmt::Display for Error {
     #[inline]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         self.0.fmt(formatter)
     }
 }
 
-impl error::Error for ErrorString {
+impl error::Error for Error {
     #[inline]
     fn description(&self) -> &str {
         &self.0
@@ -87,7 +92,7 @@ pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
 
 fn configure<T: AsRef<Path>>(path: T) -> Result<Config> {
     let path = path.as_ref();
-    let mut config = try!(configuration::format::toml::open(path));
+    let mut config = ok!(configuration::format::toml::open(path));
     if let Some(root) = path.parent() {
         if config.set("root", root.to_path_buf()).is_none() {
             raise!("failed to set the root directory");

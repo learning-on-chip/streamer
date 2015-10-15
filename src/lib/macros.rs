@@ -39,7 +39,7 @@ macro_rules! getter {
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
-        Err(error) => return Err(Box::new(error)),
+        Err(error) => raise!(error),
     });
 );
 
@@ -95,8 +95,8 @@ macro_rules! path(
 );
 
 macro_rules! raise(
-    ($message:expr) => (return Err(Box::new(::ErrorString($message.to_string()))));
-    ($($arg:tt)*) => (return Err(Box::new(::ErrorString(format!($($arg)*)))));
+    ($message:expr) => (return Err(::Error::new($message)));
+    ($($arg:tt)*) => (return Err(::Error::new(format!($($arg)*))));
 );
 
 macro_rules! rc {
