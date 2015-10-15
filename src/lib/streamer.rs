@@ -20,17 +20,17 @@ use std::path::Path;
 mod macros;
 
 mod math;
+mod outcome;
 mod platform;
 mod profile;
-mod result;
 mod schedule;
 mod system;
 mod traffic;
 mod workload;
 
+pub use outcome::{Error, Result};
 pub use platform::Platform;
 pub use profile::Profile;
-pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
 
 pub type Config = configuration::Tree;

@@ -1,8 +1,8 @@
-use std::{error, fmt};
+use std::{error, fmt, result};
 
 pub struct Error(String);
 
-pub type Result<T> = ::std::result::Result<T, Error>;
+pub type Result<T> = result::Result<T, Error>;
 
 impl Error {
     #[inline]
