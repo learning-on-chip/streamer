@@ -133,10 +133,11 @@ fn read_dynamic_power(backend: &Connection) -> Result<HashMap<i64, Vec<f64>>> {
     use sql::prelude::*;
 
     let mut data = HashMap::new();
-    let statement = select_from("dynamic").columns(&["component_id", "dynamic_power"]);
+    let statement = select_from("dynamic").columns(&["time", "component_id", "dynamic_power"])
+                                          .order_by(column("time").ascend());
     let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
     while let Some(row) = ok!(cursor.next()) {
-        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
+        if let (Some(id), Some(value)) = (row[1].as_integer(), row[2].as_float()) {
             data.entry(id).or_insert_with(|| vec![]).push(value);
         } else {
             raise!("failed to read the dynamic power");
