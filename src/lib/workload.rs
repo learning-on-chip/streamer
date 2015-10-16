@@ -1,6 +1,7 @@
 use probability::distribution::{Categorical, Sample};
 use sqlite::Connection;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 use platform::{self, Class};
 use {Config, Result, Source};
@@ -11,15 +12,18 @@ pub struct Workload {
     distribution: Categorical,
 }
 
-rc! {
-    #[derive(Clone, Debug)]
-    pub struct Pattern(Content) {
-        pub name: String,
-        pub units: usize,
-        pub steps: usize,
-        pub time_step: f64,
-        pub elements: Vec<Element>,
-    }
+#[derive(Clone, Debug)]
+pub struct Pattern(Rc<Content>);
+
+deref! { Pattern::0 => Content }
+
+#[derive(Clone, Debug)]
+pub struct Content {
+    pub name: String,
+    pub units: usize,
+    pub steps: usize,
+    pub time_step: f64,
+    pub elements: Vec<Element>,
 }
 
 #[derive(Clone, Debug)]
@@ -92,7 +96,7 @@ impl Pattern {
             raise!("found a workload pattern without dynamic-power data");
         }
 
-        Ok(rc!(Pattern(Content {
+        Ok(Pattern(Rc::new(Content {
             name: name,
             units: units,
             steps: steps,

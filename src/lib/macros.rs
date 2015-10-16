@@ -99,22 +99,6 @@ macro_rules! raise(
     ($($arg:tt)*) => (return Err(::Error::new(format!($($arg)*))));
 );
 
-macro_rules! rc {
-    ($(#[$attr:meta])* pub struct $outer:ident($inner:ident) $body:tt) => (
-        $(#[$attr])*
-        pub struct $outer(::std::rc::Rc<$inner>);
-
-        rewrite! { [$(#[$attr])* pub struct $inner] [] $body }
-        deref! { $outer::0 => $inner }
-    );
-    ($outer:ident($inner:ident { $($field:ident: $value:expr),* })) => (
-        rc!($outer($inner { $($field: $value,)* }))
-    );
-    ($outer:ident($inner:ident { $($field:ident: $value:expr,)* })) => (
-        $outer(::std::rc::Rc::new($inner { $($field: $value,)* }))
-    );
-}
-
 macro_rules! rewrite(
     ($header:tt [$($member:tt)*] {}) => (
         rewrite!(output $header [$($member)*]);
