@@ -3,12 +3,14 @@ use std::fmt;
 
 use platform::Platform;
 use profile::Profile;
+use schedule::{self, Schedule};
 use traffic::Traffic;
 use workload::{Pattern, Workload};
 use {Config, Result, Source};
 
 pub struct System {
     platform: Platform,
+    schedule: Box<Schedule>,
     traffic: Traffic,
     workload: Workload,
     stats: Stats,
@@ -54,6 +56,9 @@ impl System {
             let config = some!(config.branch("platform"), "a platform configuration is required");
             try!(Platform::new(&config))
         };
+        let schedule = {
+            Box::new(try!(schedule::Compact::new(platform.elements())))
+        };
         let traffic = {
             let config = some!(config.branch("traffic"), "a traffic configuration is required");
             try!(Traffic::new(&config, &source))
@@ -65,6 +70,7 @@ impl System {
 
         Ok(System {
             platform: platform,
+            schedule: schedule,
             traffic: traffic,
             workload: workload,
             stats: Stats::default(),
@@ -79,7 +85,7 @@ impl System {
 
     #[inline]
     pub fn units(&self) -> usize {
-        self.platform.units()
+        self.platform.elements().len()
     }
 
     getter! { ref stats: Stats }
@@ -104,10 +110,11 @@ impl System {
 
         self.queue.push(Event { time: job.arrival, job: job.clone(), kind: EventKind::Arrival });
 
-        let (start, finish) = try!(self.platform.push(&job));
+        let decision = try!(self.schedule.push(&job));
+        try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event { time: start, job: job.clone(), kind: EventKind::Start });
-        self.queue.push(Event { time: finish, job: job, kind: EventKind::Finish });
+        self.queue.push(Event { time: decision.start, job: job.clone(), kind: EventKind::Start });
+        self.queue.push(Event { time: decision.finish, job: job, kind: EventKind::Finish });
 
         Ok(())
     }
@@ -124,6 +131,7 @@ impl Iterator for System {
             Some(event) => event,
             _ => return None,
         };
+        self.schedule.pass(event.time);
         let (power, temperature) = match self.platform.next(event.time) {
             Some((power, temperature)) => (power, temperature),
             _ => return None,

@@ -2,8 +2,8 @@ use std::cmp::Ord;
 
 use math;
 use platform::Element;
-use schedule::Schedule;
 use schedule::queue::Queue;
+use schedule::{Decision, Schedule};
 use {Job, Result};
 
 pub struct Compact {
@@ -21,7 +21,7 @@ impl Compact {
 }
 
 impl Schedule for Compact {
-    fn push(&mut self, job: &Job) -> Result<(f64, f64, Vec<(usize, usize)>)> {
+    fn push(&mut self, job: &Job) -> Result<Decision> {
         let hosts = &self.elements;
         let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
@@ -68,7 +68,7 @@ impl Schedule for Compact {
                 mapping.push((i, hosts[j].id));
             }
 
-            return Ok((start, finish, mapping));
+            return Ok(Decision::new(start, finish, mapping));
         }
     }
 

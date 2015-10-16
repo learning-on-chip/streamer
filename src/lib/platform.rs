@@ -4,12 +4,11 @@ use temperature::{self, Simulator};
 use threed_ice::{StackElement, System};
 
 use profile::Profile;
-use schedule::{self, Schedule};
+use schedule::Decision;
 use {Config, Error, Job, Result};
 
 pub struct Platform {
     elements: Vec<Element>,
-    schedule: Box<Schedule>,
     simulator: Simulator,
     power: Profile,
 }
@@ -53,8 +52,6 @@ impl Platform {
         }
         info!(target: "Platform", "Found {} processing elements.", elements.len());
 
-        let schedule = Box::new(try!(schedule::Compact::new(&elements)));
-
         info!(target: "Platform", "Constructing a thermal circuit...");
         let circuit = ok!(ThreeDICE::from(&system));
         info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
@@ -65,22 +62,20 @@ impl Platform {
 
         let power = Profile::new(elements.len(), config.time_step);
 
-        Ok(Platform { elements: elements, schedule: schedule, simulator: simulator, power: power })
+        Ok(Platform { elements: elements, simulator: simulator, power: power })
     }
 
-    pub fn push(&mut self, job: &Job) -> Result<(f64, f64)> {
-        let (start, finish, mapping) = try!(self.schedule.push(job));
+    pub fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {
         let (from, onto) = (&job.elements, &self.elements);
-        for (i, j) in mapping {
+        for &(i, j) in &decision.mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.power.push(onto.id, start, job.time_step, &from.dynamic_power,
+            self.power.push(onto.id, decision.start, job.time_step, &from.dynamic_power,
                             from.leakage_power);
         }
-        Ok((start, finish))
+        Ok(())
     }
 
     pub fn next(&mut self, time: f64) -> Option<(Profile, Profile)> {
-        self.schedule.pass(time);
         let power = self.power.pull(time);
         let mut temperature = power.clone_zero();
         self.simulator.next(&power, &mut temperature);
@@ -88,14 +83,11 @@ impl Platform {
     }
 
     #[inline]
-    pub fn units(&self) -> usize {
-        self.elements.len()
-    }
-
-    #[inline]
     pub fn time_step(&self) -> f64 {
         self.power.time_step
     }
+
+    getter! { ref elements: [Element] }
 }
 
 impl Element {
