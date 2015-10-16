@@ -8,17 +8,19 @@ impl Log for Terminal {
         metadata.level() <= self.0
     }
 
+    #[allow(unused_must_use)]
     fn log(&self, record: &LogRecord) {
         if self.enabled(record.metadata()) {
-            let mut stdout = term::stdout();
-            if record.metadata().level() < LogLevel::Info {
-                stdout.as_mut().map(|stdout| stdout.fg(term::color::RED));
-            } else {
-                stdout.as_mut().map(|stdout| stdout.fg(term::color::GREEN));
+            if let Some(mut output) = term::stdout() {
+                if record.metadata().level() < LogLevel::Info {
+                    output.fg(term::color::RED);
+                } else {
+                    output.fg(term::color::GREEN);
+                }
+                write!(output, "{:>12}", record.target());
+                output.reset();
+                write!(output, " {}\n", record.args());
             }
-            print!("{:>12}", record.target());
-            stdout.as_mut().map(|stdout| stdout.reset());
-            println!(" {}", record.args());
         }
     }
 }

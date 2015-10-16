@@ -97,8 +97,12 @@ fn help() -> ! {
     std::process::exit(0);
 }
 
+#[allow(unused_must_use)]
 fn fail(error: Error) -> ! {
     use std::io::{stderr, Write};
-    stderr().write_all(format!("Error: {}.\n", error).as_bytes()).unwrap();
+    if let Some(mut output) = term::stderr() {
+        output.fg(term::color::RED);
+        output.write_all(format!("Error: {}.\n", error).as_bytes());
+    }
     std::process::exit(1);
 }
