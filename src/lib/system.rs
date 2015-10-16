@@ -62,8 +62,10 @@ impl System {
         })
     }
 
-    getter! { ref platform: Platform }
-    getter! { ref stats: Stats }
+    getters! {
+        ref platform: Platform,
+        ref stats: Stats,
+    }
 }
 
 impl System {
@@ -117,9 +119,11 @@ impl Iterator for System {
 }
 
 impl Job {
-    getter! { id: usize }
-    getter! { arrival: f64 }
-    getter! { ref pattern: Pattern }
+    getters! {
+        id: usize,
+        arrival: f64,
+        ref pattern: Pattern,
+    }
 }
 
 impl Stats {

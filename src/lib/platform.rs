@@ -83,7 +83,9 @@ impl Platform {
         Some((power, temperature))
     }
 
-    getter! { ref elements: [Element] }
+    getters! {
+        ref elements: [Element],
+    }
 }
 
 impl Element {

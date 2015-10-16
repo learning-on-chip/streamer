@@ -21,18 +21,21 @@ macro_rules! deref {
 
 macro_rules! itemize(($($blob:item)*) => ($($blob)*));
 
-macro_rules! getter {
-    (ref $name:ident: $kind:ty) => (
-        #[inline(always)]
-        pub fn $name(&self) -> &$kind {
-            &self.$name
-        }
-    );
-    ($name:ident: $kind:ty) => (
+macro_rules! getters {
+    () => ();
+    ($name:ident: $kind:ty, $($tail:tt)*) => (
         #[inline(always)]
         pub fn $name(&self) -> $kind {
             self.$name
         }
+        getters! { $($tail)* }
+    );
+    (ref $name:ident: $kind:ty, $($tail:tt)*) => (
+        #[inline(always)]
+        pub fn $name(&self) -> &$kind {
+            &self.$name
+        }
+        getters! { $($tail)* }
     );
 }
 
