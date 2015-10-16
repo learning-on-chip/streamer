@@ -1,6 +1,6 @@
 # Streamer
 
-Streamer is a tool for generating power and temperature profiles.
+Streamer is a tool for generating on-chip data.
 
 ## Contributing
 

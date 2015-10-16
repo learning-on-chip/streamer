@@ -2,6 +2,7 @@
 name = "streamer"
 version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
+description = "Streamer is a tool for generating on-chip data."
 
 [lib]
 name = "streamer"
