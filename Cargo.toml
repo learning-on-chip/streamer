@@ -2,6 +2,9 @@
 name = "streamer"
 version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/learning-on-chip/streamer"
+homepage = "https://github.com/learning-on-chip/streamer"
 description = "Streamer is a tool for generating on-chip data."
 
 [lib]
