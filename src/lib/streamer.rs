@@ -19,6 +19,7 @@ use std::path::Path;
 #[macro_use]
 mod macros;
 
+mod event;
 mod math;
 mod outcome;
 mod platform;

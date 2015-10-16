@@ -1,6 +1,6 @@
 use std::collections::BinaryHeap;
-use std::fmt;
 
+use event::{Event, EventKind};
 use platform::Platform;
 use profile::Profile;
 use schedule::{self, Schedule};
@@ -22,22 +22,6 @@ pub struct Job {
     id: usize,
     arrival: f64,
     pattern: Pattern,
-}
-
-#[derive(Clone, Debug)]
-pub struct Event {
-    pub time: f64,
-    pub job: Job,
-    pub kind: EventKind,
-}
-
-order!(Event(time) descending);
-
-#[derive(Clone, Copy, Debug)]
-pub enum EventKind {
-    Arrival,
-    Start,
-    Finish,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -99,13 +83,13 @@ impl System {
             _ => raise!("failed to generate a new job"),
         };
 
-        self.queue.push(Event { time: job.arrival, job: job.clone(), kind: EventKind::Arrival });
+        self.queue.push(Event::new(job.arrival, EventKind::Arrival, job.clone()));
 
         let decision = try!(self.schedule.push(&job));
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event { time: decision.start, job: job.clone(), kind: EventKind::Start });
-        self.queue.push(Event { time: decision.finish, job: job, kind: EventKind::Finish });
+        self.queue.push(Event::new(decision.start, EventKind::Start, job.clone()));
+        self.queue.push(Event::new(decision.finish, EventKind::Finish, job));
 
         Ok(())
     }
@@ -133,28 +117,9 @@ impl Iterator for System {
 }
 
 impl Job {
+    getter! { id: usize }
     getter! { arrival: f64 }
-}
-
-deref! { Job::pattern => Pattern }
-
-impl fmt::Display for Event {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let pattern = &self.job.pattern;
-        write!(formatter, "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:7}",
-               self.time, self.job.id, pattern.name, pattern.units,
-               (pattern.steps as f64) * pattern.time_step, self.kind)
-    }
-}
-
-impl fmt::Display for EventKind {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            EventKind::Arrival => "arrival".fmt(formatter),
-            EventKind::Start => "start".fmt(formatter),
-            EventKind::Finish => "finish".fmt(formatter),
-        }
-    }
+    getter! { ref pattern: Pattern }
 }
 
 impl Stats {

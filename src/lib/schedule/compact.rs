@@ -22,12 +22,14 @@ impl Compact {
 
 impl Schedule for Compact {
     fn push(&mut self, job: &Job) -> Result<Decision> {
+        let pattern = job.pattern();
+
         let hosts = &self.elements;
-        let guests = &job.elements;
+        let guests = &pattern.elements;
         let (have, need) = (hosts.len(), guests.len());
 
         let mut start = job.arrival();
-        let length = job.duration();
+        let length = pattern.duration();
 
         'outer: loop {
             let intervals = self.queues.iter().map(|queue| queue.next(start, length))
