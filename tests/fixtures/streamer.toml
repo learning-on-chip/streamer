@@ -1,5 +1,6 @@
 seed = 0
 time_step = 1e-3
+root = "tests/fixtures"
 
 [platform]
 path = "004.stk"

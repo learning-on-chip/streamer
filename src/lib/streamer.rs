@@ -48,12 +48,5 @@ pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
 }
 
 fn configure<T: AsRef<Path>>(path: T) -> Result<Config> {
-    let path = path.as_ref();
-    let mut config = ok!(configuration::format::toml::open(path));
-    if let Some(root) = path.parent() {
-        if config.set("root", root.to_path_buf()).is_none() {
-            raise!("failed to set the root directory");
-        }
-    }
-    Ok(config)
+    Ok(ok!(configuration::format::toml::open(path.as_ref())))
 }

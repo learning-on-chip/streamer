@@ -83,8 +83,8 @@ macro_rules! path(
         let path = some!($config.get::<String>("path"), "the path to {} is missing", $destination);
         let mut path = ::std::path::PathBuf::from(path);
         if path.is_relative() {
-            if let Some(ref root) = $config.get::<::std::path::PathBuf>("root") {
-                path = root.join(path);
+            if let Some(root) = $config.get::<String>("root") {
+                path = ::std::path::Path::new(root).join(path);
             }
         }
         if ::std::fs::metadata(&path).is_err() {
