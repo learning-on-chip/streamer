@@ -1,7 +1,7 @@
-use log::{self, Log, LogLevel, LogMetadata, LogRecord};
+use log::{Log, LogLevel, LogMetadata, LogRecord};
 use term;
 
-pub struct Terminal(LogLevel);
+pub struct Terminal(pub LogLevel);
 
 impl Log for Terminal {
     fn enabled(&self, metadata: &LogMetadata) -> bool {
@@ -21,11 +21,4 @@ impl Log for Terminal {
             println!(" {}", record.args());
         }
     }
-}
-
-pub fn setup(level: LogLevel) {
-    let _ = log::set_logger(|max_log_level| {
-        max_log_level.set(level.to_log_level_filter());
-        Box::new(Terminal(level))
-    });
 }

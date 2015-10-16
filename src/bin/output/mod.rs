@@ -4,8 +4,8 @@ use streamer::{Increment, Result, System};
 mod database;
 mod null;
 
-pub use self::database::Database;
-pub use self::null::Null;
+use self::database::Database;
+use self::null::Null;
 
 pub trait Output {
     fn next(&mut self, Increment) -> Result<()>;
