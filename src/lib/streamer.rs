@@ -48,5 +48,5 @@ pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
 }
 
 fn configure<T: AsRef<Path>>(path: T) -> Result<Config> {
-    Ok(ok!(configuration::format::toml::open(path.as_ref())))
+    Ok(ok!(configuration::format::toml::open(path)))
 }
