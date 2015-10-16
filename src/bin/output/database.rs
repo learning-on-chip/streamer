@@ -1,19 +1,15 @@
 use sqlite::{Connection, Statement, State};
 use std::mem;
 use std::path::Path;
-use streamer::{Increment, Profile, Result, System};
 
-pub trait Output {
-    fn next(&mut self, Increment) -> Result<()>;
-}
+use output::Output;
+use streamer::{Increment, Profile, Result, System};
 
 pub struct Database {
     #[allow(dead_code)]
     connection: Connection,
     statement: Statement<'static>,
 }
-
-pub struct Null;
 
 impl Database {
     pub fn new<T: AsRef<Path>>(system: &System, path: T) -> Result<Database> {
@@ -66,17 +62,4 @@ impl Output for Database {
         }
         Ok(())
     }
-}
-
-impl Output for Null {
-    fn next(&mut self, _: Increment) -> Result<()> {
-        Ok(())
-    }
-}
-
-pub fn new<T: AsRef<Path>>(system: &System, output: Option<T>) -> Result<Box<Output>> {
-    Ok(match output {
-        Some(output) => Box::new(try!(Database::new(system, output))),
-        _ => Box::new(Null),
-    })
 }
