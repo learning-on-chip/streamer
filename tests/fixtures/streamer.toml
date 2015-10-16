@@ -13,6 +13,6 @@ path = "google.sqlite3"
 
 [workload]
 patterns = [
-  { name = "blackscholes-small", path = "blackscholes.sqlite3" },
-  { name = "x264-small",         path = "x264.sqlite3" },
+  { name = "blackscholes", path = "blackscholes.sqlite3" },
+  { name = "x264",         path = "x264.sqlite3" },
 ]
