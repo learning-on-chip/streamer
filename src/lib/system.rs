@@ -1,6 +1,6 @@
 use std::collections::BinaryHeap;
 
-use event::{Event, EventKind};
+use event::{self, Event};
 use platform::Platform;
 use profile::Profile;
 use schedule::{self, Schedule};
@@ -85,13 +85,13 @@ impl System {
             _ => raise!("failed to generate a new job"),
         };
 
-        self.queue.push(Event::new(job.arrival, EventKind::Arrival, job.clone()));
+        self.queue.push(Event::new(job.arrival, event::Kind::Arrival, job.clone()));
 
         let decision = try!(self.schedule.push(&job));
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event::new(decision.start, EventKind::Start, job.clone()));
-        self.queue.push(Event::new(decision.finish, EventKind::Finish, job));
+        self.queue.push(Event::new(decision.start, event::Kind::Start, job.clone()));
+        self.queue.push(Event::new(decision.finish, event::Kind::Finish, job));
 
         Ok(())
     }
@@ -129,9 +129,9 @@ impl Job {
 impl Stats {
     fn account(&mut self, event: &Event) {
         match event.kind {
-            EventKind::Arrival => self.arrived += 1,
-            EventKind::Start => self.started += 1,
-            EventKind::Finish => self.finished += 1,
+            event::Kind::Arrival => self.arrived += 1,
+            event::Kind::Start => self.started += 1,
+            event::Kind::Finish => self.finished += 1,
         }
     }
 }

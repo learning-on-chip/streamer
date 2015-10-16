@@ -5,14 +5,14 @@ use system::Job;
 #[derive(Clone, Debug)]
 pub struct Event {
     pub time: f64,
-    pub kind: EventKind,
+    pub kind: Kind,
     pub job: Job,
 }
 
 order!(Event(time) descending);
 
 #[derive(Clone, Copy, Debug)]
-pub enum EventKind {
+pub enum Kind {
     Arrival,
     Start,
     Finish,
@@ -20,7 +20,7 @@ pub enum EventKind {
 
 impl Event {
     #[inline]
-    pub fn new(time: f64, kind: EventKind, job: Job) -> Event {
+    pub fn new(time: f64, kind: Kind, job: Job) -> Event {
         Event { time: time, kind: kind, job: job }
     }
 }
@@ -34,12 +34,12 @@ impl fmt::Display for Event {
     }
 }
 
-impl fmt::Display for EventKind {
+impl fmt::Display for Kind {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            EventKind::Arrival => "arrival".fmt(formatter),
-            EventKind::Start => "start".fmt(formatter),
-            EventKind::Finish => "finish".fmt(formatter),
+            Kind::Arrival => "arrival".fmt(formatter),
+            Kind::Start => "start".fmt(formatter),
+            Kind::Finish => "finish".fmt(formatter),
         }
     }
 }

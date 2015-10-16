@@ -3,7 +3,7 @@ use sqlite::Connection;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use platform::{self, Class};
+use platform;
 use {Config, Result, Source};
 
 pub struct Workload {
@@ -28,7 +28,7 @@ pub struct Content {
 
 #[derive(Clone, Debug)]
 pub struct Element {
-    pub class: Class,
+    pub kind: platform::Kind,
     pub dynamic_power: Vec<f64>,
     pub leakage_power: f64,
 }
@@ -78,7 +78,7 @@ impl Pattern {
         let mut elements = vec![];
         for id in ids {
             elements.push(Element {
-                class: try!(names.remove(&id).unwrap().parse()),
+                kind: try!(names.remove(&id).unwrap().parse()),
                 dynamic_power: some!(dynamic_power.remove(&id),
                                      "cannot find the dynamic power of a processing element"),
                 leakage_power: some!(leakage_power.remove(&id),
@@ -113,7 +113,7 @@ impl Pattern {
 
 impl Element {
     pub fn accept(&self, element: &platform::Element) -> bool {
-        self.class == element.class
+        self.kind == element.kind
     }
 }
 

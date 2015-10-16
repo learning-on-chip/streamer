@@ -16,11 +16,11 @@ pub struct Platform {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Element {
     pub id: usize,
-    pub class: Class,
+    pub kind: Kind,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Class {
+pub enum Kind {
     Core,
     L3,
 }
@@ -46,8 +46,8 @@ impl Platform {
             };
             for element in die.floorplan.elements.iter() {
                 let id = elements.len();
-                let class = try!(Class::from_str(&element.id));
-                elements.push(Element { id: id, class: class });
+                let kind = try!(Kind::from_str(&element.id));
+                elements.push(Element { id: id, kind: kind });
             }
         }
         info!(target: "Platform", "Found {} processing elements.", elements.len());
@@ -91,7 +91,7 @@ impl Platform {
 impl Element {
     #[inline(always)]
     pub fn capacity(&self) -> Capacity {
-        if self.class == Class::Core {
+        if self.kind == Kind::Core {
             Capacity::Single
         } else {
             Capacity::Infinite
@@ -99,15 +99,15 @@ impl Element {
     }
 }
 
-impl FromStr for Class {
+impl FromStr for Kind {
     type Err = Error;
 
     fn from_str(id: &str) -> Result<Self> {
         let lower = id.to_lowercase();
         if lower.starts_with("core") {
-            return Ok(Class::Core);
+            return Ok(Kind::Core);
         } else if lower.starts_with("l3") {
-            return Ok(Class::L3);
+            return Ok(Kind::L3);
         }
         raise!("found an unknown id {:?}", id);
     }
@@ -123,7 +123,7 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use configure;
-    use super::{Class, Element, Platform};
+    use super::{Kind, Element, Platform};
 
     #[test]
     fn new() {
@@ -132,11 +132,11 @@ mod tests {
                                                               .unwrap();
         let platform = Platform::new(&config).unwrap();
         assert_eq!(platform.elements, &[
-            Element { id: 0, class: Class::Core },
-            Element { id: 1, class: Class::Core },
-            Element { id: 2, class: Class::Core },
-            Element { id: 3, class: Class::Core },
-            Element { id: 4, class: Class::L3 },
+            Element { id: 0, kind: Kind::Core },
+            Element { id: 1, kind: Kind::Core },
+            Element { id: 2, kind: Kind::Core },
+            Element { id: 3, kind: Kind::Core },
+            Element { id: 4, kind: Kind::L3 },
         ]);
     }
 }
