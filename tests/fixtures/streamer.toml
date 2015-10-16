@@ -4,8 +4,6 @@ root = "tests/fixtures"
 
 [platform]
 path = "004.stk"
-
-[platform.temperature]
 ambience = 318.15
 
 [traffic]

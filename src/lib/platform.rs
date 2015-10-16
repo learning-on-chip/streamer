@@ -55,17 +55,12 @@ impl Platform {
 
         let schedule = Box::new(try!(schedule::Compact::new(&elements)));
 
-        let config = {
-            let config = some!(config.branch("temperature"),
-                               "a temperature configuration is required");
-            try!(new_temperature_config(&config))
-        };
-
         info!(target: "Platform", "Constructing a thermal circuit...");
         let circuit = ok!(ThreeDICE::from(&system));
         info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
 
         info!(target: "Platform", "Initializing the temperature simulator...");
+        let config = try!(new_temperature_config(&config));
         let simulator = ok!(Simulator::new(&circuit, &config));
 
         let power = Profile::new(elements.len(), config.time_step);
