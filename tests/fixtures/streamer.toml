@@ -11,6 +11,8 @@ ambience = 318.15
 [traffic]
 path = "google.sqlite3"
 
-[[workload.patterns]]
-name = "blackscholes-small"
-path = "blackscholes.sqlite3"
+[workload]
+patterns = [
+  { name = "blackscholes-small", path = "blackscholes.sqlite3" },
+  { name = "x264-small",         path = "x264.sqlite3" },
+]
