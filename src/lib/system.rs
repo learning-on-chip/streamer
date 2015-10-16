@@ -78,16 +78,7 @@ impl System {
         })
     }
 
-    #[inline]
-    pub fn time_step(&self) -> f64 {
-        self.platform.time_step()
-    }
-
-    #[inline]
-    pub fn units(&self) -> usize {
-        self.platform.elements().len()
-    }
-
+    getter! { ref platform: Platform }
     getter! { ref stats: Stats }
 }
 

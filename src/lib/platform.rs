@@ -82,11 +82,6 @@ impl Platform {
         Some((power, temperature))
     }
 
-    #[inline]
-    pub fn time_step(&self) -> f64 {
-        self.power.time_step
-    }
-
     getter! { ref elements: [Element] }
 }
 

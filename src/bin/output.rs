@@ -31,10 +31,11 @@ impl Database {
         ok!(connection.execute(ok!(delete_from("dynamic").compile())));
 
         let statement = {
+            let units = system.platform().elements().len();
             let statement = ok!(connection.prepare({
                 ok!(insert_into("dynamic").columns(&[
                     "time", "component_id", "power", "temperature",
-                ]).batch(system.units()).compile())
+                ]).batch(units).compile())
             }));
             unsafe { mem::transmute(statement) }
         };
