@@ -13,8 +13,8 @@ pub struct System {
     schedule: Box<Schedule>,
     traffic: Traffic,
     workload: Workload,
-    stats: Stats,
     queue: BinaryHeap<Event>,
+    statistics: Statistics,
 }
 
 #[derive(Clone, Debug)]
@@ -25,7 +25,7 @@ pub struct Job {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct Stats {
+pub struct Statistics {
     pub created: usize,
     pub arrived: usize,
     pub started: usize,
@@ -57,14 +57,14 @@ impl System {
             schedule: schedule,
             traffic: traffic,
             workload: workload,
-            stats: Stats::default(),
             queue: BinaryHeap::new(),
+            statistics: Statistics::default(),
         })
     }
 
     getters! {
         ref platform: Platform,
-        ref stats: Stats,
+        ref statistics: Statistics,
     }
 }
 
@@ -80,8 +80,8 @@ impl System {
 
         let job = match (self.traffic.next(), self.workload.next()) {
             (Some(arrival), Some(pattern)) => {
-                let id = self.stats.created;
-                self.stats.created += 1;
+                let id = self.statistics.created;
+                self.statistics.created += 1;
                 Job { id: id, arrival: arrival, pattern: pattern }
             },
             _ => raise!("failed to generate a new job"),
@@ -115,12 +115,12 @@ impl Iterator for System {
             Some((power, temperature)) => (power, temperature),
             _ => return None,
         };
-        self.stats.account(&event);
+        self.statistics.account(&event);
         Some((event, power, temperature))
     }
 }
 
-impl Stats {
+impl Statistics {
     fn account(&mut self, event: &Event) {
         use event::Kind::*;
         match event.kind {

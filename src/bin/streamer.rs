@@ -79,7 +79,7 @@ fn start() -> Result<()> {
     while let Some((event, power, temperature)) = system.next() {
         let last = event.time > length;
         info!(target: "Streamer", "{} | {:2} queued", event,
-              system.stats().arrived - system.stats().started);
+              system.statistics().arrived - system.statistics().started);
         try!(output.next((event, power, temperature)));
         if last {
             break;
