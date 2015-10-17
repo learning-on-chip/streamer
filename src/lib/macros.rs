@@ -99,7 +99,7 @@ macro_rules! path(
 
 macro_rules! raise(
     ($message:expr) => (return Err(::Error::new($message)));
-    ($($arg:tt)*) => (return Err(::Error::new(format!($($arg)*))));
+    ($($argument:tt)*) => (return Err(::Error::new(format!($($argument)*))));
 );
 
 macro_rules! some(
@@ -107,8 +107,8 @@ macro_rules! some(
         Some(value) => value,
         _ => raise!("encountered a logic error"),
     });
-    ($option:expr, $($arg:tt)+) => (match $option {
+    ($option:expr, $($argument:tt)+) => (match $option {
         Some(value) => value,
-        _ => raise!($($arg)*),
+        _ => raise!($($argument)*),
     });
 );
