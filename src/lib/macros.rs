@@ -19,8 +19,6 @@ macro_rules! deref {
     });
 }
 
-macro_rules! itemize(($($blob:item)*) => ($($blob)*));
-
 macro_rules! getters {
     () => ();
     ($name:ident: $kind:ty, $($tail:tt)*) => (
@@ -38,6 +36,8 @@ macro_rules! getters {
         getters! { $($tail)* }
     );
 }
+
+macro_rules! itemize(($($blob:item)*) => ($($blob)*));
 
 macro_rules! ok(
     ($result:expr) => (match $result {
