@@ -80,7 +80,7 @@ impl System {
             (Some(arrival), Some(pattern)) => {
                 let id = self.statistics.created;
                 self.statistics.created += 1;
-                Job { id: id, arrival: arrival, pattern: pattern }
+                Job::new(id, arrival, pattern)
             },
             _ => raise!("failed to generate a new job"),
         };
@@ -115,6 +115,13 @@ impl Iterator for System {
         };
         self.statistics.account(&event);
         Some((event, power, temperature))
+    }
+}
+
+impl Job {
+    #[inline]
+    pub fn new(id: usize, arrival: f64, pattern: Pattern) -> Job {
+        Job { id: id, arrival: arrival, pattern: pattern }
     }
 }
 
