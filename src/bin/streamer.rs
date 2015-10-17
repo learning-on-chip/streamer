@@ -94,8 +94,9 @@ fn start() -> Result<()> {
 }
 
 fn construct_system(config: &Config) -> Result<System> {
+    use streamer::platform::Platform;
     use streamer::schedule;
-    use streamer::{Platform, Traffic, Workload};
+    use streamer::{Traffic, Workload};
 
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);

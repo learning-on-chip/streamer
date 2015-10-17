@@ -17,17 +17,14 @@ extern crate threed_ice;
 mod macros;
 
 mod event;
-mod platform;
-mod profile;
 mod result;
 mod system;
 mod traffic;
 mod workload;
 
+pub mod platform;
 pub mod schedule;
 
-pub use platform::Platform;
-pub use profile::Profile;
 pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
 pub use traffic::Traffic;

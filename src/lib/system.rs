@@ -2,8 +2,7 @@ use std::collections::BinaryHeap;
 
 use Result;
 use event::Event;
-use platform::Platform;
-use profile::Profile;
+use platform::{Platform, Profile};
 use schedule::Schedule;
 use traffic::Traffic;
 use workload::{Pattern, Workload};

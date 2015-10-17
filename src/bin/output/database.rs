@@ -3,7 +3,8 @@ use std::mem;
 use std::path::Path;
 
 use output::Output;
-use streamer::{Increment, Profile, Result, System};
+use streamer::platform::Profile;
+use streamer::{Increment, Result, System};
 
 pub struct Database {
     #[allow(dead_code)]
