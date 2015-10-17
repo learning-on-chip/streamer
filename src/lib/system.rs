@@ -19,9 +19,9 @@ pub struct System {
 
 #[derive(Clone, Debug)]
 pub struct Job {
-    id: usize,
-    arrival: f64,
-    pattern: Pattern,
+    pub id: usize,
+    pub arrival: f64,
+    pub pattern: Pattern,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -117,14 +117,6 @@ impl Iterator for System {
         };
         self.stats.account(&event);
         Some((event, power, temperature))
-    }
-}
-
-impl Job {
-    getters! {
-        id: usize,
-        arrival: f64,
-        ref pattern: Pattern,
     }
 }
 

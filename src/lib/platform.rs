@@ -66,7 +66,7 @@ impl Platform {
     }
 
     pub fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {
-        let pattern = job.pattern();
+        let pattern = &job.pattern;
         let (from, onto) = (&pattern.elements, &self.elements);
         for &(i, j) in &decision.mapping {
             let (from, onto) = (&from[i], &onto[j]);
