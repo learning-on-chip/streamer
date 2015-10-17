@@ -7,11 +7,11 @@ use schedule::Schedule;
 use traffic::Traffic;
 use workload::{Pattern, Workload};
 
-pub struct System {
+pub struct System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
     platform: Platform,
-    schedule: Box<Schedule>,
-    traffic: Box<Traffic>,
-    workload: Box<Workload>,
+    schedule: S,
+    traffic: T,
+    workload: W,
     queue: BinaryHeap<Event>,
     statistics: Statistics,
 }
@@ -33,16 +33,15 @@ pub struct Statistics {
 
 pub type Increment = (Event, Profile, Profile);
 
-impl System {
-    pub fn new<S, T, W>(platform: Platform, schedule: S, traffic: T, workload: W)
-                        -> Result<System>
-        where S: 'static + Schedule, T: 'static + Traffic, W: 'static + Workload
-    {
+impl<S, T, W> System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
+    pub fn new(platform: Platform, schedule: S, traffic: T, workload: W)
+               -> Result<System<S, T, W>> {
+
         Ok(System {
             platform: platform,
-            schedule: Box::new(schedule),
-            traffic: Box::new(traffic),
-            workload: Box::new(workload),
+            schedule: schedule,
+            traffic: traffic,
+            workload: workload,
             queue: BinaryHeap::new(),
             statistics: Statistics::default(),
         })
@@ -81,7 +80,7 @@ impl System {
     }
 }
 
-impl Iterator for System {
+impl<S, T, W> Iterator for System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
     type Item = Increment;
 
     fn next(&mut self) -> Option<Self::Item> {

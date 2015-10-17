@@ -12,7 +12,11 @@ extern crate time;
 
 use configuration::format::TOML;
 use log::LogLevel;
-use streamer::{Config, Error, System, Result};
+use streamer::{platform, schedule, traffic, workload};
+
+pub use streamer::{Config, Error, Result};
+
+pub type System = streamer::System<schedule::Compact, traffic::Fractal, workload::Random>;
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -94,11 +98,6 @@ fn start() -> Result<()> {
 }
 
 fn construct_system(config: &Config) -> Result<System> {
-    use streamer::platform::Platform;
-    use streamer::schedule::Compact;
-    use streamer::traffic::Fractal;
-    use streamer::workload::Random;
-
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
         let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
@@ -110,10 +109,10 @@ fn construct_system(config: &Config) -> Result<System> {
         ($name:expr) => (config.branch($name).unwrap_or_else(|| Config::new()));
     );
 
-    let platform = try!(Platform::new(&branch!("platform")));
-    let schedule = try!(Compact::new(&branch!("schedule"), &platform));
-    let traffic = try!(Fractal::new(&branch!("traffic"), &source));
-    let workload = try!(Random::new(&branch!("workload"), &source));
+    let platform = try!(platform::Platform::new(&branch!("platform")));
+    let schedule = try!(schedule::Compact::new(&branch!("schedule"), &platform));
+    let traffic = try!(traffic::Fractal::new(&branch!("traffic"), &source));
+    let workload = try!(workload::Random::new(&branch!("workload"), &source));
 
     System::new(platform, schedule, traffic, workload)
 }

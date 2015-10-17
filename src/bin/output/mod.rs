@@ -1,5 +1,7 @@
 use std::path::Path;
-use streamer::{Increment, Result, System};
+use streamer::Increment;
+
+use {Result, System};
 
 mod database;
 mod null;
