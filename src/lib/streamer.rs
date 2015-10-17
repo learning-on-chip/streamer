@@ -45,7 +45,7 @@ pub fn open<T: AsRef<Path>>(path: T) -> Result<System> {
         let seed = [0x12345678 & seed, 0x87654321 & seed];
         random::default().seed(seed)
     };
-    System::new(config, source)
+    System::new(&config, &source)
 }
 
 fn configure<T: AsRef<Path>>(path: T) -> Result<Config> {
