@@ -12,7 +12,7 @@ extern crate time;
 
 use configuration::format::TOML;
 use log::LogLevel;
-use streamer::{Error, Result, System};
+use streamer::{Config, Error, System, Result};
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -68,25 +68,14 @@ fn start() -> Result<()> {
 
     let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
                                       "a configuration file is required")));
-    let source = {
-        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
-        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
-        let seed = [0x12345678 & seed, 0x87654321 & seed];
-        random::default().seed(seed)
-    };
 
-    let mut system = try!(System::new(&config, &source));
-
-    let length = arguments.get::<f64>("length").unwrap_or(10.0);
-    if length <= 0.0 {
-        raise!("the time span should be positive");
-    }
-
+    let mut system = try!(construct_system(&config));
     let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
+    let length = arguments.get::<f64>("length").unwrap_or(10.0);
     info!(target: "Streamer", "Simulating {} seconds...", length);
-    let start = time::now();
 
+    let start = time::now();
     while let Some((event, power, temperature)) = system.next() {
         let last = event.time > length;
         info!(target: "Streamer", "{} | {:2} queued", event,
@@ -96,11 +85,42 @@ fn start() -> Result<()> {
             break;
         }
     }
+    let elapsed = time::now() - start;
 
     info!(target: "Streamer", "Well done in {:.2} seconds.",
-          (time::now() - start).num_milliseconds() as f64 / 1000.0);
+          elapsed.num_milliseconds() as f64 / 1000.0);
 
     Ok(())
+}
+
+fn construct_system(config: &Config) -> Result<System> {
+    use streamer::schedule;
+    use streamer::{Platform, Traffic, Workload};
+
+    let source = {
+        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
+        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
+        let seed = [0x12345678 & seed, 0x87654321 & seed];
+        random::default().seed(seed)
+    };
+
+    let platform = {
+        let config = some!(config.branch("platform"), "a platform configuration is required");
+        try!(Platform::new(&config))
+    };
+    let schedule = {
+        try!(schedule::Compact::new(platform.elements()))
+    };
+    let traffic = {
+        let config = some!(config.branch("traffic"), "a traffic configuration is required");
+        try!(Traffic::new(&config, &source))
+    };
+    let workload = {
+        let config = some!(config.branch("workload"), "a workload configuration is required");
+        try!(Workload::new(&config, &source))
+    };
+
+    System::new(platform, schedule, traffic, workload)
 }
 
 fn help() -> ! {

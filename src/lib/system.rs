@@ -1,12 +1,12 @@
 use std::collections::BinaryHeap;
 
+use Result;
 use event::Event;
 use platform::Platform;
 use profile::Profile;
-use schedule::{self, Schedule};
+use schedule::Schedule;
 use traffic::Traffic;
 use workload::{Pattern, Workload};
-use {Config, Result, Source};
 
 pub struct System {
     platform: Platform,
@@ -35,26 +35,13 @@ pub struct Statistics {
 pub type Increment = (Event, Profile, Profile);
 
 impl System {
-    pub fn new(config: &Config, source: &Source) -> Result<System> {
-        let platform = {
-            let config = some!(config.branch("platform"), "a platform configuration is required");
-            try!(Platform::new(&config))
-        };
-        let schedule = {
-            Box::new(try!(schedule::Compact::new(platform.elements())))
-        };
-        let traffic = {
-            let config = some!(config.branch("traffic"), "a traffic configuration is required");
-            try!(Traffic::new(&config, source))
-        };
-        let workload = {
-            let config = some!(config.branch("workload"), "a workload configuration is required");
-            try!(Workload::new(&config, source))
-        };
-
+    pub fn new<S>(platform: Platform, schedule: S, traffic: Traffic, workload: Workload)
+                  -> Result<System>
+        where S: 'static + Schedule
+    {
         Ok(System {
             platform: platform,
-            schedule: schedule,
+            schedule: Box::new(schedule),
             traffic: traffic,
             workload: workload,
             queue: BinaryHeap::new(),
@@ -62,13 +49,6 @@ impl System {
         })
     }
 
-    getters! {
-        ref platform: Platform,
-        ref statistics: Statistics,
-    }
-}
-
-impl System {
     fn tick(&mut self) -> Result<()> {
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => {}
@@ -94,6 +74,11 @@ impl System {
         self.queue.push(Event::finish(decision.finish, job));
 
         Ok(())
+    }
+
+    getters! {
+        ref platform: Platform,
+        ref statistics: Statistics,
     }
 }
 

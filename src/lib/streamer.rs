@@ -20,15 +20,18 @@ mod event;
 mod platform;
 mod profile;
 mod result;
-mod schedule;
 mod system;
 mod traffic;
 mod workload;
+
+pub mod schedule;
 
 pub use platform::Platform;
 pub use profile::Profile;
 pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
+pub use traffic::Traffic;
+pub use workload::Workload;
 
 pub type Config = configuration::Tree;
 pub type Source = random::Default;
