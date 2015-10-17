@@ -1,6 +1,6 @@
 use std::collections::BinaryHeap;
 
-use event::{self, Event};
+use event::Event;
 use platform::Platform;
 use profile::Profile;
 use schedule::{self, Schedule};
@@ -70,6 +70,8 @@ impl System {
 
 impl System {
     fn tick(&mut self) -> Result<()> {
+        use event::Kind::*;
+
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => {}
             (Some(&arrival), Some(&Event { time, .. })) if arrival < time => {},
@@ -85,13 +87,13 @@ impl System {
             _ => raise!("failed to generate a new job"),
         };
 
-        self.queue.push(Event::new(job.arrival, event::Kind::Arrival, job.clone()));
+        self.queue.push(Event::new(job.arrival, Arrival, job.clone()));
 
         let decision = try!(self.schedule.push(&job));
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event::new(decision.start, event::Kind::Start, job.clone()));
-        self.queue.push(Event::new(decision.finish, event::Kind::Finish, job));
+        self.queue.push(Event::new(decision.start, Start, job.clone()));
+        self.queue.push(Event::new(decision.finish, Finish, job));
 
         Ok(())
     }
@@ -128,10 +130,11 @@ impl Job {
 
 impl Stats {
     fn account(&mut self, event: &Event) {
+        use event::Kind::*;
         match event.kind {
-            event::Kind::Arrival => self.arrived += 1,
-            event::Kind::Start => self.started += 1,
-            event::Kind::Finish => self.finished += 1,
+            Arrival => self.arrived += 1,
+            Start => self.started += 1,
+            Finish => self.finished += 1,
         }
     }
 }
