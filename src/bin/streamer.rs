@@ -2,14 +2,17 @@
 extern crate log;
 
 extern crate arguments;
+extern crate configuration;
+extern crate random;
 extern crate sql;
 extern crate sqlite;
 extern crate streamer;
 extern crate term;
 extern crate time;
 
+use configuration::format::toml;
 use log::LogLevel;
-use streamer::{Error, Result};
+use streamer::{Error, Result, System};
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -63,8 +66,16 @@ fn start() -> Result<()> {
         logger::setup(LogLevel::Warn);
     }
 
-    let mut system = try!(streamer::open(some!(arguments.get::<String>("config"),
-                                               "a configuration file is required")));
+    let config = ok!(toml::open(some!(arguments.get::<String>("config"),
+                                      "a configuration file is required")));
+    let source = {
+        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
+        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
+        let seed = [0x12345678 & seed, 0x87654321 & seed];
+        random::default().seed(seed)
+    };
+
+    let mut system = try!(System::new(&config, &source));
 
     let length = arguments.get::<f64>("length").unwrap_or(10.0);
     if length <= 0.0 {

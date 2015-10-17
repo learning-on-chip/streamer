@@ -122,14 +122,14 @@ fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
 
 #[cfg(test)]
 mod tests {
-    use configure;
+    use configuration::format::toml;
     use super::{Kind, Element, Platform};
 
     #[test]
     fn new() {
-        let config = configure("tests/fixtures/streamer.toml").unwrap()
-                                                              .branch("platform")
-                                                              .unwrap();
+        let config = toml::open("tests/fixtures/streamer.toml").unwrap()
+                                                               .branch("platform")
+                                                               .unwrap();
         let platform = Platform::new(&config).unwrap();
         assert_eq!(platform.elements, &[
             Element { id: 0, kind: Kind::Core },
