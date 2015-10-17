@@ -1,7 +1,5 @@
 use std::str::FromStr;
-use temperature::circuit::ThreeDICE;
 use temperature::{self, Simulator};
-use threed_ice::{StackElement, System};
 
 use profile::Profile;
 use schedule::Decision;
@@ -33,31 +31,10 @@ pub enum Capacity {
 
 impl Platform {
     pub fn new(config: &Config) -> Result<Platform> {
-        let path = path!(config, "a stack description");
-
-        info!(target: "Platform", "Reading {:?}...", &path);
-        let system = ok!(System::new(&path));
-
-        let mut elements = vec![];
-        for element in system.stack.elements.iter().rev() {
-            let die = match element {
-                &StackElement::Die(ref die) => die,
-                _ => continue,
-            };
-            for element in die.floorplan.elements.iter() {
-                let id = elements.len();
-                let kind = try!(Kind::from_str(&element.id));
-                elements.push(Element { id: id, kind: kind });
-            }
-        }
-        info!(target: "Platform", "Found {} processing elements.", elements.len());
-
-        info!(target: "Platform", "Constructing a thermal circuit...");
-        let circuit = ok!(ThreeDICE::from(&system));
-        info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
+        let (elements, circuit) = try!(construct_threed_ice_cirucit(config));
 
         info!(target: "Platform", "Initializing the temperature simulator...");
-        let config = try!(new_temperature_config(&config));
+        let config = try!(extract_temperature_config(config));
         let simulator = ok!(Simulator::new(&circuit, &config));
 
         let power = Profile::new(elements.len(), config.time_step);
@@ -113,7 +90,37 @@ impl FromStr for Kind {
     }
 }
 
-fn new_temperature_config(config: &Config) -> Result<temperature::Config> {
+fn construct_threed_ice_cirucit(config: &Config) -> Result<(Vec<Element>, temperature::Circuit)> {
+    use temperature::circuit::ThreeDICE;
+    use threed_ice::{StackElement, System};
+
+    let path = path!(config, "a stack description");
+
+    info!(target: "Platform", "Reading {:?}...", &path);
+    let system = ok!(System::new(&path));
+
+    let mut elements = vec![];
+    for element in system.stack.elements.iter().rev() {
+        let die = match element {
+            &StackElement::Die(ref die) => die,
+            _ => continue,
+        };
+        for element in die.floorplan.elements.iter() {
+            let id = elements.len();
+            let kind = try!(Kind::from_str(&element.id));
+            elements.push(Element { id: id, kind: kind });
+        }
+    }
+    info!(target: "Platform", "Found {} processing elements.", elements.len());
+
+    info!(target: "Platform", "Constructing a thermal circuit...");
+    let circuit = ok!(ThreeDICE::from(&system));
+    info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
+
+    Ok((elements, circuit))
+}
+
+fn extract_temperature_config(config: &Config) -> Result<temperature::Config> {
     Ok(temperature::Config {
         ambience: *some!(config.get::<f64>("ambience"), "an ambient temperature is required"),
         time_step: *some!(config.get::<f64>("time_step"), "a time step is required"),
