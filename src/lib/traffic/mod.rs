@@ -15,7 +15,7 @@ fn read_interarrivals<T: AsRef<Path>>(path: T) -> Result<Vec<f64>> {
     use sql::prelude::*;
     use sqlite::{Connection, State};
 
-    let backend = ok!(Connection::open(&path));
+    let backend = ok!(Connection::open(path));
 
     let statement = select_from("arrivals").column("time").order_by(column("time").ascend());
     let mut statement = ok!(backend.prepare(ok!(statement.compile())));
