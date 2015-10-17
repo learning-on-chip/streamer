@@ -11,6 +11,17 @@ pub struct Traffic {
     arrivals: VecDeque<f64>,
 }
 
+macro_rules! refill(
+    ($this:ident) => (
+        if $this.arrivals.is_empty() {
+            if let Err(error) = $this.refill() {
+                error!(target: "Traffic", "Failed to refill the queue ({}).", error);
+                return None;
+            }
+        }
+    );
+);
+
 impl Traffic {
     pub fn new(config: &Config, source: &Source) -> Result<Traffic> {
         let path = path!(config, "a workload pattern database");
@@ -33,30 +44,22 @@ impl Traffic {
     }
 
     pub fn next(&mut self) -> Option<f64> {
-        if let Err(error) = self.refill() {
-            error!(target: "Traffic", "Failed to refill the queue ({}).", error);
-            return None;
-        }
+        refill!(self);
         self.arrivals.pop_front()
     }
 
     pub fn peek(&mut self) -> Option<&f64> {
-        if let Err(error) = self.refill() {
-            error!(target: "Traffic", "Failed to refill the queue ({}).", error);
-            return None;
-        }
+        refill!(self);
         self.arrivals.get(0)
     }
 
     fn refill(&mut self) -> Result<()> {
-        if self.arrivals.is_empty() {
-            info!(target: "Traffic", "Refilling the queue...");
-            for step in ok!(self.model.sample(&mut self.source)) {
-                self.time += step;
-                self.arrivals.push_back(self.time);
-            }
-            info!(target: "Traffic", "The queue contains {} arrivals.", self.arrivals.len());
+        info!(target: "Traffic", "Refilling the queue...");
+        for step in ok!(self.model.sample(&mut self.source)) {
+            self.time += step;
+            self.arrivals.push_back(self.time);
         }
+        info!(target: "Traffic", "The queue contains {} arrivals.", self.arrivals.len());
         Ok(())
     }
 }
