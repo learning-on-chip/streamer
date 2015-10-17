@@ -12,7 +12,7 @@ pub struct Compact {
 }
 
 impl Compact {
-    pub fn new(platform: &Platform, _: &Config) -> Result<Compact> {
+    pub fn new(_: &Config, platform: &Platform) -> Result<Compact> {
         let elements = platform.elements();
         Ok(Compact {
             elements: elements.to_vec(),

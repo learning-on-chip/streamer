@@ -95,7 +95,7 @@ fn start() -> Result<()> {
 
 fn construct_system(config: &Config) -> Result<System> {
     use streamer::platform::Platform;
-    use streamer::schedule;
+    use streamer::schedule::Compact;
     use streamer::{Traffic, Workload};
 
     let source = {
@@ -105,22 +105,14 @@ fn construct_system(config: &Config) -> Result<System> {
         random::default().seed(seed)
     };
 
-    let platform = {
-        let config = some!(config.branch("platform"), "a platform configuration is required");
-        try!(Platform::new(&config))
-    };
-    let schedule = {
-        let config = config.branch("schedule").unwrap_or_else(|| Config::new());
-        try!(schedule::Compact::new(&platform, &config))
-    };
-    let traffic = {
-        let config = some!(config.branch("traffic"), "a traffic configuration is required");
-        try!(Traffic::new(&config, &source))
-    };
-    let workload = {
-        let config = some!(config.branch("workload"), "a workload configuration is required");
-        try!(Workload::new(&config, &source))
-    };
+    macro_rules! branch(
+        ($name:expr) => (config.branch($name).unwrap_or_else(|| Config::new()));
+    );
+
+    let platform = try!(Platform::new(&branch!("platform")));
+    let schedule = try!(Compact::new(&branch!("schedule"), &platform));
+    let traffic = try!(Traffic::new(&branch!("traffic"), &source));
+    let workload = try!(Workload::new(&branch!("workload"), &source));
 
     System::new(platform, schedule, traffic, workload)
 }
