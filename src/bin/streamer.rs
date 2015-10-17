@@ -110,7 +110,8 @@ fn construct_system(config: &Config) -> Result<System> {
         try!(Platform::new(&config))
     };
     let schedule = {
-        try!(schedule::Compact::new(platform.elements()))
+        let config = config.branch("schedule").unwrap_or_else(|| Config::new());
+        try!(schedule::Compact::new(&platform, &config))
     };
     let traffic = {
         let config = some!(config.branch("traffic"), "a traffic configuration is required");

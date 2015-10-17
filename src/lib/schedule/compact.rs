@@ -1,10 +1,10 @@
 use std::cmp::Ord;
 
 use math;
-use platform::Element;
+use platform::{Element, Platform};
 use schedule::queue::Queue;
 use schedule::{Decision, Schedule};
-use {Job, Result};
+use {Config, Job, Result};
 
 pub struct Compact {
     elements: Vec<Element>,
@@ -12,7 +12,8 @@ pub struct Compact {
 }
 
 impl Compact {
-    pub fn new(elements: &[Element]) -> Result<Compact> {
+    pub fn new(platform: &Platform, _: &Config) -> Result<Compact> {
+        let elements = platform.elements();
         Ok(Compact {
             elements: elements.to_vec(),
             queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
