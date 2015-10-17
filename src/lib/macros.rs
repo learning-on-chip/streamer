@@ -102,25 +102,6 @@ macro_rules! raise(
     ($($arg:tt)*) => (return Err(::Error::new(format!($($arg)*))));
 );
 
-macro_rules! rewrite(
-    ($header:tt [$($member:tt)*] {}) => (
-        rewrite!(output $header [$($member)*]);
-    );
-    ($header:tt [$($member:tt)*] { pub $name:ident: $kind:ty, $($t:tt)* }) => (
-        rewrite!($header [$($member)* pub $name: $kind,] { $($t)* });
-    );
-    ($header:tt [$($member:tt)*] { $name:ident: $kind:ty, $($t:tt)* }) => (
-        rewrite!($header [$($member)* $name: $kind,] { $($t)* });
-    );
-    (output [$($chunk:tt)*] [$($member:tt)*]) => (
-        itemize!(
-            $($chunk)* {
-                $($member)*
-            }
-        );
-    );
-);
-
 macro_rules! some(
     ($option:expr) => (match $option {
         Some(value) => value,
