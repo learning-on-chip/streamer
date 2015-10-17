@@ -20,8 +20,18 @@ pub enum Kind {
 
 impl Event {
     #[inline]
-    pub fn new(time: f64, kind: Kind, job: Job) -> Event {
-        Event { time: time, kind: kind, job: job }
+    pub fn arrival(time: f64, job: Job) -> Event {
+        Event { time: time, kind: Kind::Arrival, job: job }
+    }
+
+    #[inline]
+    pub fn start(time: f64, job: Job) -> Event {
+        Event { time: time, kind: Kind::Start, job: job }
+    }
+
+    #[inline]
+    pub fn finish(time: f64, job: Job) -> Event {
+        Event { time: time, kind: Kind::Finish, job: job }
     }
 }
 

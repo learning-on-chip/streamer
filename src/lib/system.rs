@@ -70,8 +70,6 @@ impl System {
 
 impl System {
     fn tick(&mut self) -> Result<()> {
-        use event::Kind::*;
-
         match (self.traffic.peek(), self.queue.peek()) {
             (Some(_), None) => {}
             (Some(&arrival), Some(&Event { time, .. })) if arrival < time => {},
@@ -87,13 +85,13 @@ impl System {
             _ => raise!("failed to generate a new job"),
         };
 
-        self.queue.push(Event::new(job.arrival, Arrival, job.clone()));
+        self.queue.push(Event::arrival(job.arrival, job.clone()));
 
         let decision = try!(self.schedule.push(&job));
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event::new(decision.start, Start, job.clone()));
-        self.queue.push(Event::new(decision.finish, Finish, job));
+        self.queue.push(Event::start(decision.start, job.clone()));
+        self.queue.push(Event::finish(decision.finish, job));
 
         Ok(())
     }
