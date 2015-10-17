@@ -32,6 +32,8 @@ pub enum Capacity {
 impl Platform {
     pub fn new(config: &Config) -> Result<Platform> {
         let (elements, circuit) = try!(construct_threed_ice_cirucit(config));
+        info!(target: "Platform", "Found {} processing elements and obtained {} thermal nodes.",
+              elements.len(), circuit.capacitance.len());
 
         info!(target: "Platform", "Initializing the temperature simulator...");
         let config = try!(extract_temperature_config(config));
@@ -111,11 +113,9 @@ fn construct_threed_ice_cirucit(config: &Config) -> Result<(Vec<Element>, temper
             elements.push(Element { id: id, kind: kind });
         }
     }
-    info!(target: "Platform", "Found {} processing elements.", elements.len());
 
     info!(target: "Platform", "Constructing a thermal circuit...");
     let circuit = ok!(ThreeDICE::from(&system));
-    info!(target: "Platform", "Obtained {} thermal nodes.", circuit.capacitance.len());
 
     Ok((elements, circuit))
 }
