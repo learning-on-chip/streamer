@@ -19,15 +19,14 @@ mod macros;
 mod event;
 mod result;
 mod system;
-mod workload;
 
 pub mod platform;
 pub mod schedule;
 pub mod traffic;
+pub mod workload;
 
 pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
-pub use workload::Workload;
 
 pub type Config = configuration::Tree;
 pub type Source = random::Default;

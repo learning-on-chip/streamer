@@ -1,16 +1,9 @@
-use probability::distribution::{Categorical, Sample};
+use platform;
 use sqlite::Connection;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use platform;
-use {Config, Result, Source};
-
-pub struct Workload {
-    patterns: Vec<Pattern>,
-    source: Source,
-    distribution: Categorical,
-}
+use {Config, Result};
 
 #[derive(Clone, Debug)]
 pub struct Pattern(Rc<Content>);
@@ -31,30 +24,6 @@ pub struct Element {
     pub kind: platform::Kind,
     pub dynamic_power: Vec<f64>,
     pub leakage_power: f64,
-}
-
-impl Workload {
-    pub fn new(config: &Config, source: &Source) -> Result<Workload> {
-        let mut patterns = vec![];
-        if let Some(ref configs) = config.forest("patterns") {
-            for config in configs {
-                patterns.push(try!(Pattern::new(config)));
-            }
-        }
-        let count = patterns.len();
-        if count == 0 {
-            raise!("at least one workload pattern is required");
-        }
-        Ok(Workload {
-            patterns: patterns,
-            source: source.clone(),
-            distribution: Categorical::new(&vec![1.0 / count as f64; count]),
-        })
-    }
-
-    pub fn next(&mut self) -> Option<Pattern> {
-        Some(self.patterns[self.distribution.sample(&mut self.source)].clone())
-    }
 }
 
 impl Pattern {

@@ -11,7 +11,7 @@ pub struct System {
     platform: Platform,
     schedule: Box<Schedule>,
     traffic: Box<Traffic>,
-    workload: Workload,
+    workload: Box<Workload>,
     queue: BinaryHeap<Event>,
     statistics: Statistics,
 }
@@ -34,15 +34,15 @@ pub struct Statistics {
 pub type Increment = (Event, Profile, Profile);
 
 impl System {
-    pub fn new<S, T>(platform: Platform, schedule: S, traffic: T, workload: Workload)
-                     -> Result<System>
-        where S: 'static + Schedule, T: 'static + Traffic
+    pub fn new<S, T, W>(platform: Platform, schedule: S, traffic: T, workload: W)
+                        -> Result<System>
+        where S: 'static + Schedule, T: 'static + Traffic, W: 'static + Workload
     {
         Ok(System {
             platform: platform,
             schedule: Box::new(schedule),
             traffic: Box::new(traffic),
-            workload: workload,
+            workload: Box::new(workload),
             queue: BinaryHeap::new(),
             statistics: Statistics::default(),
         })
