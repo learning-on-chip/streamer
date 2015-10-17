@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::str::FromStr;
 use temperature::{self, Simulator};
 
@@ -31,8 +32,8 @@ pub enum Capacity {
 
 impl Platform {
     pub fn new(config: &Config) -> Result<Platform> {
-        let (elements, circuit) = try!(construct_threed_ice_cirucit(config));
-        info!(target: "Platform", "Found {} processing elements and obtained {} thermal nodes.",
+        let (elements, circuit) = try!(construct_cirucit(config));
+        info!(target: "Platform", "Found {} processing elements and {} thermal nodes.",
               elements.len(), circuit.capacitance.len());
 
         info!(target: "Platform", "Initializing the temperature simulator...");
@@ -92,15 +93,20 @@ impl FromStr for Kind {
     }
 }
 
-fn construct_threed_ice_cirucit(config: &Config) -> Result<(Vec<Element>, temperature::Circuit)> {
+fn construct_cirucit(config: &Config) -> Result<(Vec<Element>, temperature::Circuit)> {
+    let path = path!(config, "a thermal specification is required");
+    info!(target: "Platform", "Constructing a thermal circuit based on {:?}...", &path);
+    match path.extension() {
+        Some(extension) if extension == "stk" => construct_threed_ice(&path),
+        _ => raise!("the format of {:?} is unknown", &path),
+    }
+}
+
+fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circuit)> {
     use temperature::circuit::ThreeDICE;
     use threed_ice::{StackElement, System};
 
-    let path = path!(config, "a stack description");
-
-    info!(target: "Platform", "Reading {:?}...", &path);
-    let system = ok!(System::new(&path));
-
+    let system = ok!(System::new(path));
     let mut elements = vec![];
     for element in system.stack.elements.iter().rev() {
         let die = match element {
@@ -113,11 +119,7 @@ fn construct_threed_ice_cirucit(config: &Config) -> Result<(Vec<Element>, temper
             elements.push(Element { id: id, kind: kind });
         }
     }
-
-    info!(target: "Platform", "Constructing a thermal circuit...");
-    let circuit = ok!(ThreeDICE::from(&system));
-
-    Ok((elements, circuit))
+    Ok((elements, ok!(ThreeDICE::from(&system))))
 }
 
 fn extract_temperature_config(config: &Config) -> Result<temperature::Config> {

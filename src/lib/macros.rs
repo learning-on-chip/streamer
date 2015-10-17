@@ -82,8 +82,8 @@ macro_rules! order {
 }
 
 macro_rules! path(
-    ($config:ident, $destination:expr) => ({
-        let path = some!($config.get::<String>("path"), "the path to {} is missing", $destination);
+    ($config:ident, $($argument:tt)+) => ({
+        let path = some!($config.get::<String>("path"), $($argument)+);
         let mut path = ::std::path::PathBuf::from(path);
         if path.is_relative() {
             if let Some(root) = $config.get::<String>("root") {

@@ -59,7 +59,7 @@ impl Workload {
 
 impl Pattern {
     pub fn new(config: &Config) -> Result<Pattern> {
-        let path = path!(config, "a workload pattern database");
+        let path = path!(config, "a workload-pattern database is required");
         let backend = ok!(Connection::open(&path));
 
         info!(target: "Workload", "Reading {:?}...", &path);

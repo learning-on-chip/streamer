@@ -24,8 +24,8 @@ macro_rules! refill(
 
 impl Traffic {
     pub fn new(config: &Config, source: &Source) -> Result<Traffic> {
-        let path = path!(config, "a workload pattern database");
-        let backend = ok!(Connection::open(&path!(config, "a traffic database")));
+        let path = path!(config, "a traffic-pattern database is required");
+        let backend = ok!(Connection::open(&path));
 
         info!(target: "Traffic", "Reading {:?}...", &path);
         let data = try!(read_interarrivals(&backend));
