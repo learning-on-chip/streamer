@@ -94,9 +94,10 @@ fn start() -> Result<()> {
 }
 
 fn construct_system(config: &Config) -> Result<System> {
+    use streamer::Workload;
     use streamer::platform::Platform;
     use streamer::schedule::Compact;
-    use streamer::{Traffic, Workload};
+    use streamer::traffic::Fractal;
 
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
@@ -111,7 +112,7 @@ fn construct_system(config: &Config) -> Result<System> {
 
     let platform = try!(Platform::new(&branch!("platform")));
     let schedule = try!(Compact::new(&branch!("schedule"), &platform));
-    let traffic = try!(Traffic::new(&branch!("traffic"), &source));
+    let traffic = try!(Fractal::new(&branch!("traffic"), &source));
     let workload = try!(Workload::new(&branch!("workload"), &source));
 
     System::new(platform, schedule, traffic, workload)

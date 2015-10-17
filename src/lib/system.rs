@@ -10,7 +10,7 @@ use workload::{Pattern, Workload};
 pub struct System {
     platform: Platform,
     schedule: Box<Schedule>,
-    traffic: Traffic,
+    traffic: Box<Traffic>,
     workload: Workload,
     queue: BinaryHeap<Event>,
     statistics: Statistics,
@@ -34,14 +34,14 @@ pub struct Statistics {
 pub type Increment = (Event, Profile, Profile);
 
 impl System {
-    pub fn new<S>(platform: Platform, schedule: S, traffic: Traffic, workload: Workload)
-                  -> Result<System>
-        where S: 'static + Schedule
+    pub fn new<S, T>(platform: Platform, schedule: S, traffic: T, workload: Workload)
+                     -> Result<System>
+        where S: 'static + Schedule, T: 'static + Traffic
     {
         Ok(System {
             platform: platform,
             schedule: Box::new(schedule),
-            traffic: traffic,
+            traffic: Box::new(traffic),
             workload: workload,
             queue: BinaryHeap::new(),
             statistics: Statistics::default(),

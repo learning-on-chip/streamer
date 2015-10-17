@@ -19,15 +19,14 @@ mod macros;
 mod event;
 mod result;
 mod system;
-mod traffic;
 mod workload;
 
 pub mod platform;
 pub mod schedule;
+pub mod traffic;
 
 pub use result::{Error, Result};
 pub use system::{Increment, Job, System};
-pub use traffic::Traffic;
 pub use workload::Workload;
 
 pub type Config = configuration::Tree;
