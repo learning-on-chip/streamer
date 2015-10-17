@@ -10,7 +10,7 @@ extern crate streamer;
 extern crate term;
 extern crate time;
 
-use configuration::format::toml;
+use configuration::format::TOML;
 use log::LogLevel;
 use streamer::{Error, Result, System};
 
@@ -66,7 +66,7 @@ fn start() -> Result<()> {
         logger::setup(LogLevel::Warn);
     }
 
-    let config = ok!(toml::open(some!(arguments.get::<String>("config"),
+    let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
                                       "a configuration file is required")));
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
