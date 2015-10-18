@@ -4,6 +4,7 @@ use std::collections::VecDeque;
 use traffic::{self, Traffic};
 use {Config, Result, Source};
 
+/// A multifractal wavelet model of network traffic.
 pub struct Fractal {
     time: f64,
     model: Beta,
@@ -12,6 +13,7 @@ pub struct Fractal {
 }
 
 impl Fractal {
+    /// Create a model.
     pub fn new(config: &Config, source: &Source) -> Result<Fractal> {
         let path = path!(config, "a traffic-pattern database is required");
 
