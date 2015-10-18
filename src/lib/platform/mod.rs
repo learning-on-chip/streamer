@@ -1,4 +1,4 @@
-//! Multiprocessor platform.
+//! Target platform.
 
 use Result;
 use schedule::Decision;

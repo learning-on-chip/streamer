@@ -1,3 +1,5 @@
+//! Multiprocessor system.
+
 use std::collections::BinaryHeap;
 
 use Result;
@@ -12,6 +14,7 @@ mod job;
 pub use self::event::{Event, EventKind};
 pub use self::job::Job;
 
+/// A multiprocessor system.
 pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
     platform: P,
     schedule: S,
@@ -21,15 +24,21 @@ pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Wor
     statistics: Statistics,
 }
 
+/// Statistics about a system.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Statistics {
+    /// The number of created jobs.
     pub created: usize,
+    /// The number of arrived jobs.
     pub arrived: usize,
+    /// The number of started jobs.
     pub started: usize,
+    /// The number of finished jobs.
     pub finished: usize,
 }
 
 impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
+    /// Create a system.
     pub fn new(platform: P, schedule: S, traffic: T, workload: W) -> Result<System<P, S, T, W>> {
         Ok(System {
             platform: platform,
@@ -39,6 +48,16 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
             queue: BinaryHeap::new(),
             statistics: Statistics::default(),
         })
+    }
+
+    /// Return the platform.
+    pub fn platform(&self) -> &P {
+        &self.platform
+    }
+
+    /// Return the statistics.
+    pub fn statistics(&self) -> &Statistics {
+        &self.statistics
     }
 
     fn tick(&mut self) -> Result<()> {
@@ -65,11 +84,6 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
         self.queue.push(Event::finish(decision.finish, job));
 
         Ok(())
-    }
-
-    getters! {
-        ref platform: P,
-        ref statistics: Statistics,
     }
 }
 
