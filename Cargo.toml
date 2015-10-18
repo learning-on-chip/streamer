@@ -15,6 +15,7 @@ path = "src/lib/streamer.rs"
 name = "streamer"
 path = "src/bin/streamer.rs"
 test = false
+doc = false
 
 [dependencies]
 arguments = "*"
