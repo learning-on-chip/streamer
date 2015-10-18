@@ -21,6 +21,8 @@ macro_rules! deref {
 
 macro_rules! itemize(($($blob:item)*) => ($($blob)*));
 
+/// Unwrap a result or raise an error.
+#[macro_export]
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
@@ -79,11 +81,15 @@ macro_rules! path(
     });
 );
 
+/// Raise an error.
+#[macro_export]
 macro_rules! raise(
-    ($message:expr) => (return Err(::Error::new($message)));
-    ($($argument:tt)*) => (return Err(::Error::new(format!($($argument)*))));
+    ($message:expr) => (return Err($crate::Error::new($message)));
+    ($($argument:tt)*) => (return Err($crate::Error::new(format!($($argument)*))));
 );
 
+/// Unwrap an option or raise an error.
+#[macro_export]
 macro_rules! some(
     ($option:expr) => (match $option {
         Some(value) => value,

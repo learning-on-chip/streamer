@@ -1,14 +1,16 @@
-#[macro_use]
-extern crate log;
-
 extern crate arguments;
 extern crate configuration;
 extern crate random;
 extern crate sql;
 extern crate sqlite;
-extern crate streamer;
 extern crate term;
 extern crate time;
+
+#[macro_use]
+extern crate log;
+
+#[macro_use]
+extern crate streamer;
 
 use configuration::format::TOML;
 use log::LogLevel;
@@ -34,17 +36,6 @@ Options:
     --verbose                Display progress information.
     --help                   Display this message.
 ";
-
-macro_rules! raise(
-    ($message:expr) => (return Err(::streamer::Error::new($message)));
-);
-
-macro_rules! ok(
-    ($result:expr) => (match $result {
-        Ok(result) => result,
-        Err(error) => raise!(error),
-    });
-);
 
 macro_rules! some(
     ($option:expr, $($arg:tt)*) => (match $option {
