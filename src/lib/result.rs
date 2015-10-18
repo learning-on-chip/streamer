@@ -1,10 +1,13 @@
 use std::{error, fmt, result};
 
+/// An error.
 pub struct Error(String);
 
+/// A result.
 pub type Result<T> = result::Result<T, Error>;
 
 impl Error {
+    /// Create an error.
     #[inline]
     pub fn new<T: ToString>(message: T) -> Error {
         Error(message.to_string())

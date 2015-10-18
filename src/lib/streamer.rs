@@ -28,7 +28,10 @@ pub mod workload;
 
 pub use result::{Error, Result};
 
+/// A configuration.
 pub type Config = configuration::Tree;
+
+/// A source of randomness.
 pub type Source = random::Default;
 
 mod math {
