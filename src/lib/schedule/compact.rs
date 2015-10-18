@@ -6,12 +6,14 @@ use schedule::{Decision, Schedule, Queue};
 use system::Job;
 use {Config, Result};
 
+/// A first-in-first-served scheduling policy.
 pub struct Compact {
     elements: Vec<Element>,
     queues: Vec<Queue>,
 }
 
 impl Compact {
+    /// Create a scheduling policy.
     pub fn new(_: &Config, elements: &[Element]) -> Result<Compact> {
         Ok(Compact {
             elements: elements.to_vec(),

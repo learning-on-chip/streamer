@@ -4,11 +4,13 @@ use std::f64::INFINITY;
 use math;
 use platform::ElementCapacity;
 
+/// A structure for keeping track of vacant time intervals.
 pub struct Queue {
     capacity: ElementCapacity,
     occupied: BTreeSet<Interval>,
 }
 
+/// A time interval.
 #[derive(Clone, Copy, Debug)]
 pub struct Interval(f64, f64);
 
@@ -20,11 +22,13 @@ struct Holes<'l> {
 }
 
 impl Queue {
+    /// Create a queue.
     #[inline]
     pub fn new(capacity: ElementCapacity) -> Queue {
         Queue { capacity: capacity, occupied: BTreeSet::new() }
     }
 
+    /// Find a vacant time interval.
     pub fn next(&self, from: f64, length: f64) -> Interval {
         if let ElementCapacity::Infinite = self.capacity {
              return Interval(from, INFINITY);
@@ -35,6 +39,7 @@ impl Queue {
         }
     }
 
+    /// Occupy a time interval.
     pub fn push(&mut self, (mut start, finish): (f64, f64)) {
         debug_assert!(0.0 <= start && start <= finish);
         while self.occupied.contains(&Interval(start, 0.0)) {
@@ -43,6 +48,7 @@ impl Queue {
         self.occupied.insert(Interval(start, start.max(finish)));
     }
 
+    /// Advance time.
     pub fn tick(&mut self, time: f64) {
         let mut redundant = vec![];
         for &interval in &self.occupied {
@@ -90,11 +96,13 @@ impl<'l> Iterator for Holes<'l> {
 }
 
 impl Interval {
+    /// Return the start.
     #[inline(always)]
     pub fn start(&self) -> f64 {
         self.0
     }
 
+    /// Return the end.
     #[inline(always)]
     pub fn finish(&self) -> f64 {
         self.1
