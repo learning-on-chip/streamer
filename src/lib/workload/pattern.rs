@@ -1,7 +1,8 @@
-use platform;
 use sqlite::Connection;
 use std::collections::HashMap;
 use std::rc::Rc;
+
+use platform::{self, ElementKind};
 
 use {Config, Result};
 
@@ -21,7 +22,7 @@ pub struct Content {
 
 #[derive(Clone, Debug)]
 pub struct Element {
-    pub kind: platform::Kind,
+    pub kind: ElementKind,
     pub dynamic_power: Vec<f64>,
     pub leakage_power: f64,
 }

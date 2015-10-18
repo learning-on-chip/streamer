@@ -6,7 +6,7 @@ mod element;
 mod profile;
 mod thermal;
 
-pub use self::element::{Capacity, Element, Kind};
+pub use self::element::{Capacity, Element, ElementKind};
 pub use self::profile::Profile;
 pub use self::thermal::Thermal;
 

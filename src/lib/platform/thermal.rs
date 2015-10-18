@@ -2,7 +2,7 @@ use std::path::Path;
 use std::str::FromStr;
 use temperature::{self, Simulator};
 
-use platform::{Element, Kind, Platform, Profile};
+use platform::{Element, ElementKind, Platform, Profile};
 use schedule::Decision;
 use system::Job;
 use {Config, Result};
@@ -78,7 +78,7 @@ fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circu
         };
         for element in die.floorplan.elements.iter() {
             let id = elements.len();
-            let kind = try!(Kind::from_str(&element.id));
+            let kind = try!(ElementKind::from_str(&element.id));
             elements.push(Element { id: id, kind: kind });
         }
     }
@@ -95,7 +95,7 @@ fn extract_temperature_config(config: &Config) -> Result<temperature::Config> {
 #[cfg(test)]
 mod tests {
     use configuration::format::TOML;
-    use platform::{Element, Kind, Thermal};
+    use platform::{Element, ElementKind, Thermal};
 
     #[test]
     fn new() {
@@ -104,11 +104,11 @@ mod tests {
                                                                .unwrap();
         let platform = Thermal::new(&config).unwrap();
         assert_eq!(platform.elements, &[
-            Element { id: 0, kind: Kind::Core },
-            Element { id: 1, kind: Kind::Core },
-            Element { id: 2, kind: Kind::Core },
-            Element { id: 3, kind: Kind::Core },
-            Element { id: 4, kind: Kind::L3 },
+            Element { id: 0, kind: ElementKind::Core },
+            Element { id: 1, kind: ElementKind::Core },
+            Element { id: 2, kind: ElementKind::Core },
+            Element { id: 3, kind: ElementKind::Core },
+            Element { id: 4, kind: ElementKind::L3 },
         ]);
     }
 }

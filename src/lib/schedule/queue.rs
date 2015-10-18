@@ -104,8 +104,8 @@ impl Interval {
 #[cfg(test)]
 mod tests {
     use platform::Capacity;
-    use schedule::queue::{Interval, Queue};
     use std::f64::INFINITY;
+    use super::{Interval, Queue};
 
     macro_rules! test(
         ($queue:ident, $from:expr, [$(($start:expr, $finish:expr)),+]) => ({

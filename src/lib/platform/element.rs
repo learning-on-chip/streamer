@@ -5,11 +5,11 @@ use {Error, Result};
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Element {
     pub id: usize,
-    pub kind: Kind,
+    pub kind: ElementKind,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Kind {
+pub enum ElementKind {
     Core,
     L3,
 }
@@ -23,7 +23,7 @@ pub enum Capacity {
 impl Element {
     #[inline(always)]
     pub fn capacity(&self) -> Capacity {
-        if self.kind == Kind::Core {
+        if self.kind == ElementKind::Core {
             Capacity::Single
         } else {
             Capacity::Infinite
@@ -31,15 +31,15 @@ impl Element {
     }
 }
 
-impl FromStr for Kind {
+impl FromStr for ElementKind {
     type Err = Error;
 
     fn from_str(id: &str) -> Result<Self> {
         let lower = id.to_lowercase();
         if lower.starts_with("core") {
-            return Ok(Kind::Core);
+            return Ok(ElementKind::Core);
         } else if lower.starts_with("l3") {
-            return Ok(Kind::L3);
+            return Ok(ElementKind::L3);
         }
         raise!("found an unknown id {:?}", id);
     }

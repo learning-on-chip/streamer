@@ -2,8 +2,7 @@ use std::cmp::Ord;
 
 use math;
 use platform::Element;
-use schedule::queue::Queue;
-use schedule::{Decision, Schedule};
+use schedule::{Decision, Schedule, Queue};
 use system::Job;
 use {Config, Result};
 

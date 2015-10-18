@@ -5,6 +5,7 @@ mod compact;
 mod queue;
 
 pub use self::compact::Compact;
+pub use self::queue::{Interval, Queue};
 
 pub trait Schedule {
     fn push(&mut self, &Job) -> Result<Decision>;

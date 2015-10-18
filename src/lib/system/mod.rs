@@ -8,7 +8,7 @@ use workload::{Pattern, Workload};
 
 mod event;
 
-pub use self::event::{Event, Kind};
+pub use self::event::{Event, EventKind};
 
 pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
     platform: P,
@@ -109,9 +109,9 @@ impl Job {
 impl Statistics {
     fn account(&mut self, event: &Event) {
         match event.kind {
-            Kind::Arrival => self.arrived += 1,
-            Kind::Start => self.started += 1,
-            Kind::Finish => self.finished += 1,
+            EventKind::Arrival => self.arrived += 1,
+            EventKind::Start => self.started += 1,
+            EventKind::Finish => self.finished += 1,
         }
     }
 }
