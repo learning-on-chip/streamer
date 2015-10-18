@@ -98,12 +98,12 @@ fn construct_system(config: &Config) -> Result<System> {
         ($name:expr) => (config.branch($name).unwrap_or_else(|| Config::new()));
     );
 
-    let platform = try!(platform::Thermal::new(&branch!("platform")));
-    let schedule = try!(schedule::Impartial::new(&branch!("schedule"), platform.elements()));
     let traffic = try!(traffic::Fractal::new(&branch!("traffic"), &source));
     let workload = try!(workload::Random::new(&branch!("workload"), &source));
+    let platform = try!(platform::Thermal::new(&branch!("platform")));
+    let schedule = try!(schedule::Impartial::new(&branch!("schedule"), platform.elements()));
 
-    System::new(platform, schedule, traffic, workload)
+    System::new(traffic, workload, platform, schedule)
 }
 
 fn help() -> ! {

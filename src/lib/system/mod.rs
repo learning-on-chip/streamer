@@ -17,23 +17,23 @@ pub use self::history::History;
 pub use self::job::Job;
 
 /// A complete system.
-pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
-    platform: P,
-    schedule: S,
+pub struct System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, S: Schedule {
     traffic: T,
     workload: W,
+    platform: P,
+    schedule: S,
     history: History,
     queue: BinaryHeap<Event>,
 }
 
-impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
+impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, S: Schedule {
     /// Create a system.
-    pub fn new(platform: P, schedule: S, traffic: T, workload: W) -> Result<System<P, S, T, W>> {
+    pub fn new(traffic: T, workload: W, platform: P, schedule: S) -> Result<System<T, W, P, S>> {
         Ok(System {
-            platform: platform,
-            schedule: schedule,
             traffic: traffic,
             workload: workload,
+            platform: platform,
+            schedule: schedule,
             history: History::default(),
             queue: BinaryHeap::new(),
         })
@@ -78,8 +78,8 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
     }
 }
 
-impl<P, S, T, W> Iterator for System<P, S, T, W>
-    where P: Platform, S: Schedule, T: Traffic, W: Workload
+impl<T, W, P, S> Iterator for System<T, W, P, S>
+    where T: Traffic, W: Workload, P: Platform, S: Schedule
 {
     type Item = (Event, P::Data);
 
