@@ -3,10 +3,10 @@
 use Result;
 use system::Job;
 
-mod compact;
+mod impartial;
 mod queue;
 
-pub use self::compact::Compact;
+pub use self::impartial::Impartial;
 pub use self::queue::{Interval, Queue};
 
 /// A schedule.

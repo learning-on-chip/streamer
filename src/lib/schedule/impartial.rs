@@ -7,22 +7,22 @@ use system::Job;
 use {Config, Result};
 
 /// A first-in-first-served scheduling policy.
-pub struct Compact {
+pub struct Impartial {
     elements: Vec<Element>,
     queues: Vec<Queue>,
 }
 
-impl Compact {
+impl Impartial {
     /// Create a scheduling policy.
-    pub fn new(_: &Config, elements: &[Element]) -> Result<Compact> {
-        Ok(Compact {
+    pub fn new(_: &Config, elements: &[Element]) -> Result<Impartial> {
+        Ok(Impartial {
             elements: elements.to_vec(),
             queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
         })
     }
 }
 
-impl Schedule for Compact {
+impl Schedule for Impartial {
     fn push(&mut self, job: &Job) -> Result<Decision> {
         let pattern = &job.pattern;
 

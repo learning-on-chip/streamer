@@ -19,7 +19,7 @@ use streamer::{platform, schedule, system, traffic, workload};
 pub use streamer::{Config, Error, Result};
 
 pub type System = system::System<platform::Thermal,
-                                 schedule::Compact,
+                                 schedule::Impartial,
                                  traffic::Fractal,
                                  workload::Random>;
 
@@ -99,7 +99,7 @@ fn construct_system(config: &Config) -> Result<System> {
     );
 
     let platform = try!(platform::Thermal::new(&branch!("platform")));
-    let schedule = try!(schedule::Compact::new(&branch!("schedule"), platform.elements()));
+    let schedule = try!(schedule::Impartial::new(&branch!("schedule"), platform.elements()));
     let traffic = try!(traffic::Fractal::new(&branch!("traffic"), &source));
     let workload = try!(workload::Random::new(&branch!("workload"), &source));
 
