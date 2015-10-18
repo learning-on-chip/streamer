@@ -15,18 +15,18 @@ pub enum ElementKind {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Capacity {
+pub enum ElementCapacity {
     Single,
     Infinite,
 }
 
 impl Element {
     #[inline(always)]
-    pub fn capacity(&self) -> Capacity {
+    pub fn capacity(&self) -> ElementCapacity {
         if self.kind == ElementKind::Core {
-            Capacity::Single
+            ElementCapacity::Single
         } else {
-            Capacity::Infinite
+            ElementCapacity::Infinite
         }
     }
 }
@@ -41,6 +41,6 @@ impl FromStr for ElementKind {
         } else if lower.starts_with("l3") {
             return Ok(ElementKind::L3);
         }
-        raise!("found an unknown id {:?}", id);
+        raise!("found an unknown element id ({:?})", id);
     }
 }

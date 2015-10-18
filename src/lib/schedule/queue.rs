@@ -2,10 +2,10 @@ use std::collections::btree_set::{BTreeSet, Iter};
 use std::f64::INFINITY;
 
 use math;
-use platform::Capacity;
+use platform::ElementCapacity;
 
 pub struct Queue {
-    capacity: Capacity,
+    capacity: ElementCapacity,
     occupied: BTreeSet<Interval>,
 }
 
@@ -21,12 +21,12 @@ struct Holes<'l> {
 
 impl Queue {
     #[inline]
-    pub fn new(capacity: Capacity) -> Queue {
+    pub fn new(capacity: ElementCapacity) -> Queue {
         Queue { capacity: capacity, occupied: BTreeSet::new() }
     }
 
     pub fn next(&self, from: f64, length: f64) -> Interval {
-        if let Capacity::Infinite = self.capacity {
+        if let ElementCapacity::Infinite = self.capacity {
              return Interval(from, INFINITY);
         }
         match self.holes(from).find(|&Interval(start, finish)| start + length <= finish) {
@@ -103,7 +103,7 @@ impl Interval {
 
 #[cfg(test)]
 mod tests {
-    use platform::Capacity;
+    use platform::ElementCapacity;
     use std::f64::INFINITY;
     use super::{Interval, Queue};
 
@@ -116,7 +116,7 @@ mod tests {
 
     #[test]
     fn push() {
-        let mut queue = Queue::new(Capacity::Single);
+        let mut queue = Queue::new(ElementCapacity::Single);
 
         test!(queue, 0.0, [(0.0, INFINITY)]);
         test!(queue, 10.0, [(10.0, INFINITY)]);
@@ -135,7 +135,7 @@ mod tests {
 
     #[test]
     fn push_duplicate() {
-        let mut queue = Queue::new(Capacity::Single);
+        let mut queue = Queue::new(ElementCapacity::Single);
 
         queue.push((1.0, 2.0));
         queue.push((1.0, 4.0));
@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn tick() {
-        let mut queue = Queue::new(Capacity::Single);
+        let mut queue = Queue::new(ElementCapacity::Single);
 
         queue.push((10.0, 15.0));
         queue.push((15.0, 20.0));
