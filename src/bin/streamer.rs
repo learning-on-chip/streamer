@@ -64,11 +64,9 @@ fn main() {
 
 fn start() -> Result<()> {
     let arguments = ok!(arguments::parse(std::env::args()));
-
     if arguments.get::<bool>("help").unwrap_or(false) {
         help();
     }
-
     if arguments.get::<bool>("verbose").unwrap_or(false) {
         logger::setup(LogLevel::Info);
     } else {
@@ -83,8 +81,8 @@ fn start() -> Result<()> {
 
     let length = arguments.get::<f64>("length").unwrap_or(10.0);
     info!(target: "Streamer", "Simulating {} seconds...", length);
-
     let start = time::now();
+
     while let Some((event, (power, temperature))) = system.next() {
         let last = event.time > length;
         info!(target: "Streamer", "{} | {:2} queued", event,
@@ -94,8 +92,8 @@ fn start() -> Result<()> {
             break;
         }
     }
-    let elapsed = time::now() - start;
 
+    let elapsed = time::now() - start;
     info!(target: "Streamer", "Well done in {:.2} seconds.",
           elapsed.num_milliseconds() as f64 / 1000.0);
 
