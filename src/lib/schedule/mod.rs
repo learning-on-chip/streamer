@@ -10,6 +10,7 @@ pub trait Schedule {
     fn tick(&mut self, f64);
 }
 
+#[derive(Clone, Debug)]
 pub struct Decision {
     pub start: f64,
     pub finish: f64,

@@ -16,7 +16,12 @@ use streamer::{platform, schedule, traffic, workload};
 
 pub use streamer::{Config, Error, Result};
 
-pub type System = streamer::System<schedule::Compact, traffic::Fractal, workload::Random>;
+pub type System = streamer::System<platform::Thermal,
+                                   schedule::Compact,
+                                   traffic::Fractal,
+                                   workload::Random>;
+
+pub type Increment = (streamer::Event, (platform::Profile, platform::Profile));
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -80,11 +85,11 @@ fn start() -> Result<()> {
     info!(target: "Streamer", "Simulating {} seconds...", length);
 
     let start = time::now();
-    while let Some((event, power, temperature)) = system.next() {
+    while let Some((event, (power, temperature))) = system.next() {
         let last = event.time > length;
         info!(target: "Streamer", "{} | {:2} queued", event,
               system.statistics().arrived - system.statistics().started);
-        try!(output.next((event, power, temperature)));
+        try!(output.next((event, (power, temperature))));
         if last {
             break;
         }
@@ -98,6 +103,8 @@ fn start() -> Result<()> {
 }
 
 fn construct_system(config: &Config) -> Result<System> {
+    use streamer::platform::Platform;
+
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
         let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
@@ -109,8 +116,8 @@ fn construct_system(config: &Config) -> Result<System> {
         ($name:expr) => (config.branch($name).unwrap_or_else(|| Config::new()));
     );
 
-    let platform = try!(platform::Platform::new(&branch!("platform")));
-    let schedule = try!(schedule::Compact::new(&branch!("schedule"), &platform));
+    let platform = try!(platform::Thermal::new(&branch!("platform")));
+    let schedule = try!(schedule::Compact::new(&branch!("schedule"), platform.elements()));
     let traffic = try!(traffic::Fractal::new(&branch!("traffic"), &source));
     let workload = try!(workload::Random::new(&branch!("workload"), &source));
 

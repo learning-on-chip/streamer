@@ -1,5 +1,5 @@
 use output::Output;
-use streamer::{Increment, Result};
+use {Increment, Result};
 
 pub struct Null;
 

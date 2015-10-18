@@ -25,8 +25,9 @@ pub mod schedule;
 pub mod traffic;
 pub mod workload;
 
+pub use event::Event;
 pub use result::{Error, Result};
-pub use system::{Increment, Job, System};
+pub use system::{Job, System};
 
 pub type Config = configuration::Tree;
 pub type Source = random::Default;

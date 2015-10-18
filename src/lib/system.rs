@@ -2,13 +2,13 @@ use std::collections::BinaryHeap;
 
 use Result;
 use event::Event;
-use platform::{Platform, Profile};
+use platform::Platform;
 use schedule::Schedule;
 use traffic::Traffic;
 use workload::{Pattern, Workload};
 
-pub struct System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
-    platform: Platform,
+pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
+    platform: P,
     schedule: S,
     traffic: T,
     workload: W,
@@ -31,12 +31,8 @@ pub struct Statistics {
     pub finished: usize,
 }
 
-pub type Increment = (Event, Profile, Profile);
-
-impl<S, T, W> System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
-    pub fn new(platform: Platform, schedule: S, traffic: T, workload: W)
-               -> Result<System<S, T, W>> {
-
+impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
+    pub fn new(platform: P, schedule: S, traffic: T, workload: W) -> Result<System<P, S, T, W>> {
         Ok(System {
             platform: platform,
             schedule: schedule,
@@ -75,29 +71,28 @@ impl<S, T, W> System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
     }
 
     getters! {
-        ref platform: Platform,
+        ref platform: P,
         ref statistics: Statistics,
     }
 }
 
-impl<S, T, W> Iterator for System<S, T, W> where S: Schedule, T: Traffic, W: Workload {
-    type Item = Increment;
+impl<P, S, T, W> Iterator for System<P, S, T, W>
+    where P: Platform, S: Schedule, T: Traffic, W: Workload
+{
+    type Item = (Event, P::Output);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Err(error) = self.tick() {
+        if let Err(error ) = self.tick() {
             error!(target: "System", "Failed to update the state ({}).", error);
+            return None;
         }
         let event = match self.queue.pop() {
             Some(event) => event,
             _ => return None,
         };
         self.schedule.tick(event.time);
-        let (power, temperature) = match self.platform.next(event.time) {
-            Some((power, temperature)) => (power, temperature),
-            _ => return None,
-        };
         self.statistics.account(&event);
-        Some((event, power, temperature))
+        self.platform.next(event.time).map(|output| (event, output))
     }
 }
 

@@ -3,9 +3,8 @@ use std::mem;
 use std::path::Path;
 
 use output::Output;
-use streamer::Increment;
-use streamer::platform::Profile;
-use {Result, System};
+use streamer::platform::{Platform, Profile};
+use {Increment, Result, System};
 
 pub struct Database {
     #[allow(dead_code)]
@@ -43,7 +42,7 @@ impl Database {
 }
 
 impl Output for Database {
-    fn next(&mut self, (_, power, temperature): Increment) -> Result<()> {
+    fn next(&mut self, (_, (power, temperature)): Increment) -> Result<()> {
         let Profile { units, steps, time, time_step, data: power } = power;
         let Profile { data: temperature, .. } = temperature;
         let statement = &mut self.statement;
