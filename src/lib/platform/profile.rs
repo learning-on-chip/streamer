@@ -36,18 +36,18 @@ impl Profile {
 
     /// Add data to a particular processing element starting from a particular
     /// time moment.
-    pub fn push(&mut self, unit: usize, time: f64, time_step: f64, dynamic: &[f64], statik: f64) {
+    pub fn push(&mut self, unit: usize, time: f64, time_step: f64, data: &[f64], fill: f64) {
         debug_assert!(unit < self.units);
         debug_assert!(time >= self.time);
 
         let (t1, t2) = (self.time, time);
         let (d1, d2) = (self.time_step, time_step);
 
-        let s2 = dynamic.len();
+        let s2 = data.len();
         let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
 
         if s1 > self.steps {
-            self.data.extend(vec![statik; (s1 - self.steps) * self.units]);
+            self.data.extend(vec![fill; (s1 - self.steps) * self.units]);
             self.steps = s1;
         }
 
@@ -55,7 +55,7 @@ impl Profile {
         let mut j2 = 0;
 
         macro_rules! add(
-            ($weight:expr) => (self.data[j1 * self.units + unit] += $weight * dynamic[j2]);
+            ($weight:expr) => (self.data[j1 * self.units + unit] += $weight * data[j2]);
         );
 
         while j1 < s1 && j2 < s2 {
