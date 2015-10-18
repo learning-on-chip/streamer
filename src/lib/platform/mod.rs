@@ -1,5 +1,6 @@
+use Result;
 use schedule::Decision;
-use {Job, Result};
+use system::Job;
 
 mod element;
 mod profile;

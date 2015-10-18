@@ -1,11 +1,14 @@
 use std::collections::BinaryHeap;
 
 use Result;
-use event::Event;
 use platform::Platform;
 use schedule::Schedule;
 use traffic::Traffic;
 use workload::{Pattern, Workload};
+
+mod event;
+
+pub use self::event::{Event, Kind};
 
 pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
     platform: P,
@@ -105,11 +108,10 @@ impl Job {
 
 impl Statistics {
     fn account(&mut self, event: &Event) {
-        use event::Kind::*;
         match event.kind {
-            Arrival => self.arrived += 1,
-            Start => self.started += 1,
-            Finish => self.finished += 1,
+            Kind::Arrival => self.arrived += 1,
+            Kind::Start => self.started += 1,
+            Kind::Finish => self.finished += 1,
         }
     }
 }

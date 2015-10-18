@@ -12,16 +12,16 @@ extern crate time;
 
 use configuration::format::TOML;
 use log::LogLevel;
-use streamer::{platform, schedule, traffic, workload};
+use streamer::{platform, schedule, system, traffic, workload};
 
 pub use streamer::{Config, Error, Result};
 
-pub type System = streamer::System<platform::Thermal,
-                                   schedule::Compact,
-                                   traffic::Fractal,
-                                   workload::Random>;
+pub type System = system::System<platform::Thermal,
+                                 schedule::Compact,
+                                 traffic::Fractal,
+                                 workload::Random>;
 
-pub type Increment = (streamer::Event, (platform::Profile, platform::Profile));
+pub type Increment = (system::Event, (platform::Profile, platform::Profile));
 
 const USAGE: &'static str = "
 Usage: streamer [options]

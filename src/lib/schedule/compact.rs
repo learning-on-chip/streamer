@@ -4,7 +4,8 @@ use math;
 use platform::Element;
 use schedule::queue::Queue;
 use schedule::{Decision, Schedule};
-use {Config, Job, Result};
+use system::Job;
+use {Config, Result};
 
 pub struct Compact {
     elements: Vec<Element>,

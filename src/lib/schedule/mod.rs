@@ -1,4 +1,5 @@
-use {Job, Result};
+use Result;
+use system::Job;
 
 mod compact;
 mod queue;

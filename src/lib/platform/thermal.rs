@@ -4,7 +4,8 @@ use temperature::{self, Simulator};
 
 use platform::{Element, Kind, Platform, Profile};
 use schedule::Decision;
-use {Config, Job, Result};
+use system::Job;
+use {Config, Result};
 
 pub struct Thermal {
     elements: Vec<Element>,
