@@ -37,13 +37,6 @@ Options:
     --help                   Display this message.
 ";
 
-macro_rules! some(
-    ($option:expr, $($arg:tt)*) => (match $option {
-        Some(value) => value,
-        _ => raise!($($arg)*),
-    });
-);
-
 mod logger;
 mod output;
 
