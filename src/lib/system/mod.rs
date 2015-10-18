@@ -9,9 +9,11 @@ use traffic::Traffic;
 use workload::Workload;
 
 mod event;
+mod history;
 mod job;
 
 pub use self::event::{Event, EventKind};
+pub use self::history::History;
 pub use self::job::Job;
 
 /// A complete system.
@@ -21,20 +23,7 @@ pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Wor
     traffic: T,
     workload: W,
     queue: BinaryHeap<Event>,
-    statistics: Statistics,
-}
-
-/// Statistics about a system.
-#[derive(Clone, Copy, Debug, Default)]
-pub struct Statistics {
-    /// The number of created jobs.
-    pub created: usize,
-    /// The number of arrived jobs.
-    pub arrived: usize,
-    /// The number of started jobs.
-    pub started: usize,
-    /// The number of finished jobs.
-    pub finished: usize,
+    history: History,
 }
 
 impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
@@ -46,7 +35,7 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
             traffic: traffic,
             workload: workload,
             queue: BinaryHeap::new(),
-            statistics: Statistics::default(),
+            history: History::default(),
         })
     }
 
@@ -56,10 +45,10 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
         &self.platform
     }
 
-    /// Return the statistics.
+    /// Return the history.
     #[inline(always)]
-    pub fn statistics(&self) -> &Statistics {
-        &self.statistics
+    pub fn history(&self) -> &History {
+        &self.history
     }
 
     fn tick(&mut self) -> Result<()> {
@@ -70,10 +59,10 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
         }
 
         let job = {
-            let id = self.statistics.created;
+            let id = self.history.created;
             let arrival = some!(self.traffic.next(), "failed to generate an arrival");
             let pattern = some!(self.workload.next(arrival), "failed to generate a workload");
-            self.statistics.created += 1;
+            self.history.created += 1;
             Job::new(id, arrival, pattern)
         };
 
@@ -104,17 +93,7 @@ impl<P, S, T, W> Iterator for System<P, S, T, W>
             _ => return None,
         };
         self.schedule.tick(event.time);
-        self.statistics.account(&event);
+        self.history.remember(&event);
         self.platform.next(event.time).map(|data| (event, data))
-    }
-}
-
-impl Statistics {
-    fn account(&mut self, event: &Event) {
-        match event.kind {
-            EventKind::Arrival => self.arrived += 1,
-            EventKind::Start => self.started += 1,
-            EventKind::Finish => self.finished += 1,
-        }
     }
 }
