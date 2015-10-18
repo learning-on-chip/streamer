@@ -48,13 +48,12 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
             _ => return Ok(()),
         }
 
-        let job = match (self.traffic.next(), self.workload.next()) {
-            (Some(arrival), Some(pattern)) => {
-                let id = self.statistics.created;
-                self.statistics.created += 1;
-                Job::new(id, arrival, pattern)
-            },
-            _ => raise!("failed to generate a new job"),
+        let job = {
+            let id = self.statistics.created;
+            let arrival = some!(self.traffic.next(), "failed to generate an arrival");
+            let pattern = some!(self.workload.next(arrival), "failed to generate a workload");
+            self.statistics.created += 1;
+            Job::new(id, arrival, pattern)
         };
 
         self.queue.push(Event::arrival(job.arrival, job.clone()));

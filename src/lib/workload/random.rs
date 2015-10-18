@@ -30,7 +30,7 @@ impl Random {
 }
 
 impl Workload for Random {
-    fn next(&mut self) -> Option<Pattern> {
+    fn next(&mut self, _: f64) -> Option<Pattern> {
         Some(self.patterns[self.distribution.sample(&mut self.source)].clone())
     }
 }
