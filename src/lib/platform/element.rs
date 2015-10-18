@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use {Error, Result};
 
-/// A processing element.
+/// A processing element of a platform.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Element {
     /// The identifier.

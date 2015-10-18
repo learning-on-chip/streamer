@@ -3,6 +3,7 @@ use probability::distribution::{Categorical, Sample};
 use workload::{Pattern, Workload};
 use {Config, Result, Source};
 
+/// A workload model choosing workload patterns randomly.
 pub struct Random {
     patterns: Vec<Pattern>,
     source: Source,
@@ -10,6 +11,7 @@ pub struct Random {
 }
 
 impl Random {
+    /// Create a model.
     pub fn new(config: &Config, source: &Source) -> Result<Random> {
         let mut patterns = vec![];
         if let Some(ref configs) = config.forest("patterns") {

@@ -1,4 +1,4 @@
-//! Network traffic.
+//! Traffic modeling.
 
 use std::path::Path;
 

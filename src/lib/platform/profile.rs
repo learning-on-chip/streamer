@@ -11,7 +11,7 @@ pub struct Profile {
     pub steps: usize,
     /// The beginning of the time interval.
     pub time: f64,
-    /// The time step (also known as the sampling interval).
+    /// The time step (sampling interval).
     pub time_step: f64,
     /// The actual data.
     pub data: Vec<f64>,

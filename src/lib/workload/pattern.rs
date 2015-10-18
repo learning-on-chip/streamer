@@ -6,28 +6,40 @@ use platform::{self, ElementKind};
 
 use {Config, Result};
 
+/// A workload pattern.
 #[derive(Clone, Debug)]
 pub struct Pattern(Rc<Content>);
 
 deref! { Pattern::0 => Content }
 
+/// The content of a workload pattern.
 #[derive(Clone, Debug)]
 pub struct Content {
+    /// The name.
     pub name: String,
+    /// The number of processing elements.
     pub units: usize,
+    /// The number of time steps.
     pub steps: usize,
+    /// The time step (sampling interval).
     pub time_step: f64,
+    /// The processing elements.
     pub elements: Vec<Element>,
 }
 
+/// A processing element of a workload pattern.
 #[derive(Clone, Debug)]
 pub struct Element {
+    /// The type.
     pub kind: ElementKind,
+    /// The dynamic power.
     pub dynamic_power: Vec<f64>,
+    /// The static power.
     pub leakage_power: f64,
 }
 
 impl Pattern {
+    /// Create a workload pattern.
     pub fn new(config: &Config) -> Result<Pattern> {
         let path = path!(config, "a workload-pattern database is required");
         let backend = ok!(Connection::open(&path));
@@ -75,6 +87,7 @@ impl Pattern {
         })))
     }
 
+    /// Return the time duration.
     #[inline]
     pub fn duration(&self) -> f64 {
         self.steps as f64 * self.time_step
@@ -82,6 +95,8 @@ impl Pattern {
 }
 
 impl Element {
+    /// Check if the type matches the type of a processing element of a
+    /// platform.
     pub fn accept(&self, element: &platform::Element) -> bool {
         self.kind == element.kind
     }
