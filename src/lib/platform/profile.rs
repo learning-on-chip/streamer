@@ -1,18 +1,29 @@
 use std::mem;
 
+/// A platform profile.
+///
+/// A profile is a matrix that captures the evolution of a parameter over a time
+/// interval with respect to a number of processing elements.
 pub struct Profile {
+    /// The number of processing elements.
     pub units: usize,
+    /// The number of time steps.
     pub steps: usize,
+    /// The beginning of the time interval.
     pub time: f64,
+    /// The time step (also known as the sampling interval).
     pub time_step: f64,
+    /// The actual data.
     pub data: Vec<f64>,
 }
 
 impl Profile {
+    /// Create a profile.
     pub fn new(units: usize, time_step: f64) -> Profile {
         Profile { units: units, steps: 0, time: 0.0, time_step: time_step, data: vec![] }
     }
 
+    /// Create a copy but with the data zeroed out.
     pub fn clone_zero(&self) -> Profile {
         Profile {
             units: self.units,
@@ -23,6 +34,8 @@ impl Profile {
         }
     }
 
+    /// Add data to a particular processing element starting from a particular
+    /// time moment.
     pub fn push(&mut self, unit: usize, time: f64, time_step: f64, dynamic: &[f64], statik: f64) {
         debug_assert!(unit < self.units);
         debug_assert!(time >= self.time);
@@ -72,6 +85,7 @@ impl Profile {
         }
     }
 
+    /// Advance time and return the accumulated data.
     pub fn pull(&mut self, time: f64) -> Self {
         debug_assert!(time >= self.time);
         let steps = ((time - self.time) / self.time_step).floor() as usize;

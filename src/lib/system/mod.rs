@@ -76,7 +76,7 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
 impl<P, S, T, W> Iterator for System<P, S, T, W>
     where P: Platform, S: Schedule, T: Traffic, W: Workload
 {
-    type Item = (Event, P::Output);
+    type Item = (Event, P::Data);
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Err(error ) = self.tick() {
@@ -89,7 +89,7 @@ impl<P, S, T, W> Iterator for System<P, S, T, W>
         };
         self.schedule.tick(event.time);
         self.statistics.account(&event);
-        self.platform.next(event.time).map(|output| (event, output))
+        self.platform.next(event.time).map(|data| (event, data))
     }
 }
 

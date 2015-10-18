@@ -1,3 +1,5 @@
+//! Tool for generating on-chip data.
+
 #[cfg(test)]
 extern crate assert;
 

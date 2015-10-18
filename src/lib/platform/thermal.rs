@@ -7,6 +7,7 @@ use schedule::Decision;
 use system::Job;
 use {Config, Result};
 
+/// A platform producing power and temperature data.
 pub struct Thermal {
     elements: Vec<Element>,
     simulator: Simulator,
@@ -14,6 +15,7 @@ pub struct Thermal {
 }
 
 impl Thermal {
+    /// Create a platform.
     pub fn new(config: &Config) -> Result<Thermal> {
         let path = path!(config, "a thermal specification is required");
         info!(target: "Platform", "Constructing a thermal circuit based on {:?}...", &path);
@@ -32,11 +34,18 @@ impl Thermal {
 }
 
 impl Platform for Thermal {
-    type Output = (Profile, Profile);
+    type Data = (Profile, Profile);
 
     #[inline(always)]
     fn elements(&self) -> &[Element] {
         &self.elements
+    }
+
+    fn next(&mut self, time: f64) -> Option<Self::Data> {
+        let power = self.power.pull(time);
+        let mut temperature = power.clone_zero();
+        self.simulator.next(&power, &mut temperature);
+        Some((power, temperature))
     }
 
     fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {
@@ -48,13 +57,6 @@ impl Platform for Thermal {
                             from.leakage_power);
         }
         Ok(())
-    }
-
-    fn next(&mut self, time: f64) -> Option<Self::Output> {
-        let power = self.power.pull(time);
-        let mut temperature = power.clone_zero();
-        self.simulator.next(&power, &mut temperature);
-        Some((power, temperature))
     }
 }
 
