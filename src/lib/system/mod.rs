@@ -1,4 +1,4 @@
-//! Multiprocessor system.
+//! Complete system.
 
 use std::collections::BinaryHeap;
 
@@ -14,7 +14,7 @@ mod job;
 pub use self::event::{Event, EventKind};
 pub use self::job::Job;
 
-/// A multiprocessor system.
+/// A complete system.
 pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
     platform: P,
     schedule: S,

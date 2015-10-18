@@ -1,4 +1,4 @@
-//! Target platform.
+//! Multiprocessor platform.
 
 use Result;
 use schedule::Decision;
@@ -12,7 +12,7 @@ pub use self::element::{Element, ElementCapacity, ElementKind};
 pub use self::profile::Profile;
 pub use self::thermal::Thermal;
 
-/// A platform.
+/// A multiprocessor platform.
 pub trait Platform {
     /// The data produced by the platform.
     type Data;

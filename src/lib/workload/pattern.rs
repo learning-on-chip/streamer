@@ -39,7 +39,7 @@ pub struct Element {
 }
 
 impl Pattern {
-    /// Create a workload pattern.
+    /// Create a pattern.
     pub fn new(config: &Config) -> Result<Pattern> {
         let path = path!(config, "a workload-pattern database is required");
         let backend = ok!(Connection::open(&path));
