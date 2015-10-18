@@ -4,11 +4,13 @@ use Result;
 use platform::Platform;
 use schedule::Schedule;
 use traffic::Traffic;
-use workload::{Pattern, Workload};
+use workload::Workload;
 
 mod event;
+mod job;
 
 pub use self::event::{Event, EventKind};
+pub use self::job::Job;
 
 pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
     platform: P,
@@ -17,13 +19,6 @@ pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Wor
     workload: W,
     queue: BinaryHeap<Event>,
     statistics: Statistics,
-}
-
-#[derive(Clone, Debug)]
-pub struct Job {
-    pub id: usize,
-    pub arrival: f64,
-    pub pattern: Pattern,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -96,13 +91,6 @@ impl<P, S, T, W> Iterator for System<P, S, T, W>
         self.schedule.tick(event.time);
         self.statistics.account(&event);
         self.platform.next(event.time).map(|output| (event, output))
-    }
-}
-
-impl Job {
-    #[inline]
-    pub fn new(id: usize, arrival: f64, pattern: Pattern) -> Job {
-        Job { id: id, arrival: arrival, pattern: pattern }
     }
 }
 
