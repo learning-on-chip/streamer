@@ -32,10 +32,12 @@ pub struct Content {
 pub struct Element {
     /// The type.
     pub kind: ElementKind,
-    /// The dynamic power.
-    pub dynamic_power: Vec<f64>,
+    /// The area.
+    pub area: f64,
     /// The static power.
     pub leakage_power: f64,
+    /// The dynamic power.
+    pub dynamic_power: Vec<f64>,
 }
 
 impl Pattern {
@@ -44,15 +46,17 @@ impl Pattern {
         let path = path!(config, "a workload-pattern database is required");
         let backend = ok!(Connection::open(&path));
 
-        info!(target: "Workload", "Reading {:?}...", &path);
         let name = match config.get::<String>("name") {
             Some(name) => name.to_string(),
             _ => path.file_stem().unwrap().to_str().unwrap().to_string(),
         };
         let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
+
+        info!(target: "Workload", "Reading {:?}...", &path);
         let mut names = try!(read_names(&backend));
-        let mut dynamic_power = try!(read_dynamic_power(&backend));
-        let mut leakage_power = try!(read_leakage_power(&backend));
+        let mut areas = try!(read_static(&backend, "area"));
+        let mut leakage_power = try!(read_static(&backend, "leakage_power"));
+        let mut dynamic_power = try!(read_dynamic(&backend, "dynamic_power"));
 
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
@@ -61,10 +65,11 @@ impl Pattern {
         for id in ids {
             elements.push(Element {
                 kind: try!(names.remove(&id).unwrap().parse()),
-                dynamic_power: some!(dynamic_power.remove(&id),
-                                     "cannot find the dynamic power of a processing element"),
+                area: some!(areas.remove(&id), "cannot find the area of a processing element"),
                 leakage_power: some!(leakage_power.remove(&id),
                                      "cannot find the leakage power of a processing element"),
+                dynamic_power: some!(dynamic_power.remove(&id),
+                                     "cannot find the dynamic power of a processing element"),
             });
         }
 
@@ -118,34 +123,34 @@ fn read_names(backend: &Connection) -> Result<HashMap<i64, String>> {
     Ok(data)
 }
 
-fn read_dynamic_power(backend: &Connection) -> Result<HashMap<i64, Vec<f64>>> {
+fn read_static(backend: &Connection, name: &str) -> Result<HashMap<i64, f64>> {
     use sql::prelude::*;
 
     let mut data = HashMap::new();
-    let statement = select_from("dynamic").columns(&["time", "component_id", "dynamic_power"])
+    let statement = select_from("static").columns(&["component_id", name]);
+    let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
+    while let Some(row) = ok!(cursor.next()) {
+        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
+            data.insert(id, value);
+        } else {
+            raise!("failed to read the {} column", name);
+        }
+    }
+    Ok(data)
+}
+
+fn read_dynamic(backend: &Connection, name: &str) -> Result<HashMap<i64, Vec<f64>>> {
+    use sql::prelude::*;
+
+    let mut data = HashMap::new();
+    let statement = select_from("dynamic").columns(&["time", "component_id", name])
                                           .order_by(column("time").ascend());
     let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
     while let Some(row) = ok!(cursor.next()) {
         if let (Some(id), Some(value)) = (row[1].as_integer(), row[2].as_float()) {
             data.entry(id).or_insert_with(|| vec![]).push(value);
         } else {
-            raise!("failed to read the dynamic power");
-        }
-    }
-    Ok(data)
-}
-
-fn read_leakage_power(backend: &Connection) -> Result<HashMap<i64, f64>> {
-    use sql::prelude::*;
-
-    let mut data = HashMap::new();
-    let statement = select_from("static").columns(&["component_id", "leakage_power"]);
-    let mut cursor = ok!(backend.prepare(ok!(statement.compile()))).cursor();
-    while let Some(row) = ok!(cursor.next()) {
-        if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_float()) {
-            data.insert(id, value);
-        } else {
-            raise!("failed to read the leakage power");
+            raise!("failed to read the {} column", name);
         }
     }
     Ok(data)
@@ -168,9 +173,9 @@ mod tests {
     }
 
     #[test]
-    fn read_dynamic_power() {
+    fn read_dynamic() {
         let backend = open();
-        let data = super::read_dynamic_power(&backend).unwrap();
+        let data = super::read_dynamic(&backend, "dynamic_power").unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         for (_, data) in &data {
@@ -182,9 +187,9 @@ mod tests {
     }
 
     #[test]
-    fn read_leakage_power() {
+    fn read_static() {
         let backend = open();
-        let data = super::read_leakage_power(&backend).unwrap();
+        let data = super::read_static(&backend, "leakage_power").unwrap();
 
         assert_eq!(data.len(), 2 + 1);
         assert_eq!(data.get(&0).unwrap(), data.get(&1).unwrap());
