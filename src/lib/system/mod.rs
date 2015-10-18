@@ -51,11 +51,13 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
     }
 
     /// Return the platform.
+    #[inline(always)]
     pub fn platform(&self) -> &P {
         &self.platform
     }
 
     /// Return the statistics.
+    #[inline(always)]
     pub fn statistics(&self) -> &Statistics {
         &self.statistics
     }

@@ -19,6 +19,7 @@ pub struct Profile {
 
 impl Profile {
     /// Create a profile.
+    #[inline]
     pub fn new(units: usize, time_step: f64) -> Profile {
         Profile { units: units, steps: 0, time: 0.0, time_step: time_step, data: vec![] }
     }
