@@ -30,7 +30,7 @@ Usage: streamer [options]
 
 Options:
     --config <path>          Configuration file (required).
-    --length <time>          Time span to simulate in seconds [default: 10].
+    --length <time>          Time span to synthesize in seconds [default: 10].
     --output <path>          Output file for power and temperature profiles.
 
     --verbose                Display progress information.
@@ -64,7 +64,7 @@ fn start() -> Result<()> {
     let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
     let length = arguments.get::<f64>("length").unwrap_or(10.0);
-    info!(target: "Streamer", "Simulating {} seconds...", length);
+    info!(target: "Streamer", "Synthesizing {} seconds...", length);
     let start = time::now();
 
     while let Some((event, (power, temperature))) = system.next() {
