@@ -18,10 +18,10 @@ use streamer::{platform, schedule, system, traffic, workload};
 
 pub use streamer::{Config, Error, Result};
 
-pub type System = system::System<platform::Thermal,
-                                 schedule::Impartial,
-                                 traffic::Fractal,
-                                 workload::Random>;
+pub type System = system::System<traffic::Fractal,
+                                 workload::Random,
+                                 platform::Thermal,
+                                 schedule::Impartial>;
 
 pub type Increment = (system::Event, (platform::Profile, platform::Profile));
 
