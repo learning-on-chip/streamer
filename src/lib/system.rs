@@ -91,7 +91,7 @@ impl<S, T, W> Iterator for System<S, T, W> where S: Schedule, T: Traffic, W: Wor
             Some(event) => event,
             _ => return None,
         };
-        self.schedule.pass(event.time);
+        self.schedule.tick(event.time);
         let (power, temperature) = match self.platform.next(event.time) {
             Some((power, temperature)) => (power, temperature),
             _ => return None,
