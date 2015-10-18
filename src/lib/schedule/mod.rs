@@ -1,5 +1,10 @@
 use {Job, Result};
 
+mod compact;
+mod queue;
+
+pub use self::compact::Compact;
+
 pub trait Schedule {
     fn push(&mut self, &Job) -> Result<Decision>;
     fn pass(&mut self, f64);
@@ -10,11 +15,6 @@ pub struct Decision {
     pub finish: f64,
     pub mapping: Vec<(usize, usize)>,
 }
-
-mod compact;
-mod queue;
-
-pub use self::compact::Compact;
 
 impl Decision {
     #[inline]
