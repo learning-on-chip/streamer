@@ -22,8 +22,8 @@ pub struct System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Wor
     schedule: S,
     traffic: T,
     workload: W,
-    queue: BinaryHeap<Event>,
     history: History,
+    queue: BinaryHeap<Event>,
 }
 
 impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, W: Workload {
@@ -34,8 +34,8 @@ impl<P, S, T, W> System<P, S, T, W> where P: Platform, S: Schedule, T: Traffic, 
             schedule: schedule,
             traffic: traffic,
             workload: workload,
-            queue: BinaryHeap::new(),
             history: History::default(),
+            queue: BinaryHeap::new(),
         })
     }
 
