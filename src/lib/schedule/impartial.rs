@@ -24,14 +24,12 @@ impl Impartial {
 
 impl Schedule for Impartial {
     fn push(&mut self, job: &Job) -> Result<Decision> {
-        let pattern = &job.pattern;
-
         let hosts = &self.elements;
-        let guests = &pattern.elements;
+        let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
 
         let mut start = job.arrival;
-        let length = pattern.duration();
+        let length = job.duration();
 
         'outer: loop {
             let intervals = self.queues.iter().map(|queue| queue.next(start, length))

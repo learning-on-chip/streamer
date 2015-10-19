@@ -110,10 +110,9 @@ fn display(system: &System, event: &Event) {
         &EventKind::Started(ref job) => (job, "started"),
         &EventKind::Finished(ref job) => (job, "finished"),
     };
-    let pattern = &job.pattern;
     info!(target: "Streamer",
           "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
-          event.time, job.id, pattern.name, pattern.units, pattern.duration(), kind,
+          event.time, job.id, job.name, job.units, job.duration(), kind,
           system.history().arrived - system.history().started);
 }
 

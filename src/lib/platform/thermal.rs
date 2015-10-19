@@ -43,11 +43,10 @@ impl Platform for Thermal {
     }
 
     fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {
-        let pattern = &job.pattern;
-        let (from, onto) = (&pattern.elements, &self.elements);
+        let (from, onto) = (&job.elements, &self.elements);
         for &(i, j) in &decision.mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.builder.push(onto.id, decision.start, pattern.time_step, &from.dynamic_power);
+            self.builder.push(onto.id, decision.start, job.time_step, &from.dynamic_power);
         }
         Ok(())
     }

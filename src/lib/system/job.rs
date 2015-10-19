@@ -18,3 +18,6 @@ impl Job {
         Job { id: id, arrival: arrival, pattern: pattern }
     }
 }
+
+deref! { Job::pattern => Pattern }
+deref! { mut Job::pattern => Pattern }
