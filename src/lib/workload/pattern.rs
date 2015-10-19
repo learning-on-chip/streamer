@@ -1,5 +1,6 @@
 use sqlite::Connection;
 use std::collections::HashMap;
+use std::path::Path;
 use std::rc::Rc;
 
 use platform::{self, ElementKind};
@@ -34,7 +35,7 @@ pub struct Element {
     pub kind: ElementKind,
     /// The area.
     pub area: f64,
-    /// The static power.
+    /// The leakage power.
     pub leakage_power: f64,
     /// The dynamic power.
     pub dynamic_power: Vec<f64>,
@@ -44,7 +45,6 @@ impl Pattern {
     /// Create a pattern.
     pub fn new(config: &Config) -> Result<Pattern> {
         let path = path!(config, "a workload-pattern database is required");
-        let backend = ok!(Connection::open(&path));
 
         let name = match config.get::<String>("name") {
             Some(name) => name.to_string(),
@@ -53,31 +53,12 @@ impl Pattern {
         let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
 
         info!(target: "Workload", "Reading {:?}...", &path);
-        let mut names = try!(read_names(&backend));
-        let mut areas = try!(read_static(&backend, "area"));
-        let mut leakage_power = try!(read_static(&backend, "leakage_power"));
-        let mut dynamic_power = try!(read_dynamic(&backend, "dynamic_power"));
-
-        let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
-        ids.sort();
-
-        let mut elements = vec![];
-        for id in ids {
-            elements.push(Element {
-                kind: try!(names.remove(&id).unwrap().parse()),
-                area: some!(areas.remove(&id), "cannot find the area of a processing element"),
-                leakage_power: some!(leakage_power.remove(&id),
-                                     "cannot find the leakage power of a processing element"),
-                dynamic_power: some!(dynamic_power.remove(&id),
-                                     "cannot find the dynamic power of a processing element"),
-            });
-        }
+        let elements = try!(read(&path));
 
         let units = elements.len();
         if units == 0 {
             raise!("found a workload pattern without processing elements");
         }
-
         let steps = elements[0].dynamic_power.len();
         if steps == 0 {
             raise!("found a workload pattern without dynamic-power data");
@@ -105,6 +86,32 @@ impl Element {
     pub fn accept(&self, element: &platform::Element) -> bool {
         self.kind == element.kind
     }
+}
+
+fn read(path: &Path) -> Result<Vec<Element>> {
+    let backend = ok!(Connection::open(path));
+
+    let mut names = try!(read_names(&backend));
+    let mut areas = try!(read_static(&backend, "area"));
+    let mut leakage_power = try!(read_static(&backend, "leakage_power"));
+    let mut dynamic_power = try!(read_dynamic(&backend, "dynamic_power"));
+
+    let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
+    ids.sort();
+
+    let mut elements = vec![];
+    for id in ids {
+        elements.push(Element {
+            kind: try!(names.remove(&id).unwrap().parse()),
+            area: some!(areas.remove(&id), "cannot find the area of a processing element"),
+            leakage_power: some!(leakage_power.remove(&id),
+                                 "cannot find the leakage power of a processing element"),
+            dynamic_power: some!(dynamic_power.remove(&id),
+                                 "cannot find the dynamic power of a processing element"),
+        });
+    }
+
+    Ok(elements)
 }
 
 fn read_names(backend: &Connection) -> Result<HashMap<i64, String>> {
