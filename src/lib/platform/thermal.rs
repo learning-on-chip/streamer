@@ -2,15 +2,14 @@ use std::path::Path;
 use std::str::FromStr;
 use temperature::{self, Simulator};
 
-use platform::{self, ElementKind, Platform, Profile, ProfileBuilder};
+use platform::{Element, ElementKind, Platform, Profile, ProfileBuilder};
 use schedule::Decision;
 use system::Job;
-use workload;
 use {Config, Result};
 
 /// A platform producing power and temperature data.
 pub struct Thermal {
-    elements: Vec<platform::Element>,
+    elements: Vec<Element>,
     simulator: Simulator,
     builder: ProfileBuilder,
 }
@@ -32,7 +31,7 @@ impl Platform for Thermal {
     type Data = (Profile, Profile);
 
     #[inline(always)]
-    fn elements(&self) -> &[platform::Element] {
+    fn elements(&self) -> &[Element] {
         &self.elements
     }
 
@@ -54,7 +53,9 @@ impl Platform for Thermal {
     }
 }
 
-fn construct_power(elements: &[platform::Element], config: &Config) -> Result<ProfileBuilder> {
+fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuilder> {
+    use workload;
+
     let units = elements.len();
     let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
 
@@ -74,7 +75,7 @@ fn construct_power(elements: &[platform::Element], config: &Config) -> Result<Pr
     Ok(ProfileBuilder::new(units, time_step, leakage_power))
 }
 
-fn construct_temperature(config: &Config) -> Result<(Vec<platform::Element>, Simulator)> {
+fn construct_temperature(config: &Config) -> Result<(Vec<Element>, Simulator)> {
     let path = path!(config, "a thermal specification is required");
     info!(target: "Platform", "Modeling temperature based on {:?}...", &path);
     let (elements, circuit) = match path.extension() {
@@ -94,7 +95,7 @@ fn construct_temperature(config: &Config) -> Result<(Vec<platform::Element>, Sim
     Ok((elements, simulator))
 }
 
-fn construct_threed_ice(path: &Path) -> Result<(Vec<platform::Element>, temperature::Circuit)> {
+fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circuit)> {
     use temperature::circuit::ThreeDICE;
     use threed_ice::{StackElement, System};
 
@@ -108,7 +109,7 @@ fn construct_threed_ice(path: &Path) -> Result<(Vec<platform::Element>, temperat
         for element in die.floorplan.elements.iter() {
             let id = elements.len();
             let kind = try!(ElementKind::from_str(&element.id));
-            elements.push(platform::Element { id: id, kind: kind });
+            elements.push(Element { id: id, kind: kind });
         }
     }
     Ok((elements, ok!(ThreeDICE::from(&system))))
