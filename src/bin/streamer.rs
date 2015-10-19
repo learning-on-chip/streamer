@@ -68,9 +68,8 @@ fn start() -> Result<()> {
     let start = time::now();
 
     while let Some((event, (power, temperature))) = system.next() {
+        display(&system, &event);
         let last = event.time > length;
-        info!(target: "Streamer", "{} | {:2} queued", event,
-              system.history().arrived - system.history().started);
         try!(output.next((event, (power, temperature))));
         if last {
             break;
@@ -102,6 +101,22 @@ fn construct_system(config: &Config) -> Result<System> {
     let schedule = try!(schedule::Impartial::new(branch!("schedule"), platform.elements()));
 
     System::new(traffic, workload, platform, schedule)
+}
+
+fn display(system: &System, event: &system::Event) {
+    use streamer::system::EventKind;
+
+    let (job, kind) = match &event.kind {
+        &EventKind::Arrived(ref job) => (job, "arrived"),
+        &EventKind::Started(ref job) => (job, "started"),
+        &EventKind::Finished(ref job) => (job, "finished"),
+    };
+    let pattern = &job.pattern;
+    info!(target: "Streamer",
+          "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
+          event.time, job.id, pattern.name, pattern.units,
+          (pattern.steps as f64) * pattern.time_step, kind,
+          system.history().arrived - system.history().started);
 }
 
 fn help() -> ! {

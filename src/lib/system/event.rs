@@ -1,5 +1,3 @@
-use std::fmt;
-
 use system::Job;
 
 /// An event.
@@ -41,19 +39,5 @@ impl Event {
     #[inline]
     pub fn finished(time: f64, job: Job) -> Event {
         Event { time: time, kind: EventKind::Finished(job) }
-    }
-}
-
-impl fmt::Display for Event {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let (job, kind) = match &self.kind {
-            &EventKind::Arrived(ref job) => (job, "arrival"),
-            &EventKind::Started(ref job) => (job, "start"),
-            &EventKind::Finished(ref job) => (job, "finish"),
-        };
-        let pattern = &job.pattern;
-        write!(formatter, "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:7}",
-               self.time, job.id, pattern.name, pattern.units,
-               (pattern.steps as f64) * pattern.time_step, kind)
     }
 }
