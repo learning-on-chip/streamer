@@ -3,7 +3,7 @@ use probability::distribution::{Categorical, Sample};
 use workload::{Pattern, Workload};
 use {Config, Result, Source};
 
-/// A workload model choosing workload patterns randomly.
+/// A workload model that chooses workload patterns randomly.
 pub struct Random {
     patterns: Vec<Pattern>,
     source: Source,
