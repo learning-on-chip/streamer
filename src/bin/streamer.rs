@@ -18,12 +18,12 @@ use streamer::{platform, schedule, system, traffic, workload};
 
 pub use streamer::{Config, Error, Result};
 
+pub type Data = (platform::Profile, platform::Profile);
+pub type Event = system::Event;
 pub type System = system::System<traffic::Fractal,
                                  workload::Random,
                                  platform::Thermal,
                                  schedule::Impartial>;
-
-pub type Increment = (system::Event, (platform::Profile, platform::Profile));
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -67,11 +67,10 @@ fn start() -> Result<()> {
     info!(target: "Streamer", "Synthesizing {} seconds...", length);
     let start = time::now();
 
-    while let Some((event, (power, temperature))) = system.next() {
+    while let Some((event, data)) = system.next() {
         display(&system, &event);
-        let last = event.time > length;
-        try!(output.next((event, (power, temperature))));
-        if last {
+        try!(output.next(&event, &data));
+        if event.time > length {
             break;
         }
     }
@@ -103,7 +102,7 @@ fn construct_system(config: &Config) -> Result<System> {
     System::new(traffic, workload, platform, schedule)
 }
 
-fn display(system: &System, event: &system::Event) {
+fn display(system: &System, event: &Event) {
     use streamer::system::EventKind;
 
     let (job, kind) = match &event.kind {

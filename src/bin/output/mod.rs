@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use {Increment, Result, System};
+use {Data, Event, Result, System};
 
 mod database;
 mod null;
@@ -9,7 +9,7 @@ use self::database::Database;
 use self::null::Null;
 
 pub trait Output {
-    fn next(&mut self, Increment) -> Result<()>;
+    fn next(&mut self, &Event, &Data) -> Result<()>;
 }
 
 pub fn new<T: AsRef<Path>>(system: &System, output: Option<T>) -> Result<Box<Output>> {

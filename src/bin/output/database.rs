@@ -4,7 +4,7 @@ use std::path::Path;
 
 use output::Output;
 use streamer::platform::{Platform, Profile};
-use {Increment, Result, System};
+use {Data, Event, Result, System};
 
 pub struct Database {
     #[allow(dead_code)]
@@ -42,9 +42,9 @@ impl Database {
 }
 
 impl Output for Database {
-    fn next(&mut self, (_, (power, temperature)): Increment) -> Result<()> {
-        let Profile { units, steps, time, time_step, data: power } = power;
-        let Profile { data: temperature, .. } = temperature;
+    fn next(&mut self, _: &Event, &(ref power, ref temperature): &Data) -> Result<()> {
+        let &Profile { units, steps, time, time_step, data: ref power } = power;
+        let &Profile { data: ref temperature, .. } = temperature;
         let statement = &mut self.statement;
         for i in 0..steps {
             let time = time + (i as f64) * time_step;
