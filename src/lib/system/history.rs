@@ -16,10 +16,10 @@ pub struct History {
 impl History {
     /// Take into account an event.
     pub fn remember(&mut self, event: &Event) {
-        match event.kind {
-            EventKind::Arrival => self.arrived += 1,
-            EventKind::Start => self.started += 1,
-            EventKind::Finish => self.finished += 1,
+        match &event.kind {
+            &EventKind::Arrived(..) => self.arrived += 1,
+            &EventKind::Started(..) => self.started += 1,
+            &EventKind::Finished(..) => self.finished += 1,
         }
     }
 }

@@ -9,58 +9,51 @@ pub struct Event {
     pub time: f64,
     /// The type.
     pub kind: EventKind,
-    /// The job.
-    pub job: Job,
 }
 
 order!(Event(time) descending);
 
 /// The type of an event.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub enum EventKind {
     /// A job arrived.
-    Arrival,
+    Arrived(Job),
     /// A job started.
-    Start,
+    Started(Job),
     /// A job finished.
-    Finish,
+    Finished(Job),
 }
 
 impl Event {
-    /// Create an arrival event.
+    /// Create a job-arrived event.
     #[inline]
-    pub fn arrival(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Arrival, job: job }
+    pub fn arrived(time: f64, job: Job) -> Event {
+        Event { time: time, kind: EventKind::Arrived(job) }
     }
 
-    /// Create a start event.
+    /// Create a job-started event.
     #[inline]
-    pub fn start(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Start, job: job }
+    pub fn started(time: f64, job: Job) -> Event {
+        Event { time: time, kind: EventKind::Started(job) }
     }
 
-    /// Create a finish event.
+    /// Create a job-finished event.
     #[inline]
-    pub fn finish(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Finish, job: job }
+    pub fn finished(time: f64, job: Job) -> Event {
+        Event { time: time, kind: EventKind::Finished(job) }
     }
 }
 
 impl fmt::Display for Event {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        let pattern = &self.job.pattern;
+        let (job, kind) = match &self.kind {
+            &EventKind::Arrived(ref job) => (job, "arrival"),
+            &EventKind::Started(ref job) => (job, "start"),
+            &EventKind::Finished(ref job) => (job, "finish"),
+        };
+        let pattern = &job.pattern;
         write!(formatter, "{:7.2} s | job #{:3} ( {:20} | {:2} units | {:6.2} s ) {:7}",
-               self.time, self.job.id, pattern.name, pattern.units,
-               (pattern.steps as f64) * pattern.time_step, self.kind)
-    }
-}
-
-impl fmt::Display for EventKind {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            EventKind::Arrival => "arrival".fmt(formatter),
-            EventKind::Start => "start".fmt(formatter),
-            EventKind::Finish => "finish".fmt(formatter),
-        }
+               self.time, job.id, pattern.name, pattern.units,
+               (pattern.steps as f64) * pattern.time_step, kind)
     }
 }

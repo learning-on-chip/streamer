@@ -66,13 +66,13 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
             Job::new(id, arrival, pattern)
         };
 
-        self.queue.push(Event::arrival(job.arrival, job.clone()));
+        self.queue.push(Event::arrived(job.arrival, job.clone()));
 
         let decision = try!(self.schedule.push(&job));
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event::start(decision.start, job.clone()));
-        self.queue.push(Event::finish(decision.finish, job));
+        self.queue.push(Event::started(decision.start, job.clone()));
+        self.queue.push(Event::finished(decision.finish, job));
 
         Ok(())
     }
