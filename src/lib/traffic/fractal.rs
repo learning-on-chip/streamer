@@ -17,7 +17,7 @@ impl Fractal {
     pub fn new(config: &Config, source: &Source) -> Result<Fractal> {
         let path = path!(config, "a traffic-pattern database is required");
 
-        info!(target: "Traffic", "Reading {:?}...", &path);
+        info!(target: "Traffic", "Reading arrivals from {:?}...", &path);
         let data = try!(traffic::read_interarrivals(&path));
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),

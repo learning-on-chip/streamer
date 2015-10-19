@@ -9,7 +9,7 @@ mod profile;
 mod thermal;
 
 pub use self::element::{Element, ElementCapacity, ElementKind};
-pub use self::profile::Profile;
+pub use self::profile::{Profile, ProfileBuilder};
 pub use self::thermal::Thermal;
 
 /// A multiprocessor platform.

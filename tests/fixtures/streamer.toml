@@ -2,7 +2,10 @@ seed = 0
 time_step = 1e-3
 root = "tests/fixtures"
 
-[platform]
+[platform.power]
+path = "blackscholes.sqlite3"
+
+[platform.temperature]
 path = "004.stk"
 ambience = 318.15
 

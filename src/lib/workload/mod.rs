@@ -1,9 +1,11 @@
 //! Workload modeling.
 
+mod element;
 mod pattern;
 mod random;
 
-pub use self::pattern::{Content, Element, Pattern};
+pub use self::element::Element;
+pub use self::pattern::{Content, Pattern};
 pub use self::random::Random;
 
 /// A workload model.

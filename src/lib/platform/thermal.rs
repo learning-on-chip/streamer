@@ -2,34 +2,29 @@ use std::path::Path;
 use std::str::FromStr;
 use temperature::{self, Simulator};
 
-use platform::{Element, ElementKind, Platform, Profile};
+use platform::{self, ElementKind, Platform, Profile, ProfileBuilder};
 use schedule::Decision;
 use system::Job;
+use workload;
 use {Config, Result};
 
 /// A platform producing power and temperature data.
 pub struct Thermal {
-    elements: Vec<Element>,
+    elements: Vec<platform::Element>,
     simulator: Simulator,
-    power: Profile,
+    builder: ProfileBuilder,
 }
 
 impl Thermal {
     /// Create a platform.
     pub fn new(config: &Config) -> Result<Thermal> {
-        let path = path!(config, "a thermal specification is required");
-        info!(target: "Platform", "Constructing a thermal circuit based on {:?}...", &path);
-        let (elements, circuit) = try!(construct_cirucit(&path, config));
-        info!(target: "Platform", "Found {} processing elements and {} thermal nodes.",
-              elements.len(), circuit.capacitance.len());
+        let (elements, simulator) = try!(construct_temperature(config.branch("temperature")
+                                                                     .as_ref().unwrap_or(config)));
 
-        info!(target: "Platform", "Initializing the temperature simulator...");
-        let config = try!(extract_temperature_config(config));
-        let simulator = ok!(Simulator::new(&circuit, &config));
+        let builder = try!(construct_power(&elements, config.branch("power").as_ref()
+                                                            .unwrap_or(config)));
 
-        let power = Profile::new(elements.len(), config.time_step);
-
-        Ok(Thermal { elements: elements, simulator: simulator, power: power })
+        Ok(Thermal { elements: elements, simulator: simulator, builder: builder })
     }
 }
 
@@ -37,12 +32,12 @@ impl Platform for Thermal {
     type Data = (Profile, Profile);
 
     #[inline(always)]
-    fn elements(&self) -> &[Element] {
+    fn elements(&self) -> &[platform::Element] {
         &self.elements
     }
 
     fn next(&mut self, time: f64) -> Option<Self::Data> {
-        let power = self.power.pull(time);
+        let power = self.builder.pull(time);
         let mut temperature = power.clone_zero();
         self.simulator.next(&power, &mut temperature);
         Some((power, temperature))
@@ -53,21 +48,53 @@ impl Platform for Thermal {
         let (from, onto) = (&pattern.elements, &self.elements);
         for &(i, j) in &decision.mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.power.push(onto.id, decision.start, pattern.time_step, &from.dynamic_power,
-                            from.leakage_power);
+            self.builder.push(onto.id, decision.start, pattern.time_step, &from.dynamic_power);
         }
         Ok(())
     }
 }
 
-fn construct_cirucit(path: &Path, _: &Config) -> Result<(Vec<Element>, temperature::Circuit)> {
-    match path.extension() {
-        Some(extension) if extension == "stk" => construct_threed_ice(&path),
-        _ => raise!("the format of {:?} is unknown", &path),
+fn construct_power(elements: &[platform::Element], config: &Config) -> Result<ProfileBuilder> {
+    let units = elements.len();
+    let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
+
+    let path = path!(config, "a leakage pattern is required");
+    info!(target: "Platform", "Modeling leakage power based on {:?}...", &path);
+    let candidates = try!(workload::Element::collect(path));
+
+    let mut leakage_power = vec![0.0; units];
+    for i in 0..units {
+        if let Some(element) = candidates.iter().find(|element| element.kind == elements[i].kind) {
+            leakage_power[i] = element.leakage_power;
+        } else {
+            raise!("cannot find leakage data for a processing element");
+        }
     }
+
+    Ok(ProfileBuilder::new(units, time_step, leakage_power))
 }
 
-fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circuit)> {
+fn construct_temperature(config: &Config) -> Result<(Vec<platform::Element>, Simulator)> {
+    let path = path!(config, "a thermal specification is required");
+    info!(target: "Platform", "Modeling temperature based on {:?}...", &path);
+    let (elements, circuit) = match path.extension() {
+        Some(extension) if extension == "stk" => try!(construct_threed_ice(&path)),
+        _ => raise!("the format of {:?} is unknown", &path),
+    };
+    info!(target: "Platform", "Found {} processing elements and {} thermal nodes.",
+          elements.len(), circuit.capacitance.len());
+
+    info!(target: "Platform", "Initializing the temperature simulator...");
+    let config = temperature::Config {
+        ambience: *some!(config.get::<f64>("ambience"), "an ambient temperature is required"),
+        time_step: *some!(config.get::<f64>("time_step"), "a time step is required"),
+    };
+    let simulator = ok!(Simulator::new(circuit, config));
+
+    Ok((elements, simulator))
+}
+
+fn construct_threed_ice(path: &Path) -> Result<(Vec<platform::Element>, temperature::Circuit)> {
     use temperature::circuit::ThreeDICE;
     use threed_ice::{StackElement, System};
 
@@ -81,17 +108,10 @@ fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circu
         for element in die.floorplan.elements.iter() {
             let id = elements.len();
             let kind = try!(ElementKind::from_str(&element.id));
-            elements.push(Element { id: id, kind: kind });
+            elements.push(platform::Element { id: id, kind: kind });
         }
     }
     Ok((elements, ok!(ThreeDICE::from(&system))))
-}
-
-fn extract_temperature_config(config: &Config) -> Result<temperature::Config> {
-    Ok(temperature::Config {
-        ambience: *some!(config.get::<f64>("ambience"), "an ambient temperature is required"),
-        time_step: *some!(config.get::<f64>("time_step"), "a time step is required"),
-    })
 }
 
 #[cfg(test)]

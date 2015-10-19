@@ -94,14 +94,12 @@ fn construct_system(config: &Config) -> Result<System> {
         random::default().seed(seed)
     };
 
-    macro_rules! branch(
-        ($name:expr) => (config.branch($name).unwrap_or_else(|| Config::new()));
-    );
+    macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
 
-    let traffic = try!(traffic::Fractal::new(&branch!("traffic"), &source));
-    let workload = try!(workload::Random::new(&branch!("workload"), &source));
-    let platform = try!(platform::Thermal::new(&branch!("platform")));
-    let schedule = try!(schedule::Impartial::new(&branch!("schedule"), platform.elements()));
+    let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
+    let workload = try!(workload::Random::new(branch!("workload"), &source));
+    let platform = try!(platform::Thermal::new(branch!("platform")));
+    let schedule = try!(schedule::Impartial::new(branch!("schedule"), platform.elements()));
 
     System::new(traffic, workload, platform, schedule)
 }
