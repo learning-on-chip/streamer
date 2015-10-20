@@ -20,10 +20,11 @@ pub use streamer::{Config, Error, Result};
 
 pub type Data = (platform::Profile, platform::Profile);
 pub type Event = system::Event;
+
 pub type System = system::System<traffic::Fractal,
                                  workload::Random,
                                  platform::Thermal,
-                                 schedule::Impartial>;
+                                 schedule::Impartial<Data>>;
 
 const USAGE: &'static str = "
 Usage: streamer [options]

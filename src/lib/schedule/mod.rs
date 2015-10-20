@@ -9,13 +9,16 @@ mod queue;
 pub use self::impartial::Impartial;
 pub use self::queue::{Interval, Queue};
 
-/// A schedule.
+/// A scheduling policy.
 pub trait Schedule {
+    /// The data consumed by the policy.
+    type Data;
+
     /// Take a decision with respect to a job.
     fn push(&mut self, &Job) -> Result<Decision>;
 
-    /// Advance time.
-    fn tick(&mut self, f64) -> Result<()>;
+    /// Advance time and consume the accumulated data.
+    fn step(&mut self, f64, &Self::Data) -> Result<()>;
 }
 
 /// A scheduling decision.

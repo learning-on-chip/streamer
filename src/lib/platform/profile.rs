@@ -40,6 +40,15 @@ impl Profile {
             data: vec![0.0; self.units * self.steps],
         }
     }
+
+    fn extend(&mut self, steps: usize, fill: &[f64]) {
+        debug_assert_eq!(fill.len(), self.units);
+        self.data.reserve(steps * self.units);
+        for _ in 0..steps {
+            self.data.extend(fill);
+        }
+        self.steps += steps;
+    }
 }
 
 impl ProfileBuilder {
@@ -63,13 +72,9 @@ impl ProfileBuilder {
 
         let s2 = data.len();
         let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
-
         if s1 > profile.steps {
-            profile.data.reserve((s1 - profile.steps) * profile.units);
-            for _ in 0..(s1 - profile.steps) {
-                profile.data.extend(fill);
-            }
-            profile.steps = s1;
+            let more = s1 - profile.steps;
+            profile.extend(more, fill);
         }
 
         let mut j1 = ((t2 - t1) / d1) as usize;
@@ -108,11 +113,14 @@ impl ProfileBuilder {
 
     /// Advance time and return the accumulated data.
     pub fn pull(&mut self, time: f64) -> Profile {
-        let &mut ProfileBuilder { ref mut profile, .. } = self;
+        let &mut ProfileBuilder { ref mut profile, ref fill } = self;
 
         debug_assert!(time >= profile.time);
         let steps = ((time - profile.time) / profile.time_step).floor() as usize;
-        debug_assert!(profile.steps >= steps);
+        if profile.steps < steps {
+            let more = steps - profile.steps;
+            profile.extend(more, fill);
+        }
 
         let mut another = Profile {
             units: profile.units,

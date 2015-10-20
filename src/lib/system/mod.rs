@@ -17,7 +17,7 @@ pub use self::history::History;
 pub use self::job::Job;
 
 /// A complete system.
-pub struct System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, S: Schedule {
+pub struct System<T, W, P, S> {
     traffic: T,
     workload: W,
     platform: P,
@@ -26,7 +26,9 @@ pub struct System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, S: Sch
     queue: BinaryHeap<Event>,
 }
 
-impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, S: Schedule {
+impl<T, W, P, S, D> System<T, W, P, S>
+    where T: Traffic, W: Workload, P: Platform<Data=D>, S: Schedule<Data=D>
+{
     /// Create a system.
     pub fn new(traffic: T, workload: W, platform: P, schedule: S) -> Result<System<T, W, P, S>> {
         Ok(System {
@@ -41,14 +43,18 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
 
     /// Advance to the next event and return the accumulated data.
     pub fn next(&mut self) -> Outcome<(Event, P::Data)> {
-        try!(self.refill());
-        let event = match self.queue.pop() {
-            Some(event) => event,
-            _ => return Ok(None),
-        };
-        self.history.remember(&event);
-        try!(self.schedule.tick(event.time));
-        self.platform.next(event.time).map(|data| Some((event, data)))
+        match (try!(self.traffic.peek()), self.queue.peek().map(|event| &event.time)) {
+            (Some(&traffic), Some(&queue)) => {
+                if traffic < queue {
+                    self.next_from_traffic()
+                } else {
+                    self.next_from_queue()
+                }
+            },
+            (Some(_), None) => self.next_from_traffic(),
+            (None, Some(_)) => self.next_from_queue(),
+            _ => Ok(None),
+        }
     }
 
     /// Return the platform.
@@ -63,29 +69,33 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
         &self.history
     }
 
-    fn refill(&mut self) -> Result<()> {
-        match (try!(self.traffic.peek()), self.queue.peek()) {
-            (Some(_), None) => {}
-            (Some(&arrival), Some(&Event { time, .. })) if arrival < time => {},
-            _ => return Ok(()),
-        }
+    fn next_from_traffic(&mut self) -> Outcome<(Event, P::Data)> {
+        let time = some!(try!(self.traffic.next()));
+        let pattern = try!(self.workload.next(time));
+        let job = Job::new(self.history.arrived, time, pattern);
 
-        let job = {
-            let id = self.history.created;
-            let arrival = some!(try!(self.traffic.next()));
-            let pattern = try!(self.workload.next(arrival));
-            self.history.created += 1;
-            Job::new(id, arrival, pattern)
-        };
+        let event = Event::arrived(time, job.clone());
+        self.history.count(&event);
 
-        self.queue.push(Event::arrived(job.arrival, job.clone()));
+        let data = try!(self.platform.next(time));
+        try!(self.schedule.step(time, &data));
 
         let decision = try!(self.schedule.push(&job));
+        self.queue.push(Event::started(decision.start, job.clone()));
+        self.queue.push(Event::finished(decision.finish, job.clone()));
+
         try!(self.platform.push(&job, &decision));
 
-        self.queue.push(Event::started(decision.start, job.clone()));
-        self.queue.push(Event::finished(decision.finish, job));
+        Ok(Some((event, data)))
+    }
 
-        Ok(())
+    fn next_from_queue(&mut self) -> Outcome<(Event, P::Data)> {
+        let event = some!(self.queue.pop());
+        self.history.count(&event);
+
+        let data = try!(self.platform.next(event.time));
+        try!(self.schedule.step(event.time, &data));
+
+        Ok(Some((event, data)))
     }
 }
