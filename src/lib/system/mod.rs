@@ -26,8 +26,8 @@ pub struct System<T, W, P, S> {
     queue: BinaryHeap<Event>,
 }
 
-impl<T, W, P, S, D> System<T, W, P, S>
-    where T: Traffic, W: Workload, P: Platform<Data=D>, S: Schedule<Data=D>
+impl<T, W, P, S> System<T, W, P, S>
+    where T: Traffic, W: Workload, P: Platform, S: Schedule, S::Data: for<'l> From<&'l P::Data>
 {
     /// Create a system.
     pub fn new(traffic: T, workload: W, platform: P, schedule: S) -> Result<System<T, W, P, S>> {
@@ -77,7 +77,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
         self.history.count(&event);
 
         let data = try!(self.platform.next(time));
-        try!(self.schedule.push(time, &data));
+        try!(self.schedule.push(time, (&data).into()));
 
         let decision = try!(self.schedule.next(&job));
         self.queue.push(Event::started(decision.start, job.clone()));
@@ -93,7 +93,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
         self.history.count(&event);
 
         let data = try!(self.platform.next(event.time));
-        try!(self.schedule.push(event.time, &data));
+        try!(self.schedule.push(event.time, (&data).into()));
 
         Ok(Some((event, data)))
     }

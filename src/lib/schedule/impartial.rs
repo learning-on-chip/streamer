@@ -1,32 +1,29 @@
 use std::cmp::Ord;
-use std::marker::PhantomData;
 
 use math;
 use platform::Element;
-use schedule::{Decision, Schedule, Queue};
+use schedule::{Decision, NoData, Schedule, Queue};
 use system::Job;
 use {Config, Result};
 
 /// A first-in-first-served scheduling policy.
-pub struct Impartial<T> {
+pub struct Impartial {
     elements: Vec<Element>,
     queues: Vec<Queue>,
-    phantom: PhantomData<T>,
 }
 
-impl<T> Impartial<T> {
+impl Impartial {
     /// Create a scheduling policy.
-    pub fn new(_: &Config, elements: &[Element]) -> Result<Impartial<T>> {
+    pub fn new(_: &Config, elements: &[Element]) -> Result<Impartial> {
         Ok(Impartial {
             elements: elements.to_vec(),
             queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
-            phantom: PhantomData,
         })
     }
 }
 
-impl<T> Schedule for Impartial<T> {
-    type Data = T;
+impl Schedule for Impartial {
+    type Data = NoData;
 
     fn next(&mut self, job: &Job) -> Result<Decision> {
         let hosts = &self.elements;
@@ -79,7 +76,7 @@ impl<T> Schedule for Impartial<T> {
         }
     }
 
-    fn push(&mut self, time: f64, _: &Self::Data) -> Result<()> {
+    fn push(&mut self, time: f64, _: Self::Data) -> Result<()> {
         for queue in &mut self.queues {
             queue.tick(time);
         }

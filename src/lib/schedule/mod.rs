@@ -18,7 +18,7 @@ pub trait Schedule {
     fn next(&mut self, &Job) -> Result<Decision>;
 
     /// Advance time and consume the data accumulated since the previous call.
-    fn push(&mut self, f64, &Self::Data) -> Result<()>;
+    fn push(&mut self, f64, Self::Data) -> Result<()>;
 }
 
 /// A scheduling decision.
@@ -33,10 +33,21 @@ pub struct Decision {
     pub mapping: Vec<(usize, usize)>,
 }
 
+/// A placeholder signifying that no data are needed.
+#[derive(Clone, Copy)]
+pub struct NoData;
+
 impl Decision {
     /// Create a decision.
     #[inline]
     pub fn new(start: f64, finish: f64, mapping: Vec<(usize, usize)>) -> Decision {
         Decision { start: start, finish: finish, mapping: mapping }
+    }
+}
+
+impl<'l, T> From<&'l T> for NoData {
+    #[inline]
+    fn from(_: &'l T) -> NoData {
+        NoData
     }
 }

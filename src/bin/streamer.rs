@@ -24,7 +24,7 @@ pub type Event = system::Event;
 pub type System = system::System<traffic::Fractal,
                                  workload::Random,
                                  platform::Thermal,
-                                 schedule::Impartial<Data>>;
+                                 schedule::Impartial>;
 
 const USAGE: &'static str = "
 Usage: streamer [options]
