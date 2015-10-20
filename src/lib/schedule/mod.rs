@@ -17,7 +17,7 @@ pub trait Schedule {
     /// Take a decision with respect to a job.
     fn push(&mut self, &Job) -> Result<Decision>;
 
-    /// Advance time and consume the accumulated data.
+    /// Advance time and consume the data accumulated since the previous call.
     fn step(&mut self, f64, &Self::Data) -> Result<()>;
 }
 

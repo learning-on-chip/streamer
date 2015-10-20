@@ -111,7 +111,7 @@ impl ProfileBuilder {
         }
     }
 
-    /// Advance time and return the accumulated data.
+    /// Advance time and return the data accumulated since the previous call.
     pub fn pull(&mut self, time: f64) -> Profile {
         let &mut ProfileBuilder { ref mut profile, ref fill } = self;
 

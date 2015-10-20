@@ -41,7 +41,8 @@ impl<T, W, P, S, D> System<T, W, P, S>
         })
     }
 
-    /// Advance to the next event and return the accumulated data.
+    /// Advance to the next event and return the data accumulated since the
+    /// previous call.
     pub fn next(&mut self) -> Outcome<(Event, P::Data)> {
         match (try!(self.traffic.peek()), self.queue.peek().map(|event| &event.time)) {
             (Some(&traffic), Some(&queue)) => {
