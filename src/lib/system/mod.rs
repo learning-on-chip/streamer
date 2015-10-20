@@ -79,9 +79,9 @@ impl<T, W, P, S, D> System<T, W, P, S>
         self.history.count(&event);
 
         let data = try!(self.platform.next(time));
-        try!(self.schedule.step(time, &data));
+        try!(self.schedule.push(time, &data));
 
-        let decision = try!(self.schedule.push(&job));
+        let decision = try!(self.schedule.next(&job));
         self.queue.push(Event::started(decision.start, job.clone()));
         self.queue.push(Event::finished(decision.finish, job.clone()));
 
@@ -95,7 +95,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
         self.history.count(&event);
 
         let data = try!(self.platform.next(event.time));
-        try!(self.schedule.step(event.time, &data));
+        try!(self.schedule.push(event.time, &data));
 
         Ok(Some((event, data)))
     }

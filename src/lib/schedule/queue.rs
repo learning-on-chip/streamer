@@ -49,7 +49,7 @@ impl Queue {
     }
 
     /// Advance time.
-    pub fn step(&mut self, time: f64) {
+    pub fn tick(&mut self, time: f64) {
         let mut redundant = vec![];
         for &interval in &self.occupied {
             if interval.finish() > time {
@@ -153,26 +153,26 @@ mod tests {
     }
 
     #[test]
-    fn step() {
+    fn tick() {
         let mut queue = Queue::new(ElementCapacity::Single);
 
         queue.push((10.0, 15.0));
         queue.push((15.0, 20.0));
         queue.push((25.0, 30.0));
 
-        queue.step(10.0);
+        queue.tick(10.0);
         test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.step(11.0);
+        queue.tick(11.0);
         test!(queue, 0.0, [(0.0, 10.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.step(15.0);
+        queue.tick(15.0);
         test!(queue, 0.0, [(0.0, 15.0), (20.0, 25.0), (30.0, INFINITY)]);
 
-        queue.step(20.0);
+        queue.tick(20.0);
         test!(queue, 0.0, [(0.0, 25.0), (30.0, INFINITY)]);
 
-        queue.step(30.0);
+        queue.tick(30.0);
         test!(queue, 0.0, [(0.0, INFINITY)]);
     }
 }

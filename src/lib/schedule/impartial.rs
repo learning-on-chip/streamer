@@ -28,7 +28,7 @@ impl<T> Impartial<T> {
 impl<T> Schedule for Impartial<T> {
     type Data = T;
 
-    fn push(&mut self, job: &Job) -> Result<Decision> {
+    fn next(&mut self, job: &Job) -> Result<Decision> {
         let hosts = &self.elements;
         let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
@@ -79,9 +79,9 @@ impl<T> Schedule for Impartial<T> {
         }
     }
 
-    fn step(&mut self, time: f64, _: &Self::Data) -> Result<()> {
+    fn push(&mut self, time: f64, _: &Self::Data) -> Result<()> {
         for queue in &mut self.queues {
-            queue.step(time);
+            queue.tick(time);
         }
         Ok(())
     }
