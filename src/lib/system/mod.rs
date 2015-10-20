@@ -2,11 +2,11 @@
 
 use std::collections::BinaryHeap;
 
+use Result;
 use platform::Platform;
 use schedule::Schedule;
 use traffic::Traffic;
 use workload::Workload;
-use {Outcome, Result};
 
 mod event;
 mod history;
@@ -43,7 +43,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
 
     /// Advance to the next event and return the data accumulated since the
     /// previous call.
-    pub fn next(&mut self) -> Outcome<(Event, P::Data)> {
+    pub fn next(&mut self) -> Result<Option<(Event, P::Data)>> {
         match (try!(self.traffic.peek()), self.queue.peek().map(|event| &event.time)) {
             (Some(&traffic), Some(&queue)) => {
                 if traffic < queue {
@@ -70,7 +70,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
         &self.history
     }
 
-    fn next_from_traffic(&mut self) -> Outcome<(Event, P::Data)> {
+    fn next_from_traffic(&mut self) -> Result<Option<(Event, P::Data)>> {
         let time = some!(try!(self.traffic.next()));
         let pattern = try!(self.workload.next(time));
         let job = Job::new(self.history.arrived, time, pattern);
@@ -90,7 +90,7 @@ impl<T, W, P, S, D> System<T, W, P, S>
         Ok(Some((event, data)))
     }
 
-    fn next_from_queue(&mut self) -> Outcome<(Event, P::Data)> {
+    fn next_from_queue(&mut self) -> Result<Option<(Event, P::Data)>> {
         let event = some!(self.queue.pop());
         self.history.count(&event);
 

@@ -2,7 +2,7 @@
 
 use std::path::Path;
 
-use {Outcome, Result};
+use Result;
 
 mod fractal;
 
@@ -11,10 +11,10 @@ pub use self::fractal::Fractal;
 /// A traffic model.
 pub trait Traffic {
     /// Return the next arrival time.
-    fn next(&mut self) -> Outcome<f64>;
+    fn next(&mut self) -> Result<Option<f64>>;
 
     /// Peek at the next arrival time.
-    fn peek(&mut self) -> Outcome<&f64>;
+    fn peek(&mut self) -> Result<Option<&f64>>;
 }
 
 fn read_interarrivals<T: AsRef<Path>>(path: T) -> Result<Vec<f64>> {
