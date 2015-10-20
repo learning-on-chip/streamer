@@ -58,7 +58,7 @@ impl Schedule for Impartial {
                         continue 'outer;
                     }
                 }
-                raise!("failed to allocated resouces for a job");
+                raise!("failed to allocated resources for a job");
             }
 
             start = start.max(math::next_after(job.arrival));
