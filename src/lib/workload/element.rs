@@ -46,8 +46,9 @@ impl Element {
         Ok(elements)
     }
 
-    /// Check if the type matches the type of a processing element of a
-    /// platform.
+    /// Check if a processing element satisfies the requirements of this
+    /// workload element.
+    #[inline]
     pub fn accept(&self, element: &platform::Element) -> bool {
         self.kind == element.kind
     }
