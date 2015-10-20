@@ -30,6 +30,12 @@ pub enum ElementCapacity {
 }
 
 impl Element {
+    /// Create an element.
+    #[inline]
+    pub fn new(id: usize, kind: ElementKind) -> Element {
+        Element { id: id, kind: kind }
+    }
+
     /// Return the capacity of the processing element.
     #[inline(always)]
     pub fn capacity(&self) -> ElementCapacity {

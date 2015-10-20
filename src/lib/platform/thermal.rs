@@ -108,7 +108,7 @@ fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circu
         for element in die.floorplan.elements.iter() {
             let id = elements.len();
             let kind = try!(ElementKind::from_str(&element.id));
-            elements.push(Element { id: id, kind: kind });
+            elements.push(Element::new(id, kind));
         }
     }
     Ok((elements, ok!(ThreeDICE::from(&system))))
