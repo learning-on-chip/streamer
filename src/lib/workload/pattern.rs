@@ -56,7 +56,7 @@ impl Pattern {
         })))
     }
 
-    /// Return the time duration.
+    /// Return the duration.
     #[inline]
     pub fn duration(&self) -> f64 {
         self.steps as f64 * self.time_step
