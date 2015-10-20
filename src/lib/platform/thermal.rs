@@ -60,12 +60,13 @@ fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuild
 
     let path = path!(config, "a leakage pattern is required");
     info!(target: "Platform", "Modeling leakage power based on {:?}...", &path);
-    let candidates = try!(workload::Element::collect(path));
+    let models = try!(workload::Element::collect(path));
 
     let mut leakage_power = vec![0.0; units];
-    for i in 0..units {
-        if let Some(element) = candidates.iter().find(|element| element.kind == elements[i].kind) {
-            leakage_power[i] = element.leakage_power;
+    for (i, element) in elements.iter().enumerate() {
+        if let Some(model) = models.iter().find(|model| model.kind == element.kind) {
+            debug_assert!(element.area > 0.0 && model.area > 0.0);
+            leakage_power[i] = (element.area / model.area) * model.leakage_power;
         } else {
             raise!("cannot find leakage data for a processing element");
         }
