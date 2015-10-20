@@ -108,7 +108,8 @@ fn construct_threed_ice(path: &Path) -> Result<(Vec<Element>, temperature::Circu
         for element in die.floorplan.elements.iter() {
             let id = elements.len();
             let kind = try!(ElementKind::from_str(&element.id));
-            elements.push(Element::new(id, kind));
+            let area = 1e-6 * 1e-6 * element.area;
+            elements.push(Element::new(id, kind, area));
         }
     }
     Ok((elements, ok!(ThreeDICE::from(&system))))
@@ -126,11 +127,11 @@ mod tests {
                                                                .unwrap();
         let platform = Thermal::new(&config).unwrap();
         assert_eq!(platform.elements, &[
-            Element { id: 0, kind: ElementKind::Core },
-            Element { id: 1, kind: ElementKind::Core },
-            Element { id: 2, kind: ElementKind::Core },
-            Element { id: 3, kind: ElementKind::Core },
-            Element { id: 4, kind: ElementKind::L3 },
+            Element { id: 0, kind: ElementKind::Core, area: 3976e-6 * 7950e-6 },
+            Element { id: 1, kind: ElementKind::Core, area: 3976e-6 * 7950e-6 },
+            Element { id: 2, kind: ElementKind::Core, area: 3976e-6 * 7950e-6 },
+            Element { id: 3, kind: ElementKind::Core, area: 3976e-6 * 7950e-6 },
+            Element { id: 4, kind: ElementKind::L3, area: 15904e-6 * 3894e-6 },
         ]);
     }
 }

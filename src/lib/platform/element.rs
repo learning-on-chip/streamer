@@ -3,12 +3,14 @@ use std::str::FromStr;
 use {Error, Result};
 
 /// A processing element of a platform.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Element {
     /// The identifier.
     pub id: usize,
     /// The type.
     pub kind: ElementKind,
+    /// The area.
+    pub area: f64,
 }
 
 /// The type of a processing element.
@@ -32,8 +34,8 @@ pub enum ElementCapacity {
 impl Element {
     /// Create an element.
     #[inline]
-    pub fn new(id: usize, kind: ElementKind) -> Element {
-        Element { id: id, kind: kind }
+    pub fn new(id: usize, kind: ElementKind, area: f64) -> Element {
+        Element { id: id, kind: kind, area: area }
     }
 
     /// Return the capacity of the processing element.
