@@ -2,11 +2,11 @@
 
 use std::collections::BinaryHeap;
 
-use Result;
 use platform::Platform;
 use schedule::Schedule;
 use traffic::Traffic;
 use workload::Workload;
+use {Outcome, Result};
 
 mod event;
 mod history;
@@ -39,6 +39,18 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
         })
     }
 
+    /// Advance to the next event and return the accumulated data.
+    pub fn next(&mut self) -> Outcome<(Event, P::Data)> {
+        try!(self.refill());
+        let event = match self.queue.pop() {
+            Some(event) => event,
+            _ => return Ok(None),
+        };
+        self.history.remember(&event);
+        try!(self.schedule.tick(event.time));
+        self.platform.next(event.time).map(|data| Some((event, data)))
+    }
+
     /// Return the platform.
     #[inline(always)]
     pub fn platform(&self) -> &P {
@@ -51,8 +63,8 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
         &self.history
     }
 
-    fn tick(&mut self) -> Result<()> {
-        match (self.traffic.peek(), self.queue.peek()) {
+    fn refill(&mut self) -> Result<()> {
+        match (try!(self.traffic.peek()), self.queue.peek()) {
             (Some(_), None) => {}
             (Some(&arrival), Some(&Event { time, .. })) if arrival < time => {},
             _ => return Ok(()),
@@ -60,8 +72,8 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
 
         let job = {
             let id = self.history.created;
-            let arrival = some!(self.traffic.next(), "failed to generate an arrival");
-            let pattern = some!(self.workload.next(arrival), "failed to generate a workload");
+            let arrival = some!(try!(self.traffic.next()));
+            let pattern = try!(self.workload.next(arrival));
             self.history.created += 1;
             Job::new(id, arrival, pattern)
         };
@@ -75,25 +87,5 @@ impl<T, W, P, S> System<T, W, P, S> where T: Traffic, W: Workload, P: Platform, 
         self.queue.push(Event::finished(decision.finish, job));
 
         Ok(())
-    }
-}
-
-impl<T, W, P, S> Iterator for System<T, W, P, S>
-    where T: Traffic, W: Workload, P: Platform, S: Schedule
-{
-    type Item = (Event, P::Data);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if let Err(error ) = self.tick() {
-            error!(target: "System", "Failed to update the state ({}).", error);
-            return None;
-        }
-        let event = match self.queue.pop() {
-            Some(event) => event,
-            _ => return None,
-        };
-        self.schedule.tick(event.time);
-        self.history.remember(&event);
-        self.platform.next(event.time).map(|data| (event, data))
     }
 }

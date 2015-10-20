@@ -67,7 +67,7 @@ fn start() -> Result<()> {
     info!(target: "Streamer", "Synthesizing {} seconds...", length);
     let start = time::now();
 
-    while let Some((event, data)) = system.next() {
+    while let Some((event, data)) = try!(system.next()) {
         display(&system, &event);
         try!(output.next(&event, &data));
         if event.time > length {

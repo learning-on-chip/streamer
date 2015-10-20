@@ -15,7 +15,7 @@ pub trait Schedule {
     fn push(&mut self, &Job) -> Result<Decision>;
 
     /// Advance time.
-    fn tick(&mut self, f64);
+    fn tick(&mut self, f64) -> Result<()>;
 }
 
 /// A scheduling decision.

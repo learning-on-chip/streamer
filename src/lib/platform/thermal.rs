@@ -35,11 +35,11 @@ impl Platform for Thermal {
         &self.elements
     }
 
-    fn next(&mut self, time: f64) -> Option<Self::Data> {
+    fn next(&mut self, time: f64) -> Result<Self::Data> {
         let power = self.builder.pull(time);
         let mut temperature = power.clone_zero();
         self.simulator.next(&power, &mut temperature);
-        Some((power, temperature))
+        Ok((power, temperature))
     }
 
     fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {

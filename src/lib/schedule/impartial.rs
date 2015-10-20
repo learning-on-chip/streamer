@@ -74,10 +74,11 @@ impl Schedule for Impartial {
         }
     }
 
-    fn tick(&mut self, time: f64) {
+    fn tick(&mut self, time: f64) -> Result<()> {
         for queue in &mut self.queues {
             queue.tick(time);
         }
+        Ok(())
     }
 }
 

@@ -28,6 +28,9 @@ pub mod workload;
 
 pub use result::{Error, Result};
 
+/// An outcome.
+pub type Outcome<T> = Result<Option<T>>;
+
 /// A configuration.
 pub type Config = configuration::Tree;
 

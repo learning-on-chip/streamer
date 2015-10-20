@@ -21,7 +21,7 @@ pub trait Platform {
     fn elements(&self) -> &[Element];
 
     /// Advance time and return the accumulated data.
-    fn next(&mut self, f64) -> Option<Self::Data>;
+    fn next(&mut self, f64) -> Result<Self::Data>;
 
     /// Account for a scheduling decision taken with respect to a job.
     fn push(&mut self, &Job, &Decision) -> Result<()>;

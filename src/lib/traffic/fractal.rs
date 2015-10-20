@@ -2,7 +2,7 @@ use fractal::Beta;
 use std::collections::VecDeque;
 
 use traffic::{self, Traffic};
-use {Config, Result, Source};
+use {Config, Outcome, Result, Source};
 
 /// A multifractal wavelet model of network traffic.
 pub struct Fractal {
@@ -44,25 +44,18 @@ impl Fractal {
     }
 }
 
-macro_rules! refill(
-    ($this:ident) => (
-        if $this.arrivals.is_empty() {
-            if let Err(error) = $this.refill() {
-                error!(target: "Traffic", "Failed to refill the queue ({}).", error);
-                return None;
-            }
-        }
-    );
-);
-
 impl Traffic for Fractal {
-    fn next(&mut self) -> Option<f64> {
-        refill!(self);
-        self.arrivals.pop_front()
+    fn next(&mut self) -> Outcome<f64> {
+        if self.arrivals.is_empty() {
+            try!(self.refill());
+        }
+        Ok(self.arrivals.pop_front())
     }
 
-    fn peek(&mut self) -> Option<&f64> {
-        refill!(self);
-        self.arrivals.get(0)
+    fn peek(&mut self) -> Outcome<&f64> {
+        if self.arrivals.is_empty() {
+            try!(self.refill());
+        }
+        Ok(self.arrivals.get(0))
     }
 }
