@@ -45,12 +45,10 @@ impl<T, W, P, S, D> System<T, W, P, S>
     /// previous call.
     pub fn next(&mut self) -> Result<Option<(Event, P::Data)>> {
         match (try!(self.traffic.peek()), self.queue.peek().map(|event| &event.time)) {
-            (Some(&traffic), Some(&queue)) => {
-                if traffic < queue {
-                    self.next_from_traffic()
-                } else {
-                    self.next_from_queue()
-                }
+            (Some(&traffic), Some(&queue)) => if traffic < queue {
+                self.next_from_traffic()
+            } else {
+                self.next_from_queue()
             },
             (Some(_), None) => self.next_from_traffic(),
             (None, Some(_)) => self.next_from_queue(),
