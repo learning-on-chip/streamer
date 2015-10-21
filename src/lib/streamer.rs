@@ -1,11 +1,5 @@
 //! Tool for generating on-chip data.
 
-#[cfg(test)]
-extern crate assert;
-
-#[macro_use]
-extern crate log;
-
 extern crate configuration;
 extern crate fractal;
 extern crate probability;
@@ -14,6 +8,12 @@ extern crate sql;
 extern crate sqlite;
 extern crate temperature;
 extern crate threed_ice;
+
+#[cfg(test)]
+extern crate assert;
+
+#[macro_use]
+extern crate log;
 
 #[macro_use]
 mod macros;
