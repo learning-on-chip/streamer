@@ -1,4 +1,4 @@
-//! Tool for generating on-chip data.
+//! Generation of on-chip data.
 
 extern crate configuration;
 extern crate fractal;
