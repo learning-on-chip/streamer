@@ -84,8 +84,6 @@ fn start() -> Result<()> {
 }
 
 fn construct_system(config: &Config) -> Result<System> {
-    use streamer::platform::Platform;
-
     let source = {
         let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
         let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
@@ -98,7 +96,7 @@ fn construct_system(config: &Config) -> Result<System> {
     let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
     let workload = try!(workload::Random::new(branch!("workload"), &source));
     let platform = try!(platform::Thermal::new(branch!("platform")));
-    let schedule = try!(schedule::Impartial::new(branch!("schedule"), platform.elements()));
+    let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
 
     System::new(traffic, workload, platform, schedule)
 }

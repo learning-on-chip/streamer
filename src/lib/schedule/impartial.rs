@@ -1,7 +1,7 @@
 use std::cmp::Ord;
 
 use math;
-use platform::Element;
+use platform::{Element, Platform};
 use schedule::{Decision, NoData, Schedule, Queue};
 use system::Job;
 use {Config, Result};
@@ -14,7 +14,8 @@ pub struct Impartial {
 
 impl Impartial {
     /// Create a scheduling policy.
-    pub fn new(_: &Config, elements: &[Element]) -> Result<Impartial> {
+    pub fn new<T: Platform>(_: &Config, platform: &T) -> Result<Impartial> {
+        let elements = platform.elements();
         Ok(Impartial {
             elements: elements.to_vec(),
             queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
