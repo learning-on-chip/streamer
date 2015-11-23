@@ -37,7 +37,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -90,7 +90,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lapack-sys 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -127,12 +127,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lapack 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "num 0.1.27 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "num"
-version = "0.1.27"
+version = "0.1.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
