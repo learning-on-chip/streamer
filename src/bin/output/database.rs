@@ -27,6 +27,11 @@ impl Database {
 
         ok!(connection.execute(ok!(delete_from("dynamic").compile())));
 
+        ok!(connection.execute("
+            PRAGMA journal_mode = MEMORY;
+            PRAGMA synchronous = OFF;
+        "));
+
         let statement = {
             let units = system.platform().elements().len();
             let statement = ok!(connection.prepare({
