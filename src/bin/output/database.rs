@@ -45,6 +45,7 @@ impl Output for Database {
     fn next(&mut self, _: &Event, &(ref power, ref temperature): &Data) -> Result<()> {
         let &Profile { units, steps, time, time_step, data: ref power } = power;
         let &Profile { data: ref temperature, .. } = temperature;
+        ok!(self.connection.execute("BEGIN TRANSACTION"));
         let statement = &mut self.statement;
         for i in 0..steps {
             let time = time + (i as f64) * time_step;
@@ -61,6 +62,7 @@ impl Output for Database {
                 raise!("failed to write into the database");
             }
         }
+        ok!(self.connection.execute("END TRANSACTION"));
         Ok(())
     }
 }
