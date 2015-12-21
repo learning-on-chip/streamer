@@ -49,12 +49,12 @@ impl Output for Database {
         for i in 0..steps {
             let time = time + (i as f64) * time_step;
             ok!(statement.reset());
-            let mut k = 1;
+            let mut k = 0;
             for j in 0..units {
-                ok!(statement.bind(k + 0, time));
-                ok!(statement.bind(k + 1, j as i64));
-                ok!(statement.bind(k + 2, power[i * units + j]));
-                ok!(statement.bind(k + 3, temperature[i * units + j]));
+                ok!(statement.bind(k + 1, time));
+                ok!(statement.bind(k + 2, j as i64));
+                ok!(statement.bind(k + 3, power[i * units + j]));
+                ok!(statement.bind(k + 4, temperature[i * units + j]));
                 k += 4;
             }
             if State::Done != ok!(statement.next()) {
