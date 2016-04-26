@@ -10,22 +10,15 @@ use {Config, Result};
 pub struct Impartial {
     elements: Vec<Element>,
     queues: Vec<Queue>,
-    pending: Vec<f64>,
-    capacity: usize,
 }
 
 impl Impartial {
     /// Create a scheduling policy.
-    pub fn new<T: Platform>(config: &Config, platform: &T) -> Result<Impartial> {
+    pub fn new<T: Platform>(_: &Config, platform: &T) -> Result<Impartial> {
         let elements = platform.elements();
-        let queues = elements.iter().map(|element| Queue::new(element.capacity())).collect();
-        let capacity = config.get::<i64>("capacity").map(|value| *value as usize)
-                                                    .unwrap_or(usize::max_value());
         Ok(Impartial {
             elements: elements.to_vec(),
-            queues: queues,
-            pending: vec![],
-            capacity: capacity,
+            queues: elements.iter().map(|element| Queue::new(element.capacity())).collect(),
         })
     }
 }
@@ -34,10 +27,6 @@ impl Schedule for Impartial {
     type Data = NoData;
 
     fn next(&mut self, job: &Job) -> Result<Decision> {
-        if self.pending.len() == self.capacity {
-            return Ok(Decision::reject());
-        }
-
         let hosts = &self.elements;
         let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
@@ -45,15 +34,15 @@ impl Schedule for Impartial {
         let mut start = job.arrival;
         let length = job.duration();
 
-        let mut found = vec![None; need];
-        let mut taken = vec![false; have];
-
         'outer: loop {
             let intervals = self.queues.iter().map(|queue| queue.next(start, length))
                                               .collect::<Vec<_>>();
 
             let order = sort(&intervals);
             start = intervals[order[0]].start();
+
+            let mut found = vec![None; need];
+            let mut taken = vec![false; have];
 
             'inner: for i in 0..need {
                 for &j in &order {
@@ -69,37 +58,26 @@ impl Schedule for Impartial {
                 for &j in &order[1..] {
                     if intervals[j].start() > start {
                         start = intervals[j].start();
-                        for item in &mut found {
-                            *item = None;
-                        }
-                        for item in &mut taken {
-                            *item = false;
-                        }
                         continue 'outer;
                     }
                 }
                 raise!("failed to allocated resources for a job");
             }
 
-            break;
+            start = start.max(math::next_after(job.arrival));
+            let finish = start + length;
+            let mut mapping = Vec::with_capacity(need);
+            for i in 0..need {
+                let j = some!(found[i]);
+                self.queues[j].push((start, finish));
+                mapping.push((i, hosts[j].id));
+            }
+
+            return Ok(Decision::accept(start, finish, mapping));
         }
-
-        start = start.max(math::next_after(job.arrival));
-        self.pending.push(start);
-
-        let finish = start + length;
-        let mut mapping = Vec::with_capacity(need);
-        for i in 0..need {
-            let j = some!(found[i]);
-            self.queues[j].push((start, finish));
-            mapping.push((i, hosts[j].id));
-        }
-
-        return Ok(Decision::accept(start, finish, mapping));
     }
 
     fn push(&mut self, time: f64, _: Self::Data) -> Result<()> {
-        self.pending.retain(|&start| start > time);
         for queue in &mut self.queues {
             queue.tick(time);
         }
