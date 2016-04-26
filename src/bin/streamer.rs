@@ -110,7 +110,7 @@ fn display(system: &System, event: &Event) {
         &EventKind::Finished(ref job) => (job, "finished"),
     };
     info!(target: "Streamer",
-          "{:7.2} s | job #{:4} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
+          "{:8.2} s | job #{:4} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
           event.time, job.id, job.name, job.units, job.duration(), kind,
           system.history().arrived - system.history().started);
 }
