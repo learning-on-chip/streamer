@@ -9,6 +9,9 @@ path = "blackscholes.sqlite3"
 path = "004.stk"
 ambience = 318.15
 
+[schedule]
+capacity = 10
+
 [traffic]
 path = "google.sqlite3"
 
