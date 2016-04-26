@@ -4,7 +4,7 @@ version = "0.0.1"
 dependencies = [
  "arguments 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "assert 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "configuration 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "configuration 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.12.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -51,7 +51,7 @@ dependencies = [
 
 [[package]]
 name = "configuration"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "options 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",

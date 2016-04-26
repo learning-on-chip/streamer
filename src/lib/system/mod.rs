@@ -4,7 +4,7 @@ use std::collections::BinaryHeap;
 
 use Result;
 use platform::Platform;
-use schedule::Schedule;
+use schedule::{Decision, Schedule};
 use traffic::Traffic;
 use workload::Workload;
 
@@ -79,11 +79,11 @@ impl<T, W, P, S> System<T, W, P, S>
         let data = try!(self.platform.next(time));
         try!(self.schedule.push(time, (&data).into()));
 
-        let decision = try!(self.schedule.next(&job));
-        self.queue.push(Event::started(decision.start, job.clone()));
-        self.queue.push(Event::finished(decision.finish, job.clone()));
-
-        try!(self.platform.push(&job, &decision));
+        if let Decision::Accept { start, finish, mapping } = try!(self.schedule.next(&job)) {
+            self.queue.push(Event::started(start, job.clone()));
+            self.queue.push(Event::finished(finish, job.clone()));
+            try!(self.platform.push(&job, start, &mapping));
+        }
 
         Ok(Some((event, data)))
     }

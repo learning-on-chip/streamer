@@ -1,7 +1,6 @@
 //! Multiprocessor platform.
 
 use Result;
-use schedule::Decision;
 use system::Job;
 
 mod element;
@@ -24,5 +23,5 @@ pub trait Platform {
     fn next(&mut self, f64) -> Result<Self::Data>;
 
     /// Account for a scheduling decision taken with respect to a job.
-    fn push(&mut self, &Job, &Decision) -> Result<()>;
+    fn push(&mut self, &Job, start: f64, mapping: &[(usize, usize)]) -> Result<()>;
 }

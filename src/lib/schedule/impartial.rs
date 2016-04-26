@@ -73,7 +73,7 @@ impl Schedule for Impartial {
                 mapping.push((i, hosts[j].id));
             }
 
-            return Ok(Decision::new(start, finish, mapping));
+            return Ok(Decision::accept(start, finish, mapping));
         }
     }
 

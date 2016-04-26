@@ -3,7 +3,6 @@ use std::str::FromStr;
 use temperature::{self, Simulator};
 
 use platform::{Element, ElementKind, Platform, Profile, ProfileBuilder};
-use schedule::Decision;
 use system::Job;
 use {Config, Result};
 
@@ -42,11 +41,11 @@ impl Platform for Thermal {
         Ok((power, temperature))
     }
 
-    fn push(&mut self, job: &Job, decision: &Decision) -> Result<()> {
+    fn push(&mut self, job: &Job, start: f64, mapping: &[(usize, usize)]) -> Result<()> {
         let (from, onto) = (&job.elements, &self.elements);
-        for &(i, j) in &decision.mapping {
+        for &(i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
-            self.builder.push(onto.id, decision.start, job.time_step, &from.dynamic_power);
+            self.builder.push(onto.id, start, job.time_step, &from.dynamic_power);
         }
         Ok(())
     }
