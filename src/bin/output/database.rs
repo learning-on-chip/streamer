@@ -67,6 +67,7 @@ impl Database {
 
     fn write_arrival(&mut self, job: &Job) -> Result<()> {
         let statement = &mut self.arrivals;
+        ok!(statement.reset());
         ok!(statement.bind(1, job.arrival));
         if State::Done != ok!(statement.next()) {
             raise!("failed to write into the database");
