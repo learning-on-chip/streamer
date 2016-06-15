@@ -41,8 +41,6 @@ Options:
 mod logger;
 mod output;
 
-use output::Output;
-
 fn main() {
     start().unwrap_or_else(|error| fail(error));
 }
