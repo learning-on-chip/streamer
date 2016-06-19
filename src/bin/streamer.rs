@@ -4,11 +4,8 @@ extern crate sql;
 extern crate sqlite;
 extern crate term;
 
-#[macro_use]
-extern crate log;
-
-#[macro_use]
-extern crate streamer;
+#[macro_use] extern crate log;
+#[macro_use] extern crate streamer;
 
 use configuration::format::TOML;
 use log::LogLevel;
