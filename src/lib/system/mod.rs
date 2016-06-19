@@ -1,4 +1,4 @@
-//! Complete system.
+//! System modeling.
 
 use std::collections::BinaryHeap;
 
@@ -16,7 +16,7 @@ pub use self::event::{Event, EventKind};
 pub use self::history::History;
 pub use self::job::Job;
 
-/// A complete system.
+/// A system.
 pub struct System<T, W, P, S> {
     traffic: T,
     workload: W,
