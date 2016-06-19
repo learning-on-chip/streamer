@@ -4,7 +4,6 @@ extern crate random;
 extern crate sql;
 extern crate sqlite;
 extern crate term;
-extern crate time;
 
 #[macro_use]
 extern crate log;
@@ -26,6 +25,8 @@ pub type System = system::System<traffic::Fractal,
                                  platform::Thermal,
                                  schedule::Impartial>;
 
+const DEFAULT_LENGH: f64 = 10.0;
+
 const USAGE: &'static str = "
 Usage: streamer [options]
 
@@ -41,14 +42,24 @@ Options:
 mod logger;
 mod output;
 
+#[allow(unused_must_use)]
 fn main() {
-    start().unwrap_or_else(|error| fail(error));
+    start().unwrap_or_else(|error| {
+        use std::io::Write;
+        if let Some(mut output) = term::stderr() {
+            output.fg(term::color::RED);
+            output.write_fmt(format_args!("Error: {}.\n", error));
+            output.reset();
+        }
+        std::process::exit(1);
+    });
 }
 
 fn start() -> Result<()> {
     let arguments = ok!(arguments::parse(std::env::args()));
     if arguments.get::<bool>("help").unwrap_or(false) {
-        help();
+        println!("{}", USAGE.trim());
+        return Ok(());
     }
     if arguments.get::<bool>("verbose").unwrap_or(false) {
         logger::setup(LogLevel::Info);
@@ -59,13 +70,12 @@ fn start() -> Result<()> {
     let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
                                       "a configuration file is required")));
 
-    let mut system = try!(construct_system(&config));
+    let mut system = try!(setup(&config));
     let mut output = try!(output::new(&system, arguments.get::<String>("output")));
 
-    let length = arguments.get::<f64>("length").unwrap_or(10.0);
-    info!(target: "Streamer", "Synthesizing {} seconds...", length);
-    let start = time::now();
+    let length = arguments.get::<f64>("length").unwrap_or(DEFAULT_LENGH);
 
+    info!(target: "Streamer", "Synthesizing {} seconds...", length);
     while let Some((event, data)) = try!(system.next()) {
         display(&system, &event);
         try!(output.next(&event, &data));
@@ -73,30 +83,9 @@ fn start() -> Result<()> {
             break;
         }
     }
-
-    let elapsed = time::now() - start;
-    info!(target: "Streamer", "Well done in {:.2} seconds.",
-          elapsed.num_milliseconds() as f64 / 1000.0);
+    info!(target: "Streamer", "Well done.");
 
     Ok(())
-}
-
-fn construct_system(config: &Config) -> Result<System> {
-    let source = {
-        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
-        let seed = if seed > 0 { seed } else { time::now().to_timespec().sec as u64 };
-        let seed = [0x12345678 & seed, 0x87654321 & seed];
-        random::default().seed(seed)
-    };
-
-    macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
-
-    let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
-    let workload = try!(workload::Random::new(branch!("workload"), &source));
-    let platform = try!(platform::Thermal::new(branch!("platform")));
-    let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
-
-    System::new(traffic, workload, platform, schedule)
 }
 
 fn display(system: &System, event: &Event) {
@@ -113,17 +102,19 @@ fn display(system: &System, event: &Event) {
           system.history().arrived - system.history().started);
 }
 
-fn help() -> ! {
-    println!("{}", USAGE.trim());
-    std::process::exit(0);
-}
+fn setup(config: &Config) -> Result<System> {
+    let source = {
+        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
+        let seed = if seed > 0 { seed } else { !0u64 };
+        random::default().seed([0x12345678 & seed, 0x87654321 & seed])
+    };
 
-#[allow(unused_must_use)]
-fn fail(error: Error) -> ! {
-    use std::io::Write;
-    if let Some(mut output) = term::stderr() {
-        output.fg(term::color::RED);
-        output.write_all(format!("Error: {}.\n", error).as_bytes());
-    }
-    std::process::exit(1);
+    macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
+
+    let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
+    let workload = try!(workload::Random::new(branch!("workload"), &source));
+    let platform = try!(platform::Thermal::new(branch!("platform")));
+    let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
+
+    System::new(traffic, workload, platform, schedule)
 }
