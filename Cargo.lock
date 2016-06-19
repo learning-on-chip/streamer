@@ -8,7 +8,7 @@ dependencies = [
  "fractal 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "probability 0.14.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "random 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "random 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.22.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -164,13 +164,13 @@ name = "probability"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "random 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "random 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "special 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "random"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
