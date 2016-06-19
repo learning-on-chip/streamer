@@ -9,14 +9,10 @@ extern crate sqlite;
 extern crate temperature;
 extern crate threed_ice;
 
-#[cfg(test)]
-extern crate assert;
+#[cfg(test)] extern crate assert;
+#[macro_use] extern crate log;
 
-#[macro_use]
-extern crate log;
-
-#[macro_use]
-mod macros;
+#[macro_use] mod macros;
 
 mod math;
 mod result;
@@ -34,3 +30,11 @@ pub type Config = configuration::Tree;
 
 /// A source of randomness.
 pub type Source = random::Default;
+
+/// Create a source of randomness.
+pub fn source(mut seed: u64) -> Source {
+    if seed == 0 {
+        seed = !0u64
+    }
+    random::default().seed([0x12345678 & seed, 0x87654321 & seed])
+}

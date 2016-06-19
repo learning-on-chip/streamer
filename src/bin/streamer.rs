@@ -1,6 +1,5 @@
 extern crate arguments;
 extern crate configuration;
-extern crate random;
 extern crate sql;
 extern crate sqlite;
 extern crate term;
@@ -103,11 +102,7 @@ fn display(system: &System, event: &Event) {
 }
 
 fn setup(config: &Config) -> Result<System> {
-    let source = {
-        let seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
-        let seed = if seed > 0 { seed } else { !0u64 };
-        random::default().seed([0x12345678 & seed, 0x87654321 & seed])
-    };
+    let source = streamer::source(config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0));
 
     macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
 
