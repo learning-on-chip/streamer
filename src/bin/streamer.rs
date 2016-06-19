@@ -100,10 +100,9 @@ fn display(system: &System, event: &Event) {
 }
 
 fn setup(config: &Config) -> Result<System> {
-    let source = streamer::source(config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0));
-
     macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
 
+    let source = streamer::source(config);
     let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
     let workload = try!(workload::Random::new(branch!("workload"), &source));
     let platform = try!(platform::Thermal::new(branch!("platform")));

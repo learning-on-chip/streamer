@@ -32,7 +32,8 @@ pub type Config = configuration::Tree;
 pub type Source = random::Default;
 
 /// Create a source of randomness.
-pub fn source(mut seed: u64) -> Source {
+pub fn source(config: &Config) -> Source {
+    let mut seed = config.get::<i64>("seed").map(|&seed| seed as u64).unwrap_or(0);
     if seed == 0 {
         seed = !0u64
     }
