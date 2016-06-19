@@ -7,15 +7,19 @@ extern crate term;
 #[macro_use] extern crate log;
 #[macro_use] extern crate streamer;
 
+mod logger;
+mod output;
+
+pub use streamer::{Config, Error, Result};
+
 use configuration::format::TOML;
 use log::LogLevel;
 use streamer::{platform, schedule, system, traffic, workload};
 
-pub use streamer::{Config, Error, Result};
+use logger::Logger;
 
 pub type Data = (platform::Profile, platform::Profile);
 pub type Event = system::Event;
-
 pub type System = system::System<traffic::Fractal,
                                  workload::Random,
                                  platform::Thermal,
@@ -34,9 +38,6 @@ Options:
     --verbose                Display progress information.
     --help                   Display this message.
 ";
-
-mod logger;
-mod output;
 
 #[allow(unused_must_use)]
 fn main() {
@@ -58,9 +59,9 @@ fn start() -> Result<()> {
         return Ok(());
     }
     if arguments.get::<bool>("verbose").unwrap_or(false) {
-        logger::setup(LogLevel::Info);
+        Logger::new(LogLevel::Info).activate();
     } else {
-        logger::setup(LogLevel::Warn);
+        Logger::new(LogLevel::Warn).activate();
     }
 
     let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
