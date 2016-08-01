@@ -1,5 +1,6 @@
 language: rust
 sudo: false
+
 rust:
   - stable
   - beta
@@ -15,11 +16,10 @@ script:
   - cargo run -- --config tests/fixtures/streamer.toml --verbose
 
 after_success:
-  - curl https://learning-on-chip.github.io/travis/after_success.sh | bash
+  - curl https://learning-on-chip.github.io/travis/documentation.sh | bash
 
 env:
   global:
-    - RUSTDOC_VERSION=stable
     - secure: DwgjKduTKlBlnrNeHdxb9myTCLmEvT4a3MB9pqR1uhxeNS2MzJXHbVRX9bgy/ZPhI5q0fC/3XFgreFy8IqPDzqTEV4QuUByqs7a8E21mYJgWuw4kQE5sdly1HZAnKl1CaqG/rFewmca4yQFEPv1ZtA/VuL82NyRoNn6PXDs6JxQEKvfMhDuBMppc7VmIPpjF7abPnXbG6+fz9IttOF0JdLmnUfck9vo9ysfbrRj53I7tBvlyETpWjGfvs4sKJv3sa71kc2Qw9A8+S/Z7G90zJtRVPJw/2lwcCw+GSuTwuFPCovr+1lSnQqql3kN6pClGAVhsPY0SWxpu9/Q9iNCCJIY/9t5buM/uqdXt3FKDob+mmii+9xBikE9oeLBK0BR+a7Ob/V5RWhZkaAmZWMgSuXe/QRgyilpHmneNRyKoP6eFVmHdqe4YzhSgxZdsEdlAgp8C8VRuDhSBEtUqUFDWqlxTRLc9LO4++xCOm0GAxxjRcCuyOhLXSePDsfugDPPiDjxitkSkqPxfvUQNSQegSXykuemTT3qNSAjuSZb5bZc3c0fi6IwkskEwqpJry2MBn1UwTScF04jpFUX/ZLb4gftqlH+ibHYxrX8DjSc8quNnP0PraZ9An2UpZ6nO1lzpm00J97tkMDkTul8mL7e+wdA4aGGUu5+b8+zVJtm3op0=
 
 notifications:
