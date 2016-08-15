@@ -1,4 +1,4 @@
-//! Multiprocessor platform.
+//! Platform simulation.
 
 use Result;
 use system::Job;

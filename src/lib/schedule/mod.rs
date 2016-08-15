@@ -1,4 +1,4 @@
-//! Scheduling policy.
+//! Job scheduling.
 
 use Result;
 use system::Job;

@@ -7,19 +7,17 @@ extern crate term;
 #[macro_use] extern crate log;
 #[macro_use] extern crate streamer;
 
-mod logger;
-mod output;
-
-pub use streamer::{Config, Error, Result};
-
 use configuration::format::TOML;
 use log::LogLevel;
-use streamer::{platform, schedule, system, traffic, workload};
+use streamer::{Config, Result};
+use streamer::{platform, schedule, traffic, workload};
+use streamer::output::{self, Output};
+use streamer::system::{self, Event};
+
+mod logger;
 
 use logger::Logger;
 
-pub type Data = (platform::Profile, platform::Profile);
-pub type Event = system::Event;
 pub type System = system::System<traffic::Fractal,
                                  workload::Random,
                                  platform::Thermal,
@@ -68,14 +66,19 @@ fn start() -> Result<()> {
                                       "a configuration file is required")));
 
     let mut system = try!(setup(&config));
-    let mut output = try!(output::new(&system, arguments.get::<String>("output")));
+    let mut output = match arguments.get::<String>("output") {
+        Some(path) => Some(try!(output::Thermal::new(system.platform(), path))),
+        _ => None,
+    };
 
     let length = arguments.get::<f64>("length").unwrap_or(DEFAULT_LENGH);
 
     info!(target: "Streamer", "Synthesizing {} seconds...", length);
     while let Some((event, data)) = try!(system.next()) {
         display(&system, &event);
-        try!(output.next(&event, &data));
+        if let Some(ref mut output) = output {
+            try!(output.next(&event, &data));
+        }
         if event.time > length {
             break;
         }

@@ -1,4 +1,4 @@
-//! System modeling.
+//! System simulation.
 
 use std::collections::BinaryHeap;
 

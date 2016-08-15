@@ -2,20 +2,23 @@ use sqlite::{Connection, Statement, State};
 use std::mem;
 use std::path::Path;
 
+use Result;
 use output::Output;
-use streamer::platform::{Platform, Profile};
-use streamer::system::{EventKind, Job};
-use {Data, Event, Result, System};
+use platform::{self, Profile};
+use system::{Event, Job};
 
-pub struct Database {
+/// An output storing power and temperature data.
+pub struct Thermal {
     #[allow(dead_code)]
     connection: Connection,
     arrivals: Statement<'static>,
     profiles: Statement<'static>,
 }
 
-impl Database {
-    pub fn new<T: AsRef<Path>>(system: &System, path: T) -> Result<Database> {
+impl Thermal {
+    /// Create an output.
+    pub fn new<T>(platform: &platform::Thermal, path: T) -> Result<Self> where T: AsRef<Path> {
+        use platform::Platform;
         use sql::prelude::*;
 
         let connection = ok!(Connection::open(path));
@@ -49,7 +52,7 @@ impl Database {
             unsafe { mem::transmute(statement) }
         };
         let profiles = {
-            let units = system.platform().elements().len();
+            let units = platform.elements().len();
             let statement = ok!(connection.prepare({
                 ok!(insert_into("profiles").columns(&[
                     "time", "component_id", "power", "temperature",
@@ -58,11 +61,7 @@ impl Database {
             unsafe { mem::transmute(statement) }
         };
 
-        Ok(Database {
-            connection: connection,
-            arrivals: arrivals,
-            profiles: profiles,
-        })
+        Ok(Thermal { connection: connection, arrivals: arrivals, profiles: profiles })
     }
 
     fn write_arrival(&mut self, job: &Job) -> Result<()> {
@@ -98,8 +97,12 @@ impl Database {
     }
 }
 
-impl Output for Database {
-    fn next(&mut self, event: &Event, &(ref power, ref temperature): &Data) -> Result<()> {
+impl Output for Thermal {
+    type Data = (Profile, Profile);
+
+    fn next(&mut self, event: &Event, &(ref power, ref temperature): &Self::Data) -> Result<()> {
+        use system::EventKind;
+
         ok!(self.connection.execute("BEGIN TRANSACTION"));
         if let &EventKind::Arrived(ref job) = &event.kind {
             ok!(self.write_arrival(job));
