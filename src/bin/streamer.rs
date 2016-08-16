@@ -9,8 +9,7 @@ extern crate term;
 
 use configuration::format::TOML;
 use log::LogLevel;
-use streamer::{Config, Result};
-use streamer::{platform, schedule, traffic, workload};
+use streamer::{Result, platform, schedule, traffic, workload};
 use streamer::output::{self, Output};
 use streamer::system::{self, Event};
 
@@ -18,12 +17,10 @@ mod logger;
 
 use logger::Logger;
 
-pub type System = system::System<traffic::Fractal,
-                                 workload::Random,
-                                 platform::Thermal,
-                                 schedule::Impartial>;
-
-const DEFAULT_LENGH: f64 = 10.0;
+type System = system::System<traffic::Fractal,
+                             workload::Random,
+                             platform::Thermal,
+                             schedule::Impartial>;
 
 const USAGE: &'static str = "
 Usage: streamer [options]
@@ -62,17 +59,23 @@ fn start() -> Result<()> {
         Logger::install(LogLevel::Warn);
     }
 
-    let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
-                                      "a configuration file is required")));
-
-    let mut system = try!(setup(&config));
+    let mut system = {
+        let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
+                                          "a configuration file is required")));
+        macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(&config)));
+        let source = streamer::source(&config);
+        let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
+        let workload = try!(workload::Random::new(branch!("workload"), &source));
+        let platform = try!(platform::Thermal::new(branch!("platform")));
+        let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
+        try!(System::new(traffic, workload, platform, schedule))
+    };
     let mut output = match arguments.get::<String>("output") {
         Some(path) => Some(try!(output::Thermal::new(system.platform(), path))),
         _ => None,
     };
 
-    let length = arguments.get::<f64>("length").unwrap_or(DEFAULT_LENGH);
-
+    let length = arguments.get::<f64>("length").unwrap_or(10.0);
     info!(target: "Streamer", "Synthesizing {} seconds...", length);
     while let Some((event, data)) = try!(system.next()) {
         display(&system, &event);
@@ -100,16 +103,4 @@ fn display(system: &System, event: &Event) {
           "{:8.2} s | job #{:4} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
           event.time, job.id, job.name, job.units, job.duration(), kind,
           system.history().arrived - system.history().started);
-}
-
-fn setup(config: &Config) -> Result<System> {
-    macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(config)));
-
-    let source = streamer::source(config);
-    let traffic = try!(traffic::Fractal::new(branch!("traffic"), &source));
-    let workload = try!(workload::Random::new(branch!("workload"), &source));
-    let platform = try!(platform::Thermal::new(branch!("platform")));
-    let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
-
-    System::new(traffic, workload, platform, schedule)
 }
