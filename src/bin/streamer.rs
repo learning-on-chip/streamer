@@ -1,7 +1,5 @@
 extern crate arguments;
 extern crate configuration;
-extern crate sql;
-extern crate sqlite;
 extern crate term;
 
 #[macro_use] extern crate log;
