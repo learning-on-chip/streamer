@@ -2,23 +2,19 @@ use sqlite::{Connection, Statement, State};
 use std::mem;
 use std::path::Path;
 
-use Result;
-use output::Output;
-use platform::{self, Profile};
-use system::{Event, Job};
+use streamer::Result;
+use streamer::platform::{self, Platform, Profile};
+use streamer::system::{Event, EventKind, Job};
 
-/// An output storing power and temperature data.
-pub struct Thermal {
+pub struct Database {
     #[allow(dead_code)]
     connection: Connection,
     arrivals: Statement<'static>,
     profiles: Statement<'static>,
 }
 
-impl Thermal {
-    /// Create an output.
+impl Database {
     pub fn new<T>(platform: &platform::Thermal, path: T) -> Result<Self> where T: AsRef<Path> {
-        use platform::Platform;
         use sql::prelude::*;
 
         let connection = ok!(Connection::open(path));
@@ -61,7 +57,19 @@ impl Thermal {
             unsafe { mem::transmute(statement) }
         };
 
-        Ok(Thermal { connection: connection, arrivals: arrivals, profiles: profiles })
+        Ok(Database { connection: connection, arrivals: arrivals, profiles: profiles })
+    }
+
+    pub fn next(&mut self, event: &Event, &(ref power, ref temperature): &(Profile, Profile))
+                -> Result<()> {
+
+        ok!(self.connection.execute("BEGIN TRANSACTION"));
+        if let &EventKind::Arrived(ref job) = &event.kind {
+            ok!(self.write_arrival(job));
+        }
+        ok!(self.write_profile(power, temperature));
+        ok!(self.connection.execute("END TRANSACTION"));
+        Ok(())
     }
 
     fn write_arrival(&mut self, job: &Job) -> Result<()> {
@@ -93,22 +101,6 @@ impl Thermal {
                 raise!("failed to write into the database");
             }
         }
-        Ok(())
-    }
-}
-
-impl Output for Thermal {
-    type Data = (Profile, Profile);
-
-    fn next(&mut self, event: &Event, &(ref power, ref temperature): &Self::Data) -> Result<()> {
-        use system::EventKind;
-
-        ok!(self.connection.execute("BEGIN TRANSACTION"));
-        if let &EventKind::Arrived(ref job) = &event.kind {
-            ok!(self.write_arrival(job));
-        }
-        ok!(self.write_profile(power, temperature));
-        ok!(self.connection.execute("END TRANSACTION"));
         Ok(())
     }
 }
