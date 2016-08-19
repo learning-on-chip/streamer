@@ -6,14 +6,14 @@ use streamer::Result;
 use streamer::platform::{self, Platform, Profile};
 use streamer::system::{Event, EventKind, Job};
 
-pub struct Database {
+pub struct Output {
     #[allow(dead_code)]
     connection: Connection,
     arrivals: Statement<'static>,
     profiles: Statement<'static>,
 }
 
-impl Database {
+impl Output {
     pub fn new<T>(platform: &platform::Thermal, path: T) -> Result<Self> where T: AsRef<Path> {
         use sql::prelude::*;
 
@@ -57,7 +57,7 @@ impl Database {
             unsafe { mem::transmute(statement) }
         };
 
-        Ok(Database { connection: connection, arrivals: arrivals, profiles: profiles })
+        Ok(Output { connection: connection, arrivals: arrivals, profiles: profiles })
     }
 
     pub fn next(&mut self, event: &Event, &(ref power, ref temperature): &(Profile, Profile))
