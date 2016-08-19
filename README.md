@@ -12,8 +12,6 @@ Usage: streamer [options]
 
 Options:
     --config <path>          Configuration file (required).
-    --length <time>          Time span to synthesize in seconds [default: 10].
-    --output <path>          Output file for power and temperature profiles.
 
     --verbose                Display progress information.
     --help                   Display this message.
