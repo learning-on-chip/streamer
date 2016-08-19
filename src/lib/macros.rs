@@ -68,7 +68,7 @@ macro_rules! order {
 /// Fetch a path from a configuration or raise an error.
 #[macro_export]
 macro_rules! path(
-    ($config:ident, $($argument:tt)+) => ({
+    (@unchecked $config:ident, $($argument:tt)+) => ({
         let path = some!($config.get::<String>("path"), $($argument)+);
         let mut path = ::std::path::PathBuf::from(path);
         if path.is_relative() {
@@ -76,6 +76,10 @@ macro_rules! path(
                 path = ::std::path::Path::new(root).join(path);
             }
         }
+        path
+    });
+    ($config:ident, $($argument:tt)+) => ({
+        let path = path!(@unchecked $config, $($argument)+);
         if ::std::fs::metadata(&path).is_err() {
             raise!("the file {:?} does not exist", &path);
         }
