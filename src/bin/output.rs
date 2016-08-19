@@ -41,8 +41,8 @@ impl Output {
             ));
             unsafe { mem::transmute(statement) }
         };
-        let units = platform.elements().len();
         let profiles = {
+            let units = platform.elements().len();
             let statement = ok!(connection.prepare(
                 ok!(insert_into("profiles").columns(&[
                     "time", "component_id", "power", "temperature",
