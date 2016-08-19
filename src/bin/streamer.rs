@@ -69,8 +69,8 @@ fn start() -> Result<()> {
         let schedule = try!(schedule::Impartial::new(branch!("schedule"), &platform));
         try!(System::new(traffic, workload, platform, schedule))
     };
-    let time_span = *some!(branch!("output").get::<f64>("time_span"), "a time span is required");
-    let mut output = if branch!("output").get::<String>("path").is_some() {
+    let time_span = *some!(config.get::<f64>("output.time_span"), "a time span is required");
+    let mut output = if config.get::<String>("output.path").is_some() {
         Some(try!(Output::new(system.platform(), branch!("output"))))
     } else {
         None
