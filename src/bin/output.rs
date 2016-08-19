@@ -53,14 +53,12 @@ impl Output {
         Ok(Output { connection: connection, arrivals: arrivals, profiles: profiles })
     }
 
-    pub fn next(&mut self, event: &Event, &(ref power, ref temperature): &(Profile, Profile))
-                -> Result<()> {
-
+    pub fn next(&mut self, event: &Event, profiles: &(Profile, Profile)) -> Result<()> {
         ok!(self.connection.execute("BEGIN TRANSACTION"));
         if let &EventKind::Arrived(ref job) = &event.kind {
             ok!(self.write_arrival(job));
         }
-        ok!(self.write_profile(power, temperature));
+        ok!(self.write_profiles(profiles));
         ok!(self.connection.execute("END TRANSACTION"));
         Ok(())
     }
@@ -75,9 +73,9 @@ impl Output {
         Ok(())
     }
 
-    fn write_profile(&mut self, power: &Profile, temperature: &Profile) -> Result<()> {
-        let &Profile { units, steps, time, time_step, data: ref power } = power;
-        let &Profile { data: ref temperature, .. } = temperature;
+    fn write_profiles(&mut self, profiles: &(Profile, Profile)) -> Result<()> {
+        let &Profile { units, steps, time, time_step, data: ref power } = &profiles.0;
+        let &Profile { data: ref temperature, .. } = &profiles.1;
         let statement = &mut self.profiles;
         for i in 0..steps {
             let time = time + (i as f64) * time_step;
