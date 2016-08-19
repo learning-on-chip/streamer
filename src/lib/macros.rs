@@ -65,6 +65,8 @@ macro_rules! order {
     });
 }
 
+/// Fetch a path from a configuration or raise an error.
+#[macro_export]
 macro_rules! path(
     ($config:ident, $($argument:tt)+) => ({
         let path = some!($config.get::<String>("path"), $($argument)+);
