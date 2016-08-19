@@ -2,6 +2,9 @@ seed = 0
 time_step = 1e-3
 root = "tests/fixtures"
 
+[output]
+time_span = 10.0
+
 [platform.power]
 path = "blackscholes.sqlite3"
 

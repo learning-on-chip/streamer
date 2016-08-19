@@ -1,8 +1,7 @@
 use sqlite::{Connection, Statement, State};
 use std::mem;
-use std::path::Path;
 
-use streamer::Result;
+use streamer::{Config, Result};
 use streamer::platform::{self, Platform, Profile};
 use streamer::system::{Event, EventKind, Job};
 
@@ -14,49 +13,43 @@ pub struct Output {
 }
 
 impl Output {
-    pub fn new<T>(platform: &platform::Thermal, path: T) -> Result<Self> where T: AsRef<Path> {
+    pub fn new(platform: &platform::Thermal, config: &Config) -> Result<Self> {
         use sql::prelude::*;
 
-        let connection = ok!(Connection::open(path));
-
+        let connection = ok!(Connection::open(path!(@unchecked config,
+                                                    "an output file is required")));
         ok!(connection.execute("
             PRAGMA journal_mode = MEMORY;
             PRAGMA synchronous = OFF;
         "));
-
-        ok!(connection.execute({
+        ok!(connection.execute(
             ok!(create_table("arrivals").if_not_exists().columns(&[
                 "time".float().not_null(),
             ]).compile())
-        }));
-        ok!(connection.execute({
+        ));
+        ok!(connection.execute(
             ok!(create_table("profiles").if_not_exists().columns(&[
                 "time".float().not_null(), "component_id".integer().not_null(),
                 "power".float().not_null(), "temperature".float().not_null(),
             ]).compile())
-        }));
-
+        ));
         ok!(connection.execute(ok!(delete_from("arrivals").compile())));
         ok!(connection.execute(ok!(delete_from("profiles").compile())));
-
         let arrivals = {
-            let statement = ok!(connection.prepare({
-                ok!(insert_into("arrivals").columns(&[
-                    "time",
-                ]).compile())
-            }));
+            let statement = ok!(connection.prepare(
+                ok!(insert_into("arrivals").columns(&["time"]).compile())
+            ));
             unsafe { mem::transmute(statement) }
         };
+        let units = platform.elements().len();
         let profiles = {
-            let units = platform.elements().len();
-            let statement = ok!(connection.prepare({
+            let statement = ok!(connection.prepare(
                 ok!(insert_into("profiles").columns(&[
                     "time", "component_id", "power", "temperature",
                 ]).batch(units).compile())
-            }));
+            ));
             unsafe { mem::transmute(statement) }
         };
-
         Ok(Output { connection: connection, arrivals: arrivals, profiles: profiles })
     }
 
