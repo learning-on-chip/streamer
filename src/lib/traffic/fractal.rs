@@ -16,14 +16,12 @@ impl Fractal {
     /// Create a model.
     pub fn new(config: &Config, source: &Source) -> Result<Fractal> {
         let path = path!(config, "a traffic-pattern database is required");
-
         info!(target: "Traffic", "Reading interarrivals from {:?}...", &path);
         let data = try!(traffic::read_interarrivals(&path));
         let ncoarse = match (data.len() as f64).log2().floor() {
             ncoarse if ncoarse < 1.0 => raise!("there are not enough data"),
             ncoarse => ncoarse as usize,
         };
-
         info!(target: "Traffic", "Read {} interarrivals. Fitting the model...", data.len());
         Ok(Fractal {
             time: 0.0,

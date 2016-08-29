@@ -2,7 +2,7 @@ use std::cmp::Ord;
 
 use math;
 use platform::{Element, Platform};
-use schedule::{Decision, NoData, Schedule, Queue};
+use schedule::{Decision, Mapping, NoData, Schedule, Queue};
 use system::Job;
 use {Config, Result};
 
@@ -30,20 +30,15 @@ impl Schedule for Impartial {
         let hosts = &self.elements;
         let guests = &job.elements;
         let (have, need) = (hosts.len(), guests.len());
-
         let mut start = job.arrival;
         let length = job.duration();
-
         'outer: loop {
             let intervals = self.queues.iter().map(|queue| queue.next(start, length))
                                               .collect::<Vec<_>>();
-
             let order = sort(&intervals);
             start = intervals[order[0]].start();
-
             let mut found = vec![None; need];
             let mut taken = vec![false; have];
-
             'inner: for i in 0..need {
                 for &j in &order {
                     if taken[j] || intervals[j].start() != start {
@@ -63,16 +58,14 @@ impl Schedule for Impartial {
                 }
                 raise!("failed to allocate resources for a job");
             }
-
             start = start.max(math::next_after(job.arrival));
             let finish = start + length;
-            let mut mapping = Vec::with_capacity(need);
+            let mut mapping = Mapping::with_capacity(need);
             for i in 0..need {
                 let j = some!(found[i]);
                 self.queues[j].push((start, finish));
                 mapping.push((i, hosts[j].id));
             }
-
             return Ok(Decision::accept(start, finish, mapping));
         }
     }

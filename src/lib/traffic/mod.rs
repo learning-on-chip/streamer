@@ -22,10 +22,8 @@ fn read_interarrivals<T: AsRef<Path>>(path: T) -> Result<Vec<f64>> {
     use sqlite::{Connection, State};
 
     let backend = ok!(Connection::open(path));
-
     let statement = select_from("arrivals").column("time").order_by(column("time").ascend());
     let mut statement = ok!(backend.prepare(ok!(statement.compile())));
-
     let mut data = Vec::new();
     let mut last_time = {
         if let State::Done = ok!(statement.next()) {
@@ -38,7 +36,6 @@ fn read_interarrivals<T: AsRef<Path>>(path: T) -> Result<Vec<f64>> {
         data.push(time - last_time);
         last_time = time;
     }
-
     Ok(data)
 }
 

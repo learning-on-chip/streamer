@@ -22,15 +22,12 @@ impl Element {
     /// Read workload elements from a database.
     pub fn collect<T: AsRef<Path>>(path: T) -> Result<Vec<Element>> {
         let backend = ok!(Connection::open(path));
-
         let mut names = try!(read_names(&backend));
         let mut areas = try!(read_static(&backend, "area"));
         let mut leakage_power = try!(read_static(&backend, "leakage_power"));
         let mut dynamic_power = try!(read_dynamic(&backend, "dynamic_power"));
-
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
-
         let mut elements = vec![];
         for id in ids {
             elements.push(Element {

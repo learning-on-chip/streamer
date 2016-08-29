@@ -29,12 +29,15 @@ pub enum Decision {
         start: f64,
         /// The end of the execution interval.
         finish: f64,
-        /// The mapping from the processing elements of the job to the processing
-        /// elements of the platform.
-        mapping: Vec<(usize, usize)>,
+        /// The mapping of the job to the platform.
+        mapping: Mapping,
     },
     Reject,
 }
+
+/// A mapping of a job’s processing elements to the platform‘s procesing
+/// elements.
+pub type Mapping = Vec<(usize, usize)>;
 
 /// A placeholder signifying that no data are needed.
 #[derive(Clone, Copy)]
@@ -43,7 +46,7 @@ pub struct NoData;
 impl Decision {
     /// Create an accept decision.
     #[inline]
-    pub fn accept(start: f64, finish: f64, mapping: Vec<(usize, usize)>) -> Decision {
+    pub fn accept(start: f64, finish: f64, mapping: Mapping) -> Decision {
         Decision::Accept { start: start, finish: finish, mapping: mapping }
     }
 

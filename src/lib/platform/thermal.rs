@@ -2,9 +2,11 @@ use std::path::Path;
 use std::str::FromStr;
 use temperature::{self, Simulator};
 
-use platform::{Element, ElementKind, Platform, Profile, ProfileBuilder};
-use system::Job;
 use {Config, Result};
+use platform::{Element, ElementKind, Platform, Profile, ProfileBuilder};
+use schedule::Mapping;
+use system::Job;
+use workload;
 
 /// A platform producing power and temperature data.
 pub struct Thermal {
@@ -17,11 +19,11 @@ impl Thermal {
     /// Create a platform.
     pub fn new(config: &Config) -> Result<Thermal> {
         let (elements, simulator) = try!(construct_temperature(config.branch("temperature")
-                                                                     .as_ref().unwrap_or(config)));
-
-        let builder = try!(construct_power(&elements, config.branch("power").as_ref()
+                                                                     .as_ref()
+                                                                     .unwrap_or(config)));
+        let builder = try!(construct_power(&elements, config.branch("power")
+                                                            .as_ref()
                                                             .unwrap_or(config)));
-
         Ok(Thermal { elements: elements, simulator: simulator, builder: builder })
     }
 }
@@ -41,7 +43,7 @@ impl Platform for Thermal {
         Ok((power, temperature))
     }
 
-    fn push(&mut self, job: &Job, start: f64, mapping: &[(usize, usize)]) -> Result<()> {
+    fn push(&mut self, job: &Job, start: f64, mapping: &Mapping) -> Result<()> {
         let (from, onto) = (&job.elements, &self.elements);
         for &(i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
@@ -52,15 +54,11 @@ impl Platform for Thermal {
 }
 
 fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuilder> {
-    use workload;
-
     let units = elements.len();
     let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
-
     let path = path!(config, "a leakage pattern is required");
     info!(target: "Platform", "Modeling leakage power based on {:?}...", &path);
     let models = try!(workload::Element::collect(path));
-
     let mut leakage_power = vec![0.0; units];
     for (i, element) in elements.iter().enumerate() {
         if let Some(model) = models.iter().find(|model| model.kind == element.kind) {
@@ -70,7 +68,6 @@ fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuild
             raise!("cannot find leakage data for a processing element");
         }
     }
-
     Ok(ProfileBuilder::new(units, time_step, leakage_power))
 }
 
@@ -83,14 +80,12 @@ fn construct_temperature(config: &Config) -> Result<(Vec<Element>, Simulator)> {
     };
     info!(target: "Platform", "Found {} processing elements and {} thermal nodes.",
           elements.len(), circuit.capacitance.len());
-
     info!(target: "Platform", "Initializing the temperature simulator...");
     let config = temperature::Config {
         ambience: *some!(config.get::<f64>("ambience"), "an ambient temperature is required"),
         time_step: *some!(config.get::<f64>("time_step"), "a time step is required"),
     };
     let simulator = ok!(Simulator::new(circuit, config));
-
     Ok((elements, simulator))
 }
 

@@ -63,34 +63,26 @@ impl ProfileBuilder {
     /// time moment.
     pub fn push(&mut self, unit: usize, time: f64, time_step: f64, data: &[f64]) {
         let &mut ProfileBuilder { ref mut profile, ref fill } = self;
-
         debug_assert!(unit < profile.units);
         debug_assert!(time >= profile.time);
-
         let (t1, t2) = (profile.time, time);
         let (d1, d2) = (profile.time_step, time_step);
-
         let s2 = data.len();
         let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
         if s1 > profile.steps {
             let more = s1 - profile.steps;
             profile.extend(more, fill);
         }
-
         let mut j1 = ((t2 - t1) / d1) as usize;
         let mut j2 = 0;
-
         macro_rules! add(
             ($weight:expr) => (profile.data[j1 * profile.units + unit] += $weight * data[j2]);
         );
-
         while j1 < s1 && j2 < s2 {
             let l1 = t1 + (j1 as f64) * d1;
             let l2 = t2 + (j2 as f64) * d2;
-
             let r1 = l1 + d1;
             let r2 = l2 + d2;
-
             if l1 < l2 {
                 if r2 < r1 {
                     add!(1.0);
@@ -114,14 +106,12 @@ impl ProfileBuilder {
     /// Advance time and return the data accumulated since the previous call.
     pub fn pull(&mut self, time: f64) -> Profile {
         let &mut ProfileBuilder { ref mut profile, ref fill } = self;
-
         debug_assert!(time >= profile.time);
         let steps = ((time - profile.time) / profile.time_step).floor() as usize;
         if profile.steps < steps {
             let more = steps - profile.steps;
             profile.extend(more, fill);
         }
-
         let mut another = Profile {
             units: profile.units,
             steps: profile.steps - steps,
@@ -129,12 +119,9 @@ impl ProfileBuilder {
             time_step: profile.time_step,
             data: profile.data[(steps * profile.units)..].to_vec(),
         };
-
         mem::swap(profile, &mut another);
-
         another.steps = steps;
         another.data.truncate(steps * profile.units);
-
         another
     }
 }

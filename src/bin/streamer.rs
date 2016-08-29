@@ -57,7 +57,6 @@ fn start() -> Result<()> {
     } else {
         Logger::install(LogLevel::Warn);
     }
-
     let config = ok!(TOML::open(some!(arguments.get::<String>("config"),
                                       "a configuration file is required")));
     macro_rules! branch(($name:expr) => (config.branch($name).as_ref().unwrap_or(&config)));
@@ -75,7 +74,6 @@ fn start() -> Result<()> {
     } else {
         None
     };
-
     info!(target: "Streamer", "Synthesizing {} seconds...", time_span);
     while let Some((event, data)) = try!(system.next()) {
         if event.time > time_span {
@@ -87,7 +85,6 @@ fn start() -> Result<()> {
         }
     }
     info!(target: "Streamer", "Well done.");
-
     Ok(())
 }
 
