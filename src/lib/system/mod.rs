@@ -72,14 +72,14 @@ impl<T, W, P, S> System<T, W, P, S>
         let time = some!(try!(self.traffic.next()));
         let pattern = try!(self.workload.next(time));
         let job = Job::new(self.history.arrived, time, pattern);
-        let event = Event::arrived(time, job.clone());
+        let event = Event::arrive(time, job.clone());
         self.history.count(&event);
         let data = try!(self.platform.next(time));
         try!(self.schedule.push(time, (&data).into()));
         if let Decision::Accept { start, finish, mapping } = try!(self.schedule.next(&job)) {
-            self.queue.push(Event::started(start, job.clone()));
-            self.queue.push(Event::finished(finish, job.clone()));
             try!(self.platform.push(&job, start, &mapping));
+            self.queue.push(Event::start(start, job.clone(), mapping.clone()));
+            self.queue.push(Event::finish(finish, job.clone(), mapping));
         }
         Ok(Some((event, data)))
     }

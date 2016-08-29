@@ -1,3 +1,4 @@
+use schedule::Mapping;
 use system::Job;
 
 /// An event.
@@ -14,30 +15,30 @@ order!(Event(time) descending);
 /// The type of an event.
 #[derive(Clone, Debug)]
 pub enum EventKind {
-    /// A job arrived.
-    Arrived(Job),
-    /// A job started.
-    Started(Job),
-    /// A job finished.
-    Finished(Job),
+    /// A job has arrived.
+    Arrive(Job),
+    /// A job has started.
+    Start(Job, Mapping),
+    /// A job has finished.
+    Finish(Job, Mapping),
 }
 
 impl Event {
-    /// Create a job-arrived event.
+    /// Create a job-arrive event.
     #[inline]
-    pub fn arrived(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Arrived(job) }
+    pub fn arrive(time: f64, job: Job) -> Event {
+        Event { time: time, kind: EventKind::Arrive(job) }
     }
 
-    /// Create a job-started event.
+    /// Create a job-start event.
     #[inline]
-    pub fn started(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Started(job) }
+    pub fn start(time: f64, job: Job, mapping: Mapping) -> Event {
+        Event { time: time, kind: EventKind::Start(job, mapping) }
     }
 
-    /// Create a job-finished event.
+    /// Create a job-finish event.
     #[inline]
-    pub fn finished(time: f64, job: Job) -> Event {
-        Event { time: time, kind: EventKind::Finished(job) }
+    pub fn finish(time: f64, job: Job, mapping: Mapping) -> Event {
+        Event { time: time, kind: EventKind::Finish(job, mapping) }
     }
 }

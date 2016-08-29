@@ -55,7 +55,7 @@ impl Output {
 
     pub fn next(&mut self, event: &Event, profiles: &(Profile, Profile)) -> Result<()> {
         ok!(self.connection.execute("BEGIN TRANSACTION"));
-        if let &EventKind::Arrived(ref job) = &event.kind {
+        if let &EventKind::Arrive(ref job) = &event.kind {
             ok!(self.write_arrival(job));
         }
         ok!(self.write_profiles(profiles));

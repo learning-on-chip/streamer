@@ -92,9 +92,9 @@ fn display(system: &System, event: &Event) {
     use streamer::system::EventKind;
 
     let (job, kind) = match &event.kind {
-        &EventKind::Arrived(ref job) => (job, "arrived"),
-        &EventKind::Started(ref job) => (job, "started"),
-        &EventKind::Finished(ref job) => (job, "finished"),
+        &EventKind::Arrive(ref job) => (job, "arrived"),
+        &EventKind::Start(ref job, _) => (job, "started"),
+        &EventKind::Finish(ref job, _) => (job, "finished"),
     };
     info!(target: "Streamer",
           "{:8.2} s | job #{:4} ( {:20} | {:2} units | {:6.2} s ) {:8} | {:2} queued",
