@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
-use workload::Element;
 use {Config, Result};
+use workload::Element;
 
 /// A workload pattern.
 #[derive(Clone, Debug)]

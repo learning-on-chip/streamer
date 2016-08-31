@@ -1,20 +1,20 @@
 use fractal::Beta;
 use std::collections::VecDeque;
 
-use traffic::{self, Traffic};
 use {Config, Result, Source};
+use traffic::{self, Traffic};
 
 /// A multifractal wavelet model of network traffic.
 pub struct Fractal {
     time: f64,
     model: Beta,
-    source: Source,
     arrivals: VecDeque<f64>,
+    source: Source,
 }
 
 impl Fractal {
     /// Create a model.
-    pub fn new(config: &Config, source: &Source) -> Result<Fractal> {
+    pub fn new(config: &Config, source: Source) -> Result<Fractal> {
         let path = path!(config, "a traffic-pattern database is required");
         info!(target: "Traffic", "Reading interarrivals from {:?}...", &path);
         let data = try!(traffic::read_interarrivals(&path));
@@ -26,8 +26,8 @@ impl Fractal {
         Ok(Fractal {
             time: 0.0,
             model: ok!(Beta::new(&data, ncoarse)),
-            source: source.clone(),
             arrivals: VecDeque::new(),
+            source: source,
         })
     }
 

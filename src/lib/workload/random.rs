@@ -1,18 +1,18 @@
 use probability::distribution::{Categorical, Sample};
 
-use workload::{Pattern, Workload};
 use {Config, Result, Source};
+use workload::{Pattern, Workload};
 
 /// A workload model that chooses workload patterns randomly.
 pub struct Random {
     patterns: Vec<Pattern>,
-    source: Source,
     distribution: Categorical,
+    source: Source,
 }
 
 impl Random {
     /// Create a model.
-    pub fn new(config: &Config, source: &Source) -> Result<Random> {
+    pub fn new(config: &Config, source: Source) -> Result<Random> {
         let mut patterns = vec![];
         if let Some(ref configs) = config.forest("patterns") {
             for config in configs {
@@ -25,8 +25,8 @@ impl Random {
         }
         Ok(Random {
             patterns: patterns,
-            source: source.clone(),
             distribution: Categorical::new(&vec![1.0 / count as f64; count]),
+            source: source,
         })
     }
 }
