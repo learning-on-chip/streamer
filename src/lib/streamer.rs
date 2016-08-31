@@ -37,5 +37,5 @@ pub fn source(config: &Config) -> Source {
     if seed == 0 {
         seed = !0u64
     }
-    random::default().seed([0x12345678 & seed, 0x87654321 & seed])
+    random::default().seed([0x12345678 ^ seed, 0x87654321 ^ seed])
 }
