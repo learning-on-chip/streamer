@@ -6,7 +6,6 @@ use streamer::platform::{self, Platform, Profile};
 use streamer::system::{Event, EventKind, Job};
 
 pub struct Output {
-    #[allow(dead_code)]
     connection: Connection,
     arrivals: Statement<'static>,
     profiles: Statement<'static>,
