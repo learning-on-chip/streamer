@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use {Config, Result};
-use workload::Element;
+use workload::Component;
 
 /// A workload pattern.
 #[derive(Clone, Debug)]
@@ -14,14 +14,14 @@ deref! { Pattern::0 => Content }
 pub struct Content {
     /// The name.
     pub name: String,
-    /// The number of processing elements.
+    /// The number of components.
     pub units: usize,
     /// The number of time steps.
     pub steps: usize,
     /// The time step (sampling interval).
     pub time_step: f64,
-    /// The processing elements.
-    pub elements: Vec<Element>,
+    /// The components.
+    pub components: Vec<Component>,
 }
 
 impl Pattern {
@@ -36,13 +36,13 @@ impl Pattern {
         let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
 
         info!(target: "Workload", "Reading a pattern from {:?}...", &path);
-        let elements = try!(Element::collect(&path));
+        let components = try!(Component::collect(&path));
 
-        let units = elements.len();
+        let units = components.len();
         if units == 0 {
-            raise!("found a workload pattern without processing elements");
+            raise!("found a workload pattern without components");
         }
-        let steps = elements[0].dynamic_power.len();
+        let steps = components[0].dynamic_power.len();
         if steps == 0 {
             raise!("found a workload pattern without dynamic-power data");
         }
@@ -52,7 +52,7 @@ impl Pattern {
             units: units,
             steps: steps,
             time_step: time_step,
-            elements: elements,
+            components: components,
         })))
     }
 

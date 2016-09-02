@@ -2,11 +2,11 @@
 
 use Result;
 
-mod element;
+mod component;
 mod pattern;
 mod random;
 
-pub use self::element::Element;
+pub use self::component::Component;
 pub use self::pattern::{Content, Pattern};
 pub use self::random::Random;
 

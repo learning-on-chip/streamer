@@ -5,9 +5,9 @@ use std::path::Path;
 use Result;
 use platform::{self, ElementKind};
 
-/// A processing element of a workload pattern.
+/// A component of a workload pattern.
 #[derive(Clone, Debug)]
-pub struct Element {
+pub struct Component {
     /// The type.
     pub kind: ElementKind,
     /// The area.
@@ -18,9 +18,9 @@ pub struct Element {
     pub dynamic_power: Vec<f64>,
 }
 
-impl Element {
-    /// Read workload elements from a database.
-    pub fn collect<T: AsRef<Path>>(path: T) -> Result<Vec<Element>> {
+impl Component {
+    /// Read workload components from a database.
+    pub fn collect<T: AsRef<Path>>(path: T) -> Result<Vec<Component>> {
         let backend = ok!(Connection::open(path));
         let mut names = try!(read_names(&backend));
         let mut areas = try!(read_static(&backend, "area"));
@@ -28,9 +28,9 @@ impl Element {
         let mut dynamic_power = try!(read_dynamic(&backend, "dynamic_power"));
         let mut ids = names.keys().map(|&id| id).collect::<Vec<_>>();
         ids.sort();
-        let mut elements = vec![];
+        let mut components = vec![];
         for id in ids {
-            elements.push(Element {
+            components.push(Component {
                 kind: try!(names.remove(&id).unwrap().parse()),
                 area: some!(areas.remove(&id), "cannot find the area of a processing element"),
                 leakage_power: some!(leakage_power.remove(&id),
@@ -40,11 +40,11 @@ impl Element {
             });
         }
 
-        Ok(elements)
+        Ok(components)
     }
 
     /// Check if a processing element satisfies the requirements of this
-    /// workload element.
+    /// workload component.
     #[inline]
     pub fn accept(&self, element: &platform::Element) -> bool {
         self.kind == element.kind
@@ -61,7 +61,7 @@ fn read_names(backend: &Connection) -> Result<HashMap<i64, String>> {
         if let (Some(id), Some(value)) = (row[0].as_integer(), row[1].as_string()) {
             data.insert(id, value.to_string());
         } else {
-            raise!("failed to read the names of processing elements");
+            raise!("failed to read the names of workload components");
         }
     }
     Ok(data)

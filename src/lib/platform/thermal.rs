@@ -6,7 +6,7 @@ use {Config, Result};
 use platform::{Element, ElementKind, Platform, Profile, ProfileBuilder};
 use schedule::Mapping;
 use system::Job;
-use workload;
+use workload::Component;
 
 /// A platform producing power and temperature data.
 pub struct Thermal {
@@ -44,7 +44,7 @@ impl Platform for Thermal {
     }
 
     fn push(&mut self, job: &Job, start: f64, mapping: &Mapping) -> Result<()> {
-        let (from, onto) = (&job.elements, &self.elements);
+        let (from, onto) = (&job.components, &self.elements);
         for &(i, j) in mapping {
             let (from, onto) = (&from[i], &onto[j]);
             self.builder.push(onto.id, start, job.time_step, &from.dynamic_power);
@@ -58,7 +58,7 @@ fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuild
     let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
     let path = path!(config, "a leakage pattern is required");
     info!(target: "Platform", "Modeling leakage power based on {:?}...", &path);
-    let models = try!(workload::Element::collect(path));
+    let models = try!(Component::collect(path));
     let mut leakage_power = vec![0.0; units];
     for (i, element) in elements.iter().enumerate() {
         if let Some(model) = models.iter().find(|model| model.kind == element.kind) {

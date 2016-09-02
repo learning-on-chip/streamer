@@ -30,7 +30,7 @@ impl Schedule for Impartial {
 
     fn next(&mut self, job: &Job) -> Result<Decision> {
         let hosts = &self.elements;
-        let guests = &job.elements;
+        let guests = &job.components;
         let (have, need) = (hosts.len(), guests.len());
         let guest_order = permute(need, &mut self.source);
         let mut start = job.arrival;
