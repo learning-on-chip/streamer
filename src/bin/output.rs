@@ -41,11 +41,11 @@ impl Output {
             unsafe { mem::transmute(statement) }
         };
         let profiles = {
-            let units = platform.elements().len();
+            let element_count = platform.elements().len();
             let statement = ok!(connection.prepare(
                 ok!(insert_into("profiles").columns(&[
                     "time", "component_id", "power", "temperature",
-                ]).batch(units).compile())
+                ]).batch(element_count).compile())
             ));
             unsafe { mem::transmute(statement) }
         };
@@ -73,18 +73,18 @@ impl Output {
     }
 
     fn write_profiles(&mut self, profiles: &(Profile, Profile)) -> Result<()> {
-        let &Profile { units, step_count, time, time_step, data: ref power } = &profiles.0;
+        let &Profile { element_count, step_count, time, time_step, data: ref power } = &profiles.0;
         let &Profile { data: ref temperature, .. } = &profiles.1;
         let statement = &mut self.profiles;
         for i in 0..step_count {
             let time = time + (i as f64) * time_step;
             ok!(statement.reset());
             let mut k = 0;
-            for j in 0..units {
+            for j in 0..element_count {
                 ok!(statement.bind(k + 1, time));
                 ok!(statement.bind(k + 2, j as i64));
-                ok!(statement.bind(k + 3, power[i * units + j]));
-                ok!(statement.bind(k + 4, temperature[i * units + j]));
+                ok!(statement.bind(k + 3, power[i * element_count + j]));
+                ok!(statement.bind(k + 4, temperature[i * element_count + j]));
                 k += 4;
             }
             if State::Done != ok!(statement.next()) {

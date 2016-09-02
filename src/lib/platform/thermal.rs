@@ -54,12 +54,12 @@ impl Platform for Thermal {
 }
 
 fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuilder> {
-    let units = elements.len();
+    let element_count = elements.len();
     let time_step = *some!(config.get::<f64>("time_step"), "a time step is required");
     let path = path!(config, "a leakage pattern is required");
     info!(target: "Platform", "Modeling leakage power based on {:?}...", &path);
     let models = try!(Component::collect(path));
-    let mut leakage_power = vec![0.0; units];
+    let mut leakage_power = vec![0.0; element_count];
     for (i, element) in elements.iter().enumerate() {
         if let Some(model) = models.iter().find(|model| model.kind == element.kind) {
             debug_assert!(element.area > 0.0 && model.area > 0.0);
@@ -68,7 +68,7 @@ fn construct_power(elements: &[Element], config: &Config) -> Result<ProfileBuild
             raise!("cannot find leakage data for a processing element");
         }
     }
-    Ok(ProfileBuilder::new(units, time_step, leakage_power))
+    Ok(ProfileBuilder::new(element_count, time_step, leakage_power))
 }
 
 fn construct_temperature(config: &Config) -> Result<(Vec<Element>, Simulator)> {

@@ -6,7 +6,7 @@ use std::mem;
 /// interval with respect to a number of processing elements.
 pub struct Profile {
     /// The number of processing elements.
-    pub units: usize,
+    pub element_count: usize,
     /// The number of time steps.
     pub step_count: usize,
     /// The beginning of the time interval.
@@ -26,24 +26,30 @@ pub struct ProfileBuilder {
 impl Profile {
     /// Create a profile.
     #[inline]
-    pub fn new(units: usize, time_step: f64) -> Profile {
-        Profile { units: units, step_count: 0, time: 0.0, time_step: time_step, data: vec![] }
+    pub fn new(element_count: usize, time_step: f64) -> Profile {
+        Profile {
+            element_count: element_count,
+            step_count: 0,
+            time: 0.0,
+            time_step: time_step,
+            data: vec![],
+        }
     }
 
     /// Create a copy but with the data zeroed out.
     pub fn clone_zero(&self) -> Profile {
         Profile {
-            units: self.units,
+            element_count: self.element_count,
             step_count: self.step_count,
             time: self.time,
             time_step: self.time_step,
-            data: vec![0.0; self.units * self.step_count],
+            data: vec![0.0; self.element_count * self.step_count],
         }
     }
 
     fn extend(&mut self, step_count: usize, fill: &[f64]) {
-        debug_assert_eq!(fill.len(), self.units);
-        self.data.reserve(step_count * self.units);
+        debug_assert_eq!(fill.len(), self.element_count);
+        self.data.reserve(step_count * self.element_count);
         for _ in 0..step_count {
             self.data.extend(fill);
         }
@@ -54,16 +60,16 @@ impl Profile {
 impl ProfileBuilder {
     /// Create a builder.
     #[inline]
-    pub fn new(units: usize, time_step: f64, fill: Vec<f64>) -> ProfileBuilder {
-        debug_assert_eq!(units, fill.len());
-        ProfileBuilder { profile: Profile::new(units, time_step), fill: fill }
+    pub fn new(element_count: usize, time_step: f64, fill: Vec<f64>) -> ProfileBuilder {
+        debug_assert_eq!(element_count, fill.len());
+        ProfileBuilder { profile: Profile::new(element_count, time_step), fill: fill }
     }
 
     /// Add data to a particular processing element starting from a particular
     /// time moment.
-    pub fn push(&mut self, unit: usize, time: f64, time_step: f64, data: &[f64]) {
+    pub fn push(&mut self, element_id: usize, time: f64, time_step: f64, data: &[f64]) {
         let &mut ProfileBuilder { ref mut profile, ref fill } = self;
-        debug_assert!(unit < profile.units);
+        debug_assert!(element_id < profile.element_count);
         debug_assert!(time >= profile.time);
         let (t1, t2) = (profile.time, time);
         let (d1, d2) = (profile.time_step, time_step);
@@ -76,7 +82,9 @@ impl ProfileBuilder {
         let mut j1 = ((t2 - t1) / d1) as usize;
         let mut j2 = 0;
         macro_rules! add(
-            ($weight:expr) => (profile.data[j1 * profile.units + unit] += $weight * data[j2]);
+            ($weight:expr) => (
+                profile.data[j1 * profile.element_count + element_id] += $weight * data[j2];
+            );
         );
         while j1 < s1 && j2 < s2 {
             let l1 = t1 + (j1 as f64) * d1;
@@ -113,15 +121,15 @@ impl ProfileBuilder {
             profile.extend(more, fill);
         }
         let mut another = Profile {
-            units: profile.units,
+            element_count: profile.element_count,
             step_count: profile.step_count - step_count,
             time: (time / profile.time_step).floor() * profile.time_step,
             time_step: profile.time_step,
-            data: profile.data[(step_count * profile.units)..].to_vec(),
+            data: profile.data[(step_count * profile.element_count)..].to_vec(),
         };
         mem::swap(profile, &mut another);
         another.step_count = step_count;
-        another.data.truncate(step_count * profile.units);
+        another.data.truncate(step_count * profile.element_count);
         another
     }
 }
