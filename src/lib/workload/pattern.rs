@@ -17,7 +17,7 @@ pub struct Content {
     /// The number of components.
     pub units: usize,
     /// The number of time steps.
-    pub steps: usize,
+    pub step_count: usize,
     /// The time step (sampling interval).
     pub time_step: f64,
     /// The components.
@@ -42,15 +42,15 @@ impl Pattern {
         if units == 0 {
             raise!("found a workload pattern without components");
         }
-        let steps = components[0].dynamic_power.len();
-        if steps == 0 {
+        let step_count = components[0].dynamic_power.len();
+        if step_count == 0 {
             raise!("found a workload pattern without dynamic-power data");
         }
 
         Ok(Pattern(Rc::new(Content {
             name: name,
             units: units,
-            steps: steps,
+            step_count: step_count,
             time_step: time_step,
             components: components,
         })))
@@ -59,6 +59,6 @@ impl Pattern {
     /// Return the duration.
     #[inline]
     pub fn duration(&self) -> f64 {
-        self.steps as f64 * self.time_step
+        self.step_count as f64 * self.time_step
     }
 }

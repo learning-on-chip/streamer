@@ -73,10 +73,10 @@ impl Output {
     }
 
     fn write_profiles(&mut self, profiles: &(Profile, Profile)) -> Result<()> {
-        let &Profile { units, steps, time, time_step, data: ref power } = &profiles.0;
+        let &Profile { units, step_count, time, time_step, data: ref power } = &profiles.0;
         let &Profile { data: ref temperature, .. } = &profiles.1;
         let statement = &mut self.profiles;
-        for i in 0..steps {
+        for i in 0..step_count {
             let time = time + (i as f64) * time_step;
             ok!(statement.reset());
             let mut k = 0;

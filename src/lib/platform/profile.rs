@@ -8,7 +8,7 @@ pub struct Profile {
     /// The number of processing elements.
     pub units: usize,
     /// The number of time steps.
-    pub steps: usize,
+    pub step_count: usize,
     /// The beginning of the time interval.
     pub time: f64,
     /// The time step (sampling interval).
@@ -27,27 +27,27 @@ impl Profile {
     /// Create a profile.
     #[inline]
     pub fn new(units: usize, time_step: f64) -> Profile {
-        Profile { units: units, steps: 0, time: 0.0, time_step: time_step, data: vec![] }
+        Profile { units: units, step_count: 0, time: 0.0, time_step: time_step, data: vec![] }
     }
 
     /// Create a copy but with the data zeroed out.
     pub fn clone_zero(&self) -> Profile {
         Profile {
             units: self.units,
-            steps: self.steps,
+            step_count: self.step_count,
             time: self.time,
             time_step: self.time_step,
-            data: vec![0.0; self.units * self.steps],
+            data: vec![0.0; self.units * self.step_count],
         }
     }
 
-    fn extend(&mut self, steps: usize, fill: &[f64]) {
+    fn extend(&mut self, step_count: usize, fill: &[f64]) {
         debug_assert_eq!(fill.len(), self.units);
-        self.data.reserve(steps * self.units);
-        for _ in 0..steps {
+        self.data.reserve(step_count * self.units);
+        for _ in 0..step_count {
             self.data.extend(fill);
         }
-        self.steps += steps;
+        self.step_count += step_count;
     }
 }
 
@@ -69,8 +69,8 @@ impl ProfileBuilder {
         let (d1, d2) = (profile.time_step, time_step);
         let s2 = data.len();
         let s1 = ((t2 - t1 + (s2 as f64) * d2) / d1).ceil() as usize;
-        if s1 > profile.steps {
-            let more = s1 - profile.steps;
+        if s1 > profile.step_count {
+            let more = s1 - profile.step_count;
             profile.extend(more, fill);
         }
         let mut j1 = ((t2 - t1) / d1) as usize;
@@ -107,21 +107,21 @@ impl ProfileBuilder {
     pub fn pull(&mut self, time: f64) -> Profile {
         let &mut ProfileBuilder { ref mut profile, ref fill } = self;
         debug_assert!(time >= profile.time);
-        let steps = ((time - profile.time) / profile.time_step).floor() as usize;
-        if profile.steps < steps {
-            let more = steps - profile.steps;
+        let step_count = ((time - profile.time) / profile.time_step).floor() as usize;
+        if profile.step_count < step_count {
+            let more = step_count - profile.step_count;
             profile.extend(more, fill);
         }
         let mut another = Profile {
             units: profile.units,
-            steps: profile.steps - steps,
+            step_count: profile.step_count - step_count,
             time: (time / profile.time_step).floor() * profile.time_step,
             time_step: profile.time_step,
-            data: profile.data[(steps * profile.units)..].to_vec(),
+            data: profile.data[(step_count * profile.units)..].to_vec(),
         };
         mem::swap(profile, &mut another);
-        another.steps = steps;
-        another.data.truncate(steps * profile.units);
+        another.step_count = step_count;
+        another.data.truncate(step_count * profile.units);
         another
     }
 }
@@ -157,25 +157,25 @@ mod tests {
         let mut builder = ProfileBuilder::new(2, 0.5, vec![42.0, 42.0]);
 
         builder.push(0, 4.0, 1.0, &[]);
-        eq!(builder.steps, 8);
+        eq!(builder.step_count, 8);
         eq!(&builder.data, &vec![42.0; 2 * 8]);
 
         builder.push(0, 6.5, 1.0, &[]);
-        eq!(builder.steps, 13);
+        eq!(builder.step_count, 13);
         eq!(&builder.data, &vec![42.0; 2 * 13]);
 
         builder.push(0, 6.55, 1.0, &[]);
-        eq!(builder.steps, 14);
+        eq!(builder.step_count, 14);
         eq!(&builder.data, &vec![42.0; 2 * 14]);
 
         let mut builder = ProfileBuilder::new(2, 1.0, vec![42.0, 69.0]);
 
         builder.push(0, 0.0, 1.0, &[8.0, 8.0]);
-        eq!(builder.steps, 2);
+        eq!(builder.step_count, 2);
         eq!(&builder.data, &vec![50.0, 69.0, 50.0, 69.0]);
 
         builder.push(1, 1.0, 1.0, &[1.0, 1.0]);
-        eq!(builder.steps, 3);
+        eq!(builder.step_count, 3);
         eq!(&builder.data, &vec![50.0, 69.0, 50.0, 70.0, 42.0, 70.0]);
     }
 
@@ -184,7 +184,7 @@ mod tests {
         let mut builder = ProfileBuilder::new(2, 1.0, vec![0.0, 0.0]);
 
         builder.push(0, 1.0, 1.0, &[1.0, 2.0]);
-        eq!(builder.steps, 3);
+        eq!(builder.step_count, 3);
         eq!(&builder.data, &vec![
            0.0, 0.0,
            1.0, 0.0,
@@ -192,7 +192,7 @@ mod tests {
         ]);
 
         builder.push(0, 1.0, 1.0, &[1.0, 2.0, 3.0]);
-        eq!(builder.steps, 4);
+        eq!(builder.step_count, 4);
         eq!(&builder.data, &vec![
            0.0, 0.0,
            2.0, 0.0,
@@ -206,7 +206,7 @@ mod tests {
         let mut builder = ProfileBuilder::new(2, 1.0, vec![0.0, 0.0]);
 
         builder.push(1, 1.5, 1.0, &[1.0, 2.0, 3.0]);
-        eq!(builder.steps, 5);
+        eq!(builder.step_count, 5);
         eq!(&builder.data, &vec![
            0.0, 0.0,
            0.0, 0.5,
@@ -216,7 +216,7 @@ mod tests {
         ]);
 
         builder.push(0, 0.5, 0.25, &[1.0, 2.0, 3.0, 1.0, 3.0]);
-        eq!(builder.steps, 5);
+        eq!(builder.step_count, 5);
         eq!(&builder.data, &vec![
            3.0, 0.0,
            7.0, 0.5,
@@ -226,7 +226,7 @@ mod tests {
         ]);
 
         builder.push(0, 1.25, 1.0, &[1.0, 2.0, 3.0, 0.0, 4.0]);
-        eq!(builder.steps, 7);
+        eq!(builder.step_count, 7);
         eq!(&builder.data, &vec![
            3.00, 0.0,
            7.75, 0.5,
@@ -243,26 +243,26 @@ mod tests {
         let mut builder = ProfileBuilder::new(2, 1.0, vec![0.0, 0.0]);
         builder.push(0, 0.0, 1.0, &vec![42.0; 42]);
         eq!(builder.time, 0.0);
-        eq!(builder.steps, 42);
+        eq!(builder.step_count, 42);
 
         eq!(builder.pull(0.0).data, vec![]);
         eq!(builder.time, 0.0);
-        eq!(builder.steps, 42);
+        eq!(builder.step_count, 42);
 
         eq!(builder.pull(0.75).data, vec![]);
         eq!(builder.time, 0.0);
-        eq!(builder.steps, 42);
+        eq!(builder.step_count, 42);
 
         eq!(builder.pull(1.0).data, vec![42.0, 0.0]);
         eq!(builder.time, 1.0);
-        eq!(builder.steps, 41);
+        eq!(builder.step_count, 41);
 
         eq!(builder.pull(1.5).data, vec![]);
         eq!(builder.time, 1.0);
-        eq!(builder.steps, 41);
+        eq!(builder.step_count, 41);
 
         eq!(builder.pull(3.5).data, vec![42.0, 0.0, 42.0, 0.0]);
         eq!(builder.time, 3.0);
-        eq!(builder.steps, 39);
+        eq!(builder.step_count, 39);
     }
 }
