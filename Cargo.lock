@@ -62,7 +62,7 @@ name = "dwt"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-traits 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -126,7 +126,7 @@ dependencies = [
  "blas 0.15.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lapack 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-traits 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -134,12 +134,12 @@ name = "num-complex"
 version = "0.1.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-traits 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "num-traits"
-version = "0.1.35"
+version = "0.1.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -303,7 +303,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ab83497bf8bf4ed2a74259c1c802351fcd67a65baa86394b6ba73c36f4838054"
 "checksum matrix 0.21.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fb708d692b7e9c545d471d9e76c1c4064844d145513cad8ad50805f251e33d9c"
 "checksum num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)" = "f0c78e054dd19c3fd03419ade63fa661e9c49bb890ce3beb4eee5b7baf93f92f"
-"checksum num-traits 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)" = "8359ea48994f253fa958b5b90b013728b06f54872e5a58bce39540fcdd0f2527"
+"checksum num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "a16a42856a256b39c6d3484f097f6713e14feacd9bfb02290917904fae46c81c"
 "checksum openblas-src 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "1b0b0193417c7e5e2e3abe1111602890840562a0c544012f301cd281a429a781"
 "checksum options 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "4860781de16e821d563f8f61ed23bb2cf88085b41f13ab78a92da03ec135e090"
 "checksum pkg-config 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)" = "8cee804ecc7eaf201a4a207241472cc870e825206f6c031e3ee2a72fa425f2fa"
