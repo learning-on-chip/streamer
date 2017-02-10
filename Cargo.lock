@@ -12,7 +12,7 @@ dependencies = [
  "sql 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "term 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -77,7 +77,7 @@ dependencies = [
 
 [[package]]
 name = "gcc"
-version = "0.3.42"
+version = "0.3.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -198,7 +198,7 @@ name = "sqlite3-src"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "gcc 0.3.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gcc 0.3.43 (registry+https://github.com/rust-lang/crates.io-index)",
  "pkg-config 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -246,7 +246,7 @@ dependencies = [
 
 [[package]]
 name = "term"
-version = "0.4.4"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -295,7 +295,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum configuration 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "cb548015d17fac0f89c8f51d3d2c315f3e8a2a6c53148f6aa38d464c254658e3"
 "checksum dwt 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0be7c0d3011266fd9d38b920874e46b08e6aee55cae1b227bf696a58644f52ab"
 "checksum fractal 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c104ba7731e146d3a6455a897e2ddc5259dc0e74c1f4aecb4de5a4c5965484a4"
-"checksum gcc 0.3.42 (registry+https://github.com/rust-lang/crates.io-index)" = "291055c78f59ca3d84c99026c9501c469413d386bb46be1e1cf1d285cd1db3b0"
+"checksum gcc 0.3.43 (registry+https://github.com/rust-lang/crates.io-index)" = "c07c758b972368e703a562686adb39125707cc1ef3399da8c019fc6c2498a75d"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
 "checksum lapack 0.11.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a12f0632f6c487a6752db0c6b1d2a38c479469e232ad82f44f68f5278142f955"
 "checksum lapack-sys 0.11.5 (registry+https://github.com/rust-lang/crates.io-index)" = "ea95f06227447321da80834b8a0f60d3c5a9f0dc870f6a432d0facf1bb8dbc5b"
@@ -318,7 +318,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum superlu 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "bbaa351d6fa44cfa49da341c4d984ffd575de16f467e5ad86d32a348f3915881"
 "checksum superlu-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "17cd282e806f38616347c76576d7c029ec8e87470645d5e83ff364e8679f4f47"
 "checksum temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)" = "94f554c35654510e9f9a5debb7d336ad0f10ed1de426f878343b55575791bd77"
-"checksum term 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "3deff8a2b3b6607d6d7cc32ac25c0b33709453ca9cceac006caac51e963cf94a"
+"checksum term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "d168af3930b369cfe245132550579d47dfd873d69470755a19c2c6568dbbd989"
 "checksum threed-ice 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ba7c1df8729844c195f8837aef100da9f0b68ec301d816cd09aa906a7976bfb6"
 "checksum threed-ice-sys 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a1481b1ece622b60c7fc660482777ff1921a5487a8fb9ca0c8c8286a20961b65"
 "checksum toml 0.1.30 (registry+https://github.com/rust-lang/crates.io-index)" = "0590d72182e50e879c4da3b11c6488dae18fccb1ae0c7a3eda18e16795844796"
