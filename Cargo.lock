@@ -10,7 +10,7 @@ dependencies = [
  "probability 0.15.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "sql 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "sqlite 0.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sqlite 0.23.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -186,16 +186,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "sqlite"
-version = "0.23.3"
+version = "0.23.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
- "sqlite3-sys 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sqlite3-sys 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "sqlite3-src"
-version = "0.2.4"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.43 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -204,11 +204,11 @@ dependencies = [
 
 [[package]]
 name = "sqlite3-sys"
-version = "0.11.3"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
- "sqlite3-src 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sqlite3-src 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -311,9 +311,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum random 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)" = "97d13a3485349981c90c79112a11222c3e6e75de1d52b87a7525b3bf5361420f"
 "checksum special 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "21eaa7dfc4b37e1c870971950d2b2a19224a19243d3b7b50c15f82e18739a5ab"
 "checksum sql 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4386a6e4ff00c0d403fc51e8987edd1ebc59d876b2ed26a5c49eeb54450e7906"
-"checksum sqlite 0.23.3 (registry+https://github.com/rust-lang/crates.io-index)" = "bb1d137aaac193337c71908b7e8464c59091d45dd304885e3e2c7bd626f83717"
-"checksum sqlite3-src 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "4fcdd654f7498af4f5a21805bd5d4183d047f1b0e033383ded53fbff4f8a96a7"
-"checksum sqlite3-sys 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)" = "863df8fc90fec63dd816e73f2cb1461cfe8fec660519029af4f2a28c404fca96"
+"checksum sqlite 0.23.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a3cd27f80d9229b15313403f73d9180f2368f181a870be51f07e8f7f41d7a264"
+"checksum sqlite3-src 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "52f02ac7a64c3446581ee43758075d9f1cdced596d70ffe28bf02979a719dbed"
+"checksum sqlite3-sys 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "71fec807a1534bd13eeaaec396175d67c79bdc68df55e18a452726ec62a8fb08"
 "checksum statistics 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "3f4628c807954468b720f27d8863a5447d328378cbb874d633f6c4e952073acf"
 "checksum superlu 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "bbaa351d6fa44cfa49da341c4d984ffd575de16f467e5ad86d32a348f3915881"
 "checksum superlu-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "17cd282e806f38616347c76576d7c029ec8e87470645d5e83ff364e8679f4f47"
