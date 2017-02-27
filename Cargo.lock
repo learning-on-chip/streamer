@@ -3,7 +3,7 @@ name = "streamer"
 version = "0.0.1"
 dependencies = [
  "arguments 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "assert 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "assert 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "configuration 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -26,7 +26,7 @@ dependencies = [
 
 [[package]]
 name = "assert"
-version = "0.7.2"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -36,7 +36,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas-sys 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-complex 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -62,7 +62,7 @@ name = "dwt"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -96,7 +96,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lapack-sys 0.11.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-complex 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -125,21 +125,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "lapack 0.11.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)",
- "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-complex 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "num-complex"
-version = "0.1.35"
+version = "0.1.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "num-traits"
-version = "0.1.36"
+version = "0.1.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -289,7 +289,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
 "checksum arguments 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ef446ba94fd640b51609759f5280d5d2927386b58a1a4946594b4145f5d4a4c8"
-"checksum assert 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4faf9a55d5822fa56822911ccf066d060b4a4d029223947b261477c56c3f3ed"
+"checksum assert 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "5dcddca7185de51abeabdad499b4d0ea4ad554ab76ecc5bcaed774dc4df771bb"
 "checksum blas 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)" = "d89215d6295d4ca24eedbdbbeb5aaa62cab0cd64c4d474e571b8e359315aae33"
 "checksum blas-sys 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)" = "53cbdd4b36d33b64984806f031086fe013f17c86fc2e95fa4938df2e47524b5d"
 "checksum configuration 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "cb548015d17fac0f89c8f51d3d2c315f3e8a2a6c53148f6aa38d464c254658e3"
@@ -302,8 +302,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)" = "684f330624d8c3784fb9558ca46c4ce488073a8d22450415c5eb4f4cfb0d11b5"
 "checksum log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ab83497bf8bf4ed2a74259c1c802351fcd67a65baa86394b6ba73c36f4838054"
 "checksum matrix 0.21.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fb708d692b7e9c545d471d9e76c1c4064844d145513cad8ad50805f251e33d9c"
-"checksum num-complex 0.1.35 (registry+https://github.com/rust-lang/crates.io-index)" = "f0c78e054dd19c3fd03419ade63fa661e9c49bb890ce3beb4eee5b7baf93f92f"
-"checksum num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "a16a42856a256b39c6d3484f097f6713e14feacd9bfb02290917904fae46c81c"
+"checksum num-complex 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)" = "3534898d8a1f6b16c12f9fc2f4eaabc7ecdcc55f267213caa8988fdc7d60ff94"
+"checksum num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "e1cbfa3781f3fe73dc05321bed52a06d2d491eaa764c52335cf4399f046ece99"
 "checksum openblas-src 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9567796e5e1ade1bd802a37ebfbd01dc0548f8c32773b732cce5707cae043c72"
 "checksum options 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7cae662c78308e9d468ee0548cd8852e66a9b4a945c16ddcc6eed3dd9ef14cb0"
 "checksum pkg-config 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "3a8b4c6b8165cd1a1cd4b9b120978131389f64bdaf456435caa41e630edba903"
