@@ -31,7 +31,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "blas"
-version = "0.15.3"
+version = "0.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas-sys 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -91,7 +91,7 @@ dependencies = [
 
 [[package]]
 name = "lapack"
-version = "0.11.2"
+version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lapack-sys 0.11.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -123,8 +123,8 @@ name = "matrix"
 version = "0.21.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "blas 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "lapack 0.11.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blas 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lapack 0.11.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -290,14 +290,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [metadata]
 "checksum arguments 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ef446ba94fd640b51609759f5280d5d2927386b58a1a4946594b4145f5d4a4c8"
 "checksum assert 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "5dcddca7185de51abeabdad499b4d0ea4ad554ab76ecc5bcaed774dc4df771bb"
-"checksum blas 0.15.3 (registry+https://github.com/rust-lang/crates.io-index)" = "d89215d6295d4ca24eedbdbbeb5aaa62cab0cd64c4d474e571b8e359315aae33"
+"checksum blas 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)" = "5eb258fe599f994e73fdc6d2992f65b6f5c0d53a8a1ded01b5f534c8ce863b1b"
 "checksum blas-sys 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)" = "0dbb0aa755ad397cfcfb82ce50edcdf4f93eacc2697fc40f9723354d616d97d7"
 "checksum configuration 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "cb548015d17fac0f89c8f51d3d2c315f3e8a2a6c53148f6aa38d464c254658e3"
 "checksum dwt 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "537fc1f78e72b8d14a7fd0d918996a3a33220149b89ef88864256af2f5b25c3f"
 "checksum fractal 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c104ba7731e146d3a6455a897e2ddc5259dc0e74c1f4aecb4de5a4c5965484a4"
 "checksum gcc 0.3.45 (registry+https://github.com/rust-lang/crates.io-index)" = "40899336fb50db0c78710f53e87afc54d8c7266fb76262fecc78ca1a7f09deae"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
-"checksum lapack 0.11.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a12f0632f6c487a6752db0c6b1d2a38c479469e232ad82f44f68f5278142f955"
+"checksum lapack 0.11.4 (registry+https://github.com/rust-lang/crates.io-index)" = "e372b9e14c2ada73027a09e650ae1a3b27412aecaa69a27920c4bbb804148a6e"
 "checksum lapack-sys 0.11.6 (registry+https://github.com/rust-lang/crates.io-index)" = "d5a8ccdef691c70f9dd49a20f5ec864f4525e2d1f8debcf1bada9ae985531041"
 "checksum libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)" = "88ee81885f9f04bff991e306fea7c1c60a5f0f9e409e99f6b40e3311a3363135"
 "checksum log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "5141eca02775a762cc6cd564d8d2c50f67c0ea3a372cbf1c51592b3e029e10ad"
