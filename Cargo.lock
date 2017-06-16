@@ -35,7 +35,7 @@ version = "0.15.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas-sys 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -44,7 +44,7 @@ name = "blas-sys"
 version = "0.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "openblas-src 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -95,7 +95,7 @@ version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "lapack-sys 0.11.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -104,13 +104,13 @@ name = "lapack-sys"
 version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "openblas-src 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "libc"
-version = "0.2.23"
+version = "0.2.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -176,7 +176,7 @@ name = "special"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -189,7 +189,7 @@ name = "sqlite"
 version = "0.23.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite3-sys 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -207,7 +207,7 @@ name = "sqlite3-sys"
 version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite3-src 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -221,7 +221,7 @@ name = "superlu"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "matrix 0.21.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "superlu-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -232,7 +232,7 @@ version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "blas-sys 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -268,7 +268,7 @@ name = "threed-ice-sys"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "superlu-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -299,7 +299,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
 "checksum lapack 0.11.4 (registry+https://github.com/rust-lang/crates.io-index)" = "e372b9e14c2ada73027a09e650ae1a3b27412aecaa69a27920c4bbb804148a6e"
 "checksum lapack-sys 0.11.6 (registry+https://github.com/rust-lang/crates.io-index)" = "d5a8ccdef691c70f9dd49a20f5ec864f4525e2d1f8debcf1bada9ae985531041"
-"checksum libc 0.2.23 (registry+https://github.com/rust-lang/crates.io-index)" = "e7eb6b826bfc1fdea7935d46556250d1799b7fe2d9f7951071f4291710665e3e"
+"checksum libc 0.2.24 (registry+https://github.com/rust-lang/crates.io-index)" = "38f5c2b18a287cf78b4097db62e20f43cace381dc76ae5c0a3073067f78b7ddc"
 "checksum log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)" = "880f77541efa6e5cc74e76910c9884d9859683118839d6a1dc3b11e63512565b"
 "checksum matrix 0.21.6 (registry+https://github.com/rust-lang/crates.io-index)" = "69d51734d2417d02e5fe0f25eebbab7c54dafc9b14f0045b7bae4f9984473c62"
 "checksum num-complex 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)" = "412dfc143c56579aa6a22c574e38ddbf724522f1280ae2b257498cccff3fb6af"
