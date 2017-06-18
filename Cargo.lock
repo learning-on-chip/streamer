@@ -7,9 +7,9 @@ dependencies = [
  "configuration 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "fractal 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "probability 0.15.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "probability 0.15.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "random 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sql 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sql 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.23.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -71,7 +71,7 @@ version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "dwt 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "probability 0.15.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "probability 0.15.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "statistics 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -159,7 +159,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "probability"
-version = "0.15.7"
+version = "0.15.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "random 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -181,7 +181,7 @@ dependencies = [
 
 [[package]]
 name = "sql"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -307,10 +307,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum openblas-src 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "6a83675723211745cf3b08eedf276a7b7b4c6d58f9a2b41cb06a9164329e0b89"
 "checksum options 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7cae662c78308e9d468ee0548cd8852e66a9b4a945c16ddcc6eed3dd9ef14cb0"
 "checksum pkg-config 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "3a8b4c6b8165cd1a1cd4b9b120978131389f64bdaf456435caa41e630edba903"
-"checksum probability 0.15.7 (registry+https://github.com/rust-lang/crates.io-index)" = "30b48b4a9fbe4e44087ad68c9488931572fe9fbf8931a83b42572d4a0155a9c8"
+"checksum probability 0.15.8 (registry+https://github.com/rust-lang/crates.io-index)" = "c05db4a142bdd978bb91ea5ad72194dd7deb8cf8a25b7f275a2e080d7abc9294"
 "checksum random 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)" = "97d13a3485349981c90c79112a11222c3e6e75de1d52b87a7525b3bf5361420f"
 "checksum special 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)" = "13b3a383171533f0ea3cbe0140b57c66edd57be9246060beaafd19c403140776"
-"checksum sql 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4386a6e4ff00c0d403fc51e8987edd1ebc59d876b2ed26a5c49eeb54450e7906"
+"checksum sql 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c1006305372e8f9b02bfa018a03762b1cfd8dce228e44d41a6acb16f6bed6efb"
 "checksum sqlite 0.23.4 (registry+https://github.com/rust-lang/crates.io-index)" = "a3cd27f80d9229b15313403f73d9180f2368f181a870be51f07e8f7f41d7a264"
 "checksum sqlite3-src 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "967684cb9bbfad8e76d8805c634affda15e51350922fbfad62f06ca4db93c4c6"
 "checksum sqlite3-sys 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "71fec807a1534bd13eeaaec396175d67c79bdc68df55e18a452726ec62a8fb08"
