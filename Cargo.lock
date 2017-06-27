@@ -12,7 +12,7 @@ dependencies = [
  "sql 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "sqlite 0.23.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "term 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "threed-ice 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -246,7 +246,7 @@ dependencies = [
 
 [[package]]
 name = "term"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -318,7 +318,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum superlu 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "bbaa351d6fa44cfa49da341c4d984ffd575de16f467e5ad86d32a348f3915881"
 "checksum superlu-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "17cd282e806f38616347c76576d7c029ec8e87470645d5e83ff364e8679f4f47"
 "checksum temperature 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)" = "94f554c35654510e9f9a5debb7d336ad0f10ed1de426f878343b55575791bd77"
-"checksum term 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "d168af3930b369cfe245132550579d47dfd873d69470755a19c2c6568dbbd989"
+"checksum term 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "fa63644f74ce96fbeb9b794f66aff2a52d601cbd5e80f4b97123e3899f4570f1"
 "checksum threed-ice 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ba7c1df8729844c195f8837aef100da9f0b68ec301d816cd09aa906a7976bfb6"
 "checksum threed-ice-sys 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "a1481b1ece622b60c7fc660482777ff1921a5487a8fb9ca0c8c8286a20961b65"
 "checksum toml 0.1.30 (registry+https://github.com/rust-lang/crates.io-index)" = "0590d72182e50e879c4da3b11c6488dae18fccb1ae0c7a3eda18e16795844796"
