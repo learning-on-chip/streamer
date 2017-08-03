@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Fractal","A multifractal wavelet model of network traffic."]],"trait":[["Traffic","A traffic model."]]});

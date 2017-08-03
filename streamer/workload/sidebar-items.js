@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Component","A component of a workload pattern."],["Content","The content of a workload pattern."],["Pattern","A workload pattern."],["Random","A workload model that chooses workload patterns randomly."]],"trait":[["Workload","A workload model."]]});

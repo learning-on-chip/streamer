@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["SingularValue","The singular-value decomposition."],["SymmetricEigen","The eigendecomposition for symmetric matrices."]]});

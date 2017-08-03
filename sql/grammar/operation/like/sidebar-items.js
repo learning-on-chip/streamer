@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Like","A `LIKE` operation."]],"trait":[["Likable","An object that can be matched."]]});

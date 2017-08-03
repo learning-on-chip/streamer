@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Element","An element."],["Position","A position."],["Size","A size."]]});

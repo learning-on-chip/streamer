@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Names","An iterator over names."],["Options","A collection of named parameters."],["Parameters","An iterator over parameters."],["ParametersMut","An iterator over mutable parameters."],["Value","A parameter value."]],"type":[["Name","A parameter name."]]});

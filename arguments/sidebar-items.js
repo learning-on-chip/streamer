@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["parse","Parse command-line arguments."]],"struct":[["Arguments","Command-line arguments."],["Error","An error."],["Options","A collection of named parameters."],["Parser","A parser for command-line arguments."]],"type":[["Result","A result."]]});

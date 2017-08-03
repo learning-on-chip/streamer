@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Variant","A variant of a packed matrix."]],"struct":[["Packed","A packed matrix."]]});

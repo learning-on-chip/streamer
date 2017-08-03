@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CreateTable","A `CREATE TABLE` statement."],["Delete","A `DELETE` statement."],["Insert","An `INSERT` statement."],["Select","A `SELECT` statement."]]});

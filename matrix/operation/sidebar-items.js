@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Multiply","A multiplication."],["MultiplyInto","A multiplication that adds the result to a third object."],["MultiplySelf","A multiplication that overwrites the receiver with the result."],["ScaleSelf","A scaling that overwrites the receiver with the result."],["Transpose","The transpose."]]});

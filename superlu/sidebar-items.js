@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SuperMatrix","A super matrix."]],"trait":[["FromSuperMatrix","A type capable of instantiating itself from a super matrix."]]});

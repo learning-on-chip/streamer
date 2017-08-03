@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["clause","Clauses."],["definition","Definitions."],["operation","Operations."],["statement","Statements."]],"trait":[["Clause","A clause."],["Condition","A condition."],["Definition","A definition."],["Expression","An expression."],["Operation","An operation."],["Statement","A statement."]]});

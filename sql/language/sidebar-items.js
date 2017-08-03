@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["column","Create a column definition."],["create_table","Create a `CREATE TABLE` statement."],["delete_from","Create a `DELETE` statement."],["insert_into","Create an `INSERT` statement."],["select_from","Create a `SELECT` statement."]]});

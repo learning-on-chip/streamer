@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Variant","A variant of a compressed matrix."]],"struct":[["Compressed","A compressed matrix."],["Iterator","A sparse iterator."],["IteratorMut","A sparse iterator allowing mutation."]]});

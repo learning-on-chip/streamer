@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Where","A `WHERE` clause."]]});

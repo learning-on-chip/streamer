@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["EventKind","The type of an event."]],"struct":[["Event","An event."],["History","Statistics about a system."],["Job","A job."],["System","A system."]]});

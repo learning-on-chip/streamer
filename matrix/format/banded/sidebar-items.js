@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Banded","A banded matrix."],["Iterator","A sparse iterator."]]});

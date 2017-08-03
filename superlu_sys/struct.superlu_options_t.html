@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `superlu_options_t` struct in crate `superlu_sys`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, superlu_options_t">
+
+    <title>superlu_sys::superlu_options_t - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct superlu_options_t</p><div class="block items"><ul><li><a href="#fields">Fields</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>superlu_sys</a></p><script>window.sidebarCurrent = {name: 'superlu_options_t', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>superlu_sys</a>::<wbr><a class="struct" href=''>superlu_options_t</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/superlu_sys/slu_util.rs.html#10-38' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'><div class="docblock attributes">#[repr(C)]
+</div>pub struct superlu_options_t {
+    pub Fact: <a class="enum" href="../superlu_sys/enum.fact_t.html" title="enum superlu_sys::fact_t">fact_t</a>,
+    pub Equil: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub ColPerm: <a class="enum" href="../superlu_sys/enum.colperm_t.html" title="enum superlu_sys::colperm_t">colperm_t</a>,
+    pub Trans: <a class="enum" href="../superlu_sys/enum.trans_t.html" title="enum superlu_sys::trans_t">trans_t</a>,
+    pub IterRefine: <a class="enum" href="../superlu_sys/enum.IterRefine_t.html" title="enum superlu_sys::IterRefine_t">IterRefine_t</a>,
+    pub DiagPivotThresh: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a>,
+    pub SymmetricMode: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub PivotGrowth: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub ConditionNumber: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub RowPerm: <a class="enum" href="../superlu_sys/enum.rowperm_t.html" title="enum superlu_sys::rowperm_t">rowperm_t</a>,
+    pub ILU_DropRule: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub ILU_DropTol: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a>,
+    pub ILU_FillFactor: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a>,
+    pub ILU_Norm: <a class="enum" href="../superlu_sys/enum.norm_t.html" title="enum superlu_sys::norm_t">norm_t</a>,
+    pub ILU_FillTol: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a>,
+    pub ILU_MILU: <a class="enum" href="../superlu_sys/enum.milu_t.html" title="enum superlu_sys::milu_t">milu_t</a>,
+    pub ILU_MILU_Dim: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a>,
+    pub ParSymbFact: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub ReplaceTinyPivot: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub SolveInitialized: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub RefineInitialized: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub PrintStat: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub nnzL: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub nnzU: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub num_lookaheads: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub lookahead_etree: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+    pub SymPattern: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a>,
+}</pre><h2 id='fields' class='fields section-header'>
+                       <a href='#fields'>Fields</a></h2><span id='structfield.Fact' class="structfield">
+                           <span id='Fact.v' class='invisible'>
+                           <code>Fact: <a class="enum" href="../superlu_sys/enum.fact_t.html" title="enum superlu_sys::fact_t">fact_t</a></code>
+                           </span></span><span id='structfield.Equil' class="structfield">
+                           <span id='Equil.v' class='invisible'>
+                           <code>Equil: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.ColPerm' class="structfield">
+                           <span id='ColPerm.v' class='invisible'>
+                           <code>ColPerm: <a class="enum" href="../superlu_sys/enum.colperm_t.html" title="enum superlu_sys::colperm_t">colperm_t</a></code>
+                           </span></span><span id='structfield.Trans' class="structfield">
+                           <span id='Trans.v' class='invisible'>
+                           <code>Trans: <a class="enum" href="../superlu_sys/enum.trans_t.html" title="enum superlu_sys::trans_t">trans_t</a></code>
+                           </span></span><span id='structfield.IterRefine' class="structfield">
+                           <span id='IterRefine.v' class='invisible'>
+                           <code>IterRefine: <a class="enum" href="../superlu_sys/enum.IterRefine_t.html" title="enum superlu_sys::IterRefine_t">IterRefine_t</a></code>
+                           </span></span><span id='structfield.DiagPivotThresh' class="structfield">
+                           <span id='DiagPivotThresh.v' class='invisible'>
+                           <code>DiagPivotThresh: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a></code>
+                           </span></span><span id='structfield.SymmetricMode' class="structfield">
+                           <span id='SymmetricMode.v' class='invisible'>
+                           <code>SymmetricMode: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.PivotGrowth' class="structfield">
+                           <span id='PivotGrowth.v' class='invisible'>
+                           <code>PivotGrowth: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.ConditionNumber' class="structfield">
+                           <span id='ConditionNumber.v' class='invisible'>
+                           <code>ConditionNumber: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.RowPerm' class="structfield">
+                           <span id='RowPerm.v' class='invisible'>
+                           <code>RowPerm: <a class="enum" href="../superlu_sys/enum.rowperm_t.html" title="enum superlu_sys::rowperm_t">rowperm_t</a></code>
+                           </span></span><span id='structfield.ILU_DropRule' class="structfield">
+                           <span id='ILU_DropRule.v' class='invisible'>
+                           <code>ILU_DropRule: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id='structfield.ILU_DropTol' class="structfield">
+                           <span id='ILU_DropTol.v' class='invisible'>
+                           <code>ILU_DropTol: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a></code>
+                           </span></span><span id='structfield.ILU_FillFactor' class="structfield">
+                           <span id='ILU_FillFactor.v' class='invisible'>
+                           <code>ILU_FillFactor: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a></code>
+                           </span></span><span id='structfield.ILU_Norm' class="structfield">
+                           <span id='ILU_Norm.v' class='invisible'>
+                           <code>ILU_Norm: <a class="enum" href="../superlu_sys/enum.norm_t.html" title="enum superlu_sys::norm_t">norm_t</a></code>
+                           </span></span><span id='structfield.ILU_FillTol' class="structfield">
+                           <span id='ILU_FillTol.v' class='invisible'>
+                           <code>ILU_FillTol: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a></code>
+                           </span></span><span id='structfield.ILU_MILU' class="structfield">
+                           <span id='ILU_MILU.v' class='invisible'>
+                           <code>ILU_MILU: <a class="enum" href="../superlu_sys/enum.milu_t.html" title="enum superlu_sys::milu_t">milu_t</a></code>
+                           </span></span><span id='structfield.ILU_MILU_Dim' class="structfield">
+                           <span id='ILU_MILU_Dim.v' class='invisible'>
+                           <code>ILU_MILU_Dim: <a class="type" href="../libc/type.c_double.html" title="type libc::c_double">c_double</a></code>
+                           </span></span><span id='structfield.ParSymbFact' class="structfield">
+                           <span id='ParSymbFact.v' class='invisible'>
+                           <code>ParSymbFact: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.ReplaceTinyPivot' class="structfield">
+                           <span id='ReplaceTinyPivot.v' class='invisible'>
+                           <code>ReplaceTinyPivot: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.SolveInitialized' class="structfield">
+                           <span id='SolveInitialized.v' class='invisible'>
+                           <code>SolveInitialized: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.RefineInitialized' class="structfield">
+                           <span id='RefineInitialized.v' class='invisible'>
+                           <code>RefineInitialized: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.PrintStat' class="structfield">
+                           <span id='PrintStat.v' class='invisible'>
+                           <code>PrintStat: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.nnzL' class="structfield">
+                           <span id='nnzL.v' class='invisible'>
+                           <code>nnzL: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id='structfield.nnzU' class="structfield">
+                           <span id='nnzU.v' class='invisible'>
+                           <code>nnzU: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id='structfield.num_lookaheads' class="structfield">
+                           <span id='num_lookaheads.v' class='invisible'>
+                           <code>num_lookaheads: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id='structfield.lookahead_etree' class="structfield">
+                           <span id='lookahead_etree.v' class='invisible'>
+                           <code>lookahead_etree: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span><span id='structfield.SymPattern' class="structfield">
+                           <span id='SymPattern.v' class='invisible'>
+                           <code>SymPattern: <a class="enum" href="../superlu_sys/enum.yes_no_t.html" title="enum superlu_sys::yes_no_t">yes_no_t</a></code>
+                           </span></span>
+            <h2 id='implementations' class='section-header'>
+              <a href='#implementations'>Trait Implementations</a>
+            </h2>
+        <h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../superlu_sys/struct.superlu_options_t.html" title="struct superlu_sys::superlu_options_t">superlu_options_t</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/superlu_sys/slu_util.rs.html#8' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../superlu_sys/struct.superlu_options_t.html" title="struct superlu_sys::superlu_options_t">superlu_options_t</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/superlu_sys/slu_util.rs.html#8' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#111-113' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="struct" href="../superlu_sys/struct.superlu_options_t.html" title="struct superlu_sys::superlu_options_t">superlu_options_t</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/superlu_sys/slu_util.rs.html#8' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "superlu_sys";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

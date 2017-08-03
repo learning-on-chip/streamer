@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Type","A data type."]],"mod":[["grammar","The grammar."],["language","The language."],["prelude","Reexports of functions, traits, and types."]],"struct":[["Error","An error."]],"trait":[["Typable","An object that can be assigend a type."]],"type":[["Result","A result."]]});

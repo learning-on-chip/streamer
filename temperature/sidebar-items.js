@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["circuit","Thermal circuits."]],"struct":[["Circuit","A thermal circuit."],["Config","A configuration of temperature simulation."],["Error","An error."],["Simulator","A temperature simulator."]],"type":[["Result","A result."]]});

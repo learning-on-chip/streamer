@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `System` struct in crate `streamer`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, System">
+
+    <title>streamer::system::System - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct System</p><div class="block items"><ul><li><a href="#methods">Methods</a></li></ul></div><p class='location'><a href='../index.html'>streamer</a>::<wbr><a href='index.html'>system</a></p><script>window.sidebarCurrent = {name: 'System', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>streamer</a>::<wbr><a href='index.html'>system</a>::<wbr><a class="struct" href=''>System</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/streamer/system/mod.rs.html#20-27' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct System&lt;T, W, P, S&gt; { /* fields omitted */ }</pre><div class='docblock'><p>A system.</p>
+</div>
+                    <h2 id='methods' class='section-header'>
+                      <a href='#methods'>Methods</a>
+                    </h2>
+                <h3 class='impl'><span class='in-band'><code>impl&lt;T, W, P, S&gt; <a class="struct" href="../../streamer/system/struct.System.html" title="struct streamer::system::System">System</a>&lt;T, W, P, S&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="../../streamer/traffic/trait.Traffic.html" title="trait streamer::traffic::Traffic">Traffic</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;W: <a class="trait" href="../../streamer/workload/trait.Workload.html" title="trait streamer::workload::Workload">Workload</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;P: <a class="trait" href="../../streamer/platform/trait.Platform.html" title="trait streamer::platform::Platform">Platform</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href="../../streamer/schedule/trait.Schedule.html" title="trait streamer::schedule::Schedule">Schedule</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;S::<a class="type" href="../../streamer/schedule/trait.Schedule.html#associatedtype.Data" title="type streamer::schedule::Schedule::Data">Data</a>: for&lt;'l&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.From.html" title="trait core::convert::From">From</a>&lt;&amp;'l P::<a class="type" href="../../streamer/platform/trait.Platform.html#associatedtype.Data" title="type streamer::platform::Platform::Data">Data</a>&gt;,&nbsp;</span></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/streamer/system/mod.rs.html#29-94' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;traffic: T, <br>&nbsp;&nbsp;&nbsp;&nbsp;workload: W, <br>&nbsp;&nbsp;&nbsp;&nbsp;platform: P, <br>&nbsp;&nbsp;&nbsp;&nbsp;schedule: S<br>) -&gt; <a class="type" href="../../streamer/type.Result.html" title="type streamer::Result">Result</a>&lt;<a class="struct" href="../../streamer/system/struct.System.html" title="struct streamer::system::System">System</a>&lt;T, W, P, S&gt;&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/streamer/system/mod.rs.html#33-42' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Create a system.</p>
+</div><h4 id='method.next' class="method"><span id='next.v' class='invisible'><code>fn <a href='#method.next' class='fnname'>next</a>(&amp;mut self) -&gt; <a class="type" href="../../streamer/type.Result.html" title="type streamer::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="struct" href="../../streamer/system/struct.Event.html" title="struct streamer::system::Event">Event</a>, P::<a class="type" href="../../streamer/platform/trait.Platform.html#associatedtype.Data" title="type streamer::platform::Platform::Data">Data</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/streamer/system/mod.rs.html#46-57' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Advance to the next event and return the data accumulated since the
+previous call.</p>
+</div><h4 id='method.platform' class="method"><span id='platform.v' class='invisible'><code>fn <a href='#method.platform' class='fnname'>platform</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>P</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/streamer/system/mod.rs.html#61-63' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the platform.</p>
+</div><h4 id='method.history' class="method"><span id='history.v' class='invisible'><code>fn <a href='#method.history' class='fnname'>history</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../streamer/system/struct.History.html" title="struct streamer::system::History">History</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/streamer/system/mod.rs.html#67-69' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return the history.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "streamer";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

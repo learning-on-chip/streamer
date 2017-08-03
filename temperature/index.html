@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `temperature` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, temperature">
+
+    <title>temperature - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc mod">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Crate temperature</p><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'temperature', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>temperature</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/temperature/lib.rs.html#1-167' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Temperature simulator.</p>
+
+<h2 id='model' class='section-header'><a href='#model'>Model</a></h2>
+<p>Temperature simulation is based on the well-known analogy between electrical
+and thermal circuits. Given a system with <code>units</code> processing elements, an
+equivalent thermal RC circuit with <code>nodes</code> thermal nodes is constructed. The
+circuit is then used for modeling the thermal behavior of the system.
+Concretely, the thermal behavior is described using the following system of
+differential-algebraic equations:</p>
+
+<pre><code class="language-math">    dT
+Cth -- + Gth (T - Tamb) = Mp P
+    dt
+
+Q = Mq T
+</code></pre>
+
+<p>where</p>
+
+<ul>
+<li><p><code>Cth</code> is a <code>nodes × nodes</code> diagonal matrix of the thermal capacitance;</p></li>
+<li><p><code>Gth</code> is a <code>nodes × nodes</code> symmetric, positive-definite matrix of the
+thermal conductance;</p></li>
+<li><p><code>T</code> is a <code>nodes</code>-element vector of the temperature of the thermal nodes;</p></li>
+<li><p><code>Tamb</code> is a <code>nodes</code>-element vector of the ambient temperature;</p></li>
+<li><p><code>P</code> is a <code>units</code>-element vector of the power dissipation of the processing
+elements;</p></li>
+<li><p><code>Mp</code> is a <code>nodes × units</code> matrix that distributes the power dissipation of
+the processing elements onto the thermal nodes;</p></li>
+<li><p><code>Q</code> is a <code>spots</code>-element vector of the temperature of interest; and</p></li>
+<li><p><code>Mq</code> is a <code>spots × nodes</code> matrix that aggregates the temperature of the
+thermal nodes into the temperature of interest.</p></li>
+</ul>
+
+<h2 id='solution' class='section-header'><a href='#solution'>Solution</a></h2>
+<p>The original system is transformed into the following:</p>
+
+<pre><code class="language-math">dS
+-- = A S + B P
+dt
+
+Q = C S + Mq Tamb
+</code></pre>
+
+<p>where</p>
+
+<pre><code class="language-math">S = D^(-1) (T - Tamb),
+A = -D Gth D,
+B = D Mp,
+C = Mq D, and
+D = Cth^(-1/2).
+</code></pre>
+
+<p>The eigendecomposition of <code>A</code>, which is real and symmetric, is</p>
+
+<pre><code class="language-math">A = U diag(Λ) U^T.
+</code></pre>
+
+<p>For a short time interval <code>[0, Δt]</code>, the solution is obtained using the
+following equation:</p>
+
+<pre><code class="language-math">S(t) = E S(0) + F P(0)
+</code></pre>
+
+<p>where</p>
+
+<pre><code class="language-math">E = exp(A Δt) = U diag(exp(λi Δt)) U^T and
+F = A^(-1) (exp(A Δt) - I) B = U diag((exp(λi Δt) - 1) / λi) U^T B.
+</code></pre>
+
+<p>The solution makes use of the assumption that <code>Δt</code>, referred to as the time
+step, is short enough so that the power dissipation does not change much
+within <code>[0, Δt]</code>. In order to compute the temperature profile corresponding
+for the whole time span of interest, the time span is split into small
+subintervals, and the above equation is successively applied to each of
+them.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="mod" href="circuit/index.html"
+                                  title='mod temperature::circuit'>circuit</a></td>
+                           <td class='docblock-short'>
+                                <p>Thermal circuits.</p>
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Circuit.html"
+                                  title='struct temperature::Circuit'>Circuit</a></td>
+                           <td class='docblock-short'>
+                                <p>A thermal circuit.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Config.html"
+                                  title='struct temperature::Config'>Config</a></td>
+                           <td class='docblock-short'>
+                                <p>A configuration of temperature simulation.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Error.html"
+                                  title='struct temperature::Error'>Error</a></td>
+                           <td class='docblock-short'>
+                                <p>An error.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Simulator.html"
+                                  title='struct temperature::Simulator'>Simulator</a></td>
+                           <td class='docblock-short'>
+                                <p>A temperature simulator.</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="type" href="type.Result.html"
+                                  title='type temperature::Result'>Result</a></td>
+                           <td class='docblock-short'>
+                                <p>A result.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "temperature";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
